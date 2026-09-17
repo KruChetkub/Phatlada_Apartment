@@ -2,7 +2,6 @@ import React, { useEffect, useState } from 'react';
 import {
   MapPin,
   Phone,
-  MessageSquare,
   Clock,
   ArrowUpRight,
   Navigation,
@@ -27,6 +26,7 @@ export const LandingContact: React.FC<LandingContactProps> = ({ onOpenBooking })
   const fullAddress = settings.address || '79 หมู่ 7 เวียง อำเภอ เชียงของ เชียงราย 57140';
   const phoneNumber = settings.phone || '087 188 9122';
   const cleanPhone = phoneNumber.replace(/[^0-9]/g, '');
+  const googleMapsShareUrl = 'https://maps.app.goo.gl/E2qLGRGJMNUEMSzE7';
 
   return (
     <section id="contact" className="py-16 sm:py-24 bg-white border-t border-line">
@@ -88,20 +88,6 @@ export const LandingContact: React.FC<LandingContactProps> = ({ onOpenBooking })
                   </div>
                 </div>
 
-                {/* LINE Official */}
-                <div className="flex items-start space-x-3 text-ink">
-                  <div className="p-2.5 rounded-xl bg-tone-blue-soft text-tone-blue-solid flex-shrink-0 mt-0.5">
-                    <MessageSquare className="h-5 w-5" />
-                  </div>
-                  <div>
-                    <span className="font-bold text-ink block mb-0.5">LINE Official</span>
-                    <p className="text-ink font-mono font-bold text-sm text-primary">
-                      @phatlada
-                    </p>
-                    <span className="text-[11px] text-ink-secondary">แชตสอบถามข้อมูลห้องว่างและส่งข้อความได้ตลอด 24 ชม.</span>
-                  </div>
-                </div>
-
                 {/* Operating hours */}
                 <div className="flex items-start space-x-3 text-ink">
                   <div className="p-2.5 rounded-xl bg-tone-amber-soft text-tone-amber-solid flex-shrink-0 mt-0.5">
@@ -133,7 +119,7 @@ export const LandingContact: React.FC<LandingContactProps> = ({ onOpenBooking })
                   <span>แผนที่ตั้ง ภัทร์ลดา อพาร์ทเมนท์</span>
                 </h3>
                 <a
-                  href="https://maps.google.com/?q=20.250335765634254,100.40798988063878"
+                  href={googleMapsShareUrl}
                   target="_blank"
                   rel="noreferrer"
                   className="inline-flex items-center space-x-1 text-xs text-primary font-semibold hover:underline"
@@ -143,16 +129,14 @@ export const LandingContact: React.FC<LandingContactProps> = ({ onOpenBooking })
                 </a>
               </div>
 
-              {/* Embedded Google Maps iFrame */}
+              {/* Embedded Google Maps iFrame - Universal & Reliable Embed */}
               <div className="w-full h-80 sm:h-96 rounded-2xl overflow-hidden border border-line shadow-sm bg-surface relative">
                 <iframe
-                  src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3743.2048873555455!2d100.40798988063878!3d20.250335765634254!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x30d63108ba856d7f%3A0xf925c4fdd3ab8fb1!2z4Lig4Lix4LiX4Lij4LmM4Lil4LiU4Liy4Lit4Lie4Liy4Lij4LmM4LiX4LmA4Lih4LiZ4LiX4LmM!5e0!3m2!1sth!2sth!4v1789656955480!5m2!1sth!2sth"
+                  src="https://maps.google.com/maps?q=20.2503358,100.4079899+(%E0%B8%A0%E0%B8%B1%E0%B8%97%E0%B8%A3%E0%B9%8C%E0%B8%A5%E0%B8%94%E0%B8%B2+%E0%B8%AD%E0%B8%9E%E0%B8%B2%E0%B8%A3%E0%B9%8C%E0%B8%97%E0%B9%80%E0%B8%A1%E0%B8%99%E0%B8%97%E0%B9%8C)&t=&z=16&ie=UTF8&iwloc=B&output=embed"
                   width="100%"
                   height="100%"
                   style={{ border: 0 }}
                   allowFullScreen
-                  loading="lazy"
-                  referrerPolicy="strict-origin-when-cross-origin"
                   title="แผนที่ ภัทร์ลดา อพาร์ทเมนท์ เชียงของ เชียงราย"
                   className="w-full h-full"
                 />
@@ -165,7 +149,7 @@ export const LandingContact: React.FC<LandingContactProps> = ({ onOpenBooking })
                 <span>พิกัด: 79 หมู่ 7 เวียง อ.เชียงของ จ.เชียงราย</span>
               </div>
               <a
-                href="https://maps.google.com/?q=20.250335765634254,100.40798988063878"
+                href={googleMapsShareUrl}
                 target="_blank"
                 rel="noreferrer"
                 className="text-xs text-primary font-bold hover:underline shrink-0"
