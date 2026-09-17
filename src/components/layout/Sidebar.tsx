@@ -1,5 +1,5 @@
 import React from 'react';
-import { NavLink } from 'react-router-dom';
+import { NavLink, Link } from 'react-router-dom';
 import {
   Home,
   BedDouble,
@@ -13,6 +13,7 @@ import {
   Bell,
   Settings,
   HelpCircle,
+  Globe,
   X,
 } from 'lucide-react';
 import { DormCard } from './DormCard';
@@ -32,7 +33,7 @@ interface SidebarProps {
 }
 
 const MENU_ITEMS = [
-  { id: 'dashboard', label: 'หน้าหลัก', icon: Home, path: '/' },
+  { id: 'dashboard', label: 'หน้าหลักระบบจัดการ', icon: Home, path: '/dashboard' },
   { id: 'rooms', label: 'ห้องพัก', icon: BedDouble, path: '/rooms' },
   { id: 'tenants', label: 'ผู้เช่า', icon: Users, path: '/tenants' },
   { id: 'leases', label: 'สัญญาเช่า', icon: FileText, path: '/leases' },
@@ -44,6 +45,7 @@ const MENU_ITEMS = [
   { id: 'notifications', label: 'การแจ้งเตือน', icon: Bell, path: '/notifications' },
   { id: 'settings', label: 'ตั้งค่า', icon: Settings, path: '/settings' },
   { id: 'help', label: 'วิธีใช้งานระบบ', icon: HelpCircle, path: '/help' },
+  { id: 'landing', label: 'ดูหน้าเว็บหอพัก', icon: Globe, path: '/' },
 ];
 
 export const Sidebar: React.FC<SidebarProps> = ({
@@ -71,7 +73,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
       >
         {/* Header / Brand Logo */}
         <div className="flex h-20 items-center justify-between px-5">
-          <div className="flex items-center space-x-3">
+          <Link to="/" title="คลิกเพื่อดูหน้าเว็บไซต์หอพัก" className="flex items-center space-x-3 hover:opacity-90 transition">
             <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-white/20 text-white shadow-inner">
               <Home className="h-6 w-6 text-white" />
             </div>
@@ -83,7 +85,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
                 จัดการหอพัก...ให้ง่ายขึ้น
               </p>
             </div>
-          </div>
+          </Link>
           {onClose && (
             <button
               onClick={onClose}

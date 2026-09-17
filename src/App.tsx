@@ -14,6 +14,7 @@ import { SettingsPage } from './pages/SettingsPage';
 import { InvoicesPage } from './pages/InvoicesPage';
 import { NotificationsPage } from './pages/NotificationsPage';
 import { HelpPage } from './pages/HelpPage';
+import { LandingPage } from './pages/LandingPage';
 import { PlaceholderPage } from './pages/PlaceholderPage';
 import { DormSwitchModal } from './components/dorm/DormSwitchModal';
 import { AuthRoleModal } from './components/auth/AuthRoleModal';
@@ -23,7 +24,7 @@ import { DashboardSummary } from './types/dashboard';
 
 const initialDormitory = {
   id: 'default-dorm',
-  name: 'หอพักของฉัน',
+  name: 'ภัทร์ลดาอพาร์ทเมนท์',
   roomCount: 0,
   tenantCount: 0,
   plan: 'PREMIUM' as const,
@@ -138,59 +139,65 @@ export const App: React.FC = () => {
     };
   }, []);
 
-  return (
-    <BrowserRouter>
-      <div className="flex min-h-screen bg-bg text-ink">
-        {/* Sidebar */}
-        <Sidebar
-          dormitory={{
-            name: dashboardData.dormitory?.name || initialDormitory.name,
-            roomCount: dashboardData.rooms?.total || 0,
-            tenantCount: dashboardData.tenants?.total || 0,
-            plan: dashboardData.dormitory?.plan || initialDormitory.plan,
-          }}
-          isOpen={mobileMenuOpen}
-          onClose={() => setMobileMenuOpen(false)}
-          onOpenDormSwitch={() => setIsDormSwitchOpen(true)}
+  const renderAdminLayout = (element: React.ReactNode) => (
+    <div className="flex min-h-screen bg-bg text-ink">
+      {/* Sidebar */}
+      <Sidebar
+        dormitory={{
+          name: dashboardData.dormitory?.name || initialDormitory.name,
+          roomCount: dashboardData.rooms?.total || 0,
+          tenantCount: dashboardData.tenants?.total || 0,
+          plan: dashboardData.dormitory?.plan || initialDormitory.plan,
+        }}
+        isOpen={mobileMenuOpen}
+        onClose={() => setMobileMenuOpen(false)}
+        onOpenDormSwitch={() => setIsDormSwitchOpen(true)}
+      />
+
+      {/* Main Content Area */}
+      <div className="flex min-w-0 flex-1 flex-col">
+        {/* Topbar */}
+        <Topbar
+          user={dashboardData.user || initialUser}
+          unreadCount={dashboardData.unreadNotifications || 0}
+          onOpenMobileMenu={() => setMobileMenuOpen(true)}
+          onOpenRoleModal={() => setIsRoleModalOpen(true)}
         />
 
-        {/* Main Content Area */}
-        <div className="flex min-w-0 flex-1 flex-col">
-          {/* Topbar */}
-          <Topbar
-            user={dashboardData.user || initialUser}
-            unreadCount={dashboardData.unreadNotifications || 0}
-            onOpenMobileMenu={() => setMobileMenuOpen(true)}
-            onOpenRoleModal={() => setIsRoleModalOpen(true)}
-          />
-
-          {/* Page Routing */}
-          <main className="flex-1">
-            <Routes>
-              <Route
-                path="/"
-                element={<DashboardPage onDataLoaded={handleDataLoaded} />}
-              />
-              <Route path="/rooms" element={<RoomsPage />} />
-              <Route path="/tenants" element={<TenantsPage />} />
-              <Route path="/tenants/new" element={<TenantsPage />} />
-              <Route path="/leases" element={<LeasesPage />} />
-              <Route path="/leases/new" element={<LeasesPage />} />
-              <Route path="/invoices" element={<InvoicesPage />} />
-              <Route path="/finance" element={<FinancePage />} />
-              <Route path="/finance/payments/new" element={<FinancePage />} />
-              <Route path="/maintenance" element={<MaintenancePage />} />
-              <Route path="/maintenance/new" element={<MaintenancePage />} />
-              <Route path="/reports" element={<ReportsPage />} />
-              <Route path="/messages" element={<MessagesPage />} />
-              <Route path="/settings" element={<SettingsPage />} />
-              <Route path="/notifications" element={<NotificationsPage />} />
-              <Route path="/help" element={<HelpPage />} />
-              <Route path="*" element={<PlaceholderPage title="ไม่พบหน้าที่ต้องการ" />} />
-            </Routes>
-          </main>
-        </div>
+        {/* Page Routing */}
+        <main className="flex-1">{element}</main>
       </div>
+    </div>
+  );
+
+  return (
+    <BrowserRouter>
+      <Routes>
+        {/* Public Website (หน้าบ้าน - ภัทร์ลดาอพาร์ทเมนท์) */}
+        <Route path="/" element={<LandingPage />} />
+
+        {/* Admin Back-Office (ระบบจัดการหอพักหลังบ้าน) */}
+        <Route
+          path="/dashboard"
+          element={renderAdminLayout(<DashboardPage onDataLoaded={handleDataLoaded} />)}
+        />
+        <Route path="/rooms" element={renderAdminLayout(<RoomsPage />)} />
+        <Route path="/tenants" element={renderAdminLayout(<TenantsPage />)} />
+        <Route path="/tenants/new" element={renderAdminLayout(<TenantsPage />)} />
+        <Route path="/leases" element={renderAdminLayout(<LeasesPage />)} />
+        <Route path="/leases/new" element={renderAdminLayout(<LeasesPage />)} />
+        <Route path="/invoices" element={renderAdminLayout(<InvoicesPage />)} />
+        <Route path="/finance" element={renderAdminLayout(<FinancePage />)} />
+        <Route path="/finance/payments/new" element={renderAdminLayout(<FinancePage />)} />
+        <Route path="/maintenance" element={renderAdminLayout(<MaintenancePage />)} />
+        <Route path="/maintenance/new" element={renderAdminLayout(<MaintenancePage />)} />
+        <Route path="/reports" element={renderAdminLayout(<ReportsPage />)} />
+        <Route path="/messages" element={renderAdminLayout(<MessagesPage />)} />
+        <Route path="/settings" element={renderAdminLayout(<SettingsPage />)} />
+        <Route path="/notifications" element={renderAdminLayout(<NotificationsPage />)} />
+        <Route path="/help" element={renderAdminLayout(<HelpPage />)} />
+        <Route path="*" element={renderAdminLayout(<PlaceholderPage title="ไม่พบหน้าที่ต้องการ" />)} />
+      </Routes>
 
       {/* Global Security & Dormitory Modals */}
       <DormSwitchModal
