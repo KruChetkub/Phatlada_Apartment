@@ -16,8 +16,8 @@ export const LandingFooter: React.FC = () => {
               <div className="h-9 w-9 rounded-xl bg-primary flex items-center justify-center text-white">
                 <Building2 className="h-5 w-5" />
               </div>
-              <span className="text-base font-bold text-white font-prompt">
-                ภัทร์ลดาอพาร์ทเมนท์ (Phatlada Apartment)
+              <span className="text-base sm:text-lg font-bold text-white tracking-tight font-prompt">
+                ภัทร์ลดา อพาร์ทเมนท์ (Phatlada Apartment)
               </span>
             </div>
             <p className="text-xs text-white/60 max-w-md leading-relaxed">
@@ -83,7 +83,7 @@ export const LandingFooter: React.FC = () => {
         </div>
 
         <div className="flex flex-col sm:flex-row items-center justify-between gap-4 text-white/50 text-[11px]">
-          <p>© 2568 - 2569 ภัทร์ลดาอพาร์ทเมนท์ (Phatlada Apartment). All rights reserved.</p>
+          <p>© 2568 - 2569 ภัทร์ลดา อพาร์ทเมนท์ (Phatlada Apartment). All rights reserved.</p>
           <p className="flex items-center space-x-1">
             <span>Powered by DormPlus</span>
             <ShieldCheck className="h-3.5 w-3.5 text-primary" />

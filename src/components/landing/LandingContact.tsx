@@ -29,7 +29,7 @@ export const LandingContact: React.FC<LandingContactProps> = ({ onOpenBooking })
           <div className="p-6 sm:p-8 rounded-2xl bg-white border border-line shadow-xs flex flex-col justify-between space-y-6">
             <div className="space-y-6">
               <div>
-                <h3 className="text-lg font-bold text-ink mb-1">ภัทร์ลดาอพาร์ทเมนท์ (Phatlada Apartment)</h3>
+                <h3 className="text-lg font-bold text-ink mb-1">ภัทร์ลดา อพาร์ทเมนท์ (Phatlada Apartment)</h3>
                 <p className="text-xs text-ink-secondary">ยินดีต้อนรับผู้พักอาศัยทุกท่านด้วยความอบอุ่นและเป็นมิตร</p>
               </div>
 
@@ -121,12 +121,12 @@ export const LandingContact: React.FC<LandingContactProps> = ({ onOpenBooking })
             <div className="h-56 rounded-xl border border-line bg-surface overflow-hidden relative flex items-center justify-center text-center p-4">
               <div className="space-y-2">
                 <MapPin className="h-8 w-8 text-primary mx-auto animate-bounce" />
-                <span className="text-xs font-bold text-ink block">พิกัด ภัทร์ลดาอพาร์ทเมนท์</span>
+                <span className="text-xs font-bold text-ink block">พิกัด ภัทร์ลดา อพาร์ทเมนท์</span>
                 <p className="text-[11px] text-ink-secondary max-w-xs">
-                  สามารถค้นหาคำว่า &quot;ภัทร์ลดาอพาร์ทเมนท์&quot; บน Google Maps หรือนำทางผ่าน GPS ได้ทันที
+                  สามารถค้นหาคำว่า &quot;ภัทร์ลดา อพาร์ทเมนท์&quot; บน Google Maps หรือนำทางผ่าน GPS ได้ทันที
                 </p>
                 <a
-                  href={`https://maps.google.com/?q=${encodeURIComponent('ภัทร์ลดาอพาร์ทเมนท์')}`}
+                  href={`https://maps.google.com/?q=${encodeURIComponent('ภัทร์ลดา อพาร์ทเมนท์')}`}
                   target="_blank"
                   rel="noreferrer"
                   className="inline-flex items-center space-x-1 text-xs text-primary font-semibold hover:underline pt-1"

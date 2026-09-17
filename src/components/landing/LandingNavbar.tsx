@@ -19,7 +19,7 @@ export const LandingNavbar: React.FC<LandingNavbarProps> = ({ onOpenBooking }) =
           </div>
           <div>
             <span className="text-lg sm:text-xl font-extrabold text-ink tracking-tight block font-prompt leading-tight">
-              ภัทร์ลดาอพาร์ทเมนท์
+              ภัทร์ลดา อพาร์ทเมนท์
             </span>
             <span className="text-[11px] sm:text-xs text-primary font-semibold tracking-wider block uppercase font-sans">
               Phatlada Apartment

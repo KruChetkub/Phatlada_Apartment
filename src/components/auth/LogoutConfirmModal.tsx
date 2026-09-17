@@ -36,7 +36,7 @@ export const LogoutConfirmModal: React.FC<LogoutConfirmModalProps> = ({
         <div className="py-4">
           <p className="text-sm text-ink-muted">
             คุณต้องการออกจากระบบการจัดการของ{' '}
-            <span className="font-semibold text-ink">ภัทร์ลดาอพาร์ทเมนท์</span> ใช่หรือไม่?
+            <span className="font-semibold text-ink">ภัทร์ลดา อพาร์ทเมนท์</span> ใช่หรือไม่?
           </p>
         </div>
 

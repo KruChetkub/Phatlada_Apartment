@@ -60,7 +60,7 @@ export const BookingInquiryModal: React.FC<BookingInquiryModalProps> = ({
           <CheckCircle2 className="h-12 w-12 text-tone-green-solid mx-auto animate-bounce" />
           <h3 className="text-base font-bold text-ink">ส่งข้อมูลนัดหมายเรียบร้อยแล้ว!</h3>
           <p className="text-xs text-ink-secondary max-w-sm mx-auto">
-            เจ้าหน้าที่ผู้ดูแล ภัทร์ลดาอพาร์ทเมนท์ ได้รับข้อความของคุณแล้ว และจะติดต่อกลับทางเบอร์โทรศัพท์โดยเร็วที่สุด
+            เจ้าหน้าที่ผู้ดูแล ภัทร์ลดา อพาร์ทเมนท์ ได้รับข้อความของคุณแล้ว และจะติดต่อกลับทางเบอร์โทรศัพท์โดยเร็วที่สุด
           </p>
         </div>
       ) : (

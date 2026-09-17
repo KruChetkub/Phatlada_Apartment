@@ -36,7 +36,7 @@ export interface DormSettings {
 
 export const defaultSettings: DormSettings = {
   dormitoryId: 'default-dorm',
-  dormitoryName: 'ภัทร์ลดาอพาร์ทเมนท์',
+  dormitoryName: 'ภัทร์ลดา อพาร์ทเมนท์',
   address: 'เลขที่ 516 ถ.มิตรภาพ ต.ในเมือง อ.เมือง จ.นครราชสีมา',
   phone: '081-234-5678',
   taxId: '',

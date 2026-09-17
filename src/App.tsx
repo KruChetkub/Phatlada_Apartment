@@ -27,7 +27,7 @@ import { DashboardSummary } from './types/dashboard';
 
 const initialDormitory = {
   id: 'default-dorm',
-  name: 'ภัทร์ลดาอพาร์ทเมนท์',
+  name: 'ภัทร์ลดา อพาร์ทเมนท์',
   roomCount: 0,
   tenantCount: 0,
   plan: 'PREMIUM' as const,
@@ -188,7 +188,7 @@ export const App: React.FC = () => {
   return (
     <BrowserRouter>
       <Routes>
-        {/* Public Website (หน้าบ้าน - ภัทร์ลดาอพาร์ทเมนท์) */}
+        {/* Public Website (หน้าบ้าน - ภัทร์ลดา อพาร์ทเมนท์) */}
         <Route path="/" element={<LandingPage />} />
 
         {/* Authentication Route */}

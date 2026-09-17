@@ -91,7 +91,7 @@ export const LoginPage: React.FC = () => {
           className="inline-flex items-center space-x-2 text-sm font-medium text-ink-muted hover:text-primary transition"
         >
           <ArrowLeft className="h-4 w-4" />
-          <span>กลับสู่หน้าแรกเว็บไซต์ (ภัทร์ลดาอพาร์ทเมนท์)</span>
+          <span>กลับสู่หน้าแรกเว็บไซต์ (ภัทร์ลดา อพาร์ทเมนท์)</span>
         </Link>
       </div>
 
@@ -101,7 +101,7 @@ export const LoginPage: React.FC = () => {
           <Building2 className="h-9 w-9" />
         </div>
         <h1 className="text-2xl font-black tracking-tight text-ink sm:text-3xl">
-          ภัทร์ลดาอพาร์ทเมนท์
+          ภัทร์ลดา อพาร์ทเมนท์
         </h1>
         <p className="mt-1.5 text-sm text-ink-muted">
           ระบบบริหารจัดการหอพักและห้องพักอัจฉริยะ (Management Portal)
@@ -280,7 +280,7 @@ export const LoginPage: React.FC = () => {
 
         {/* Security Notice Footer */}
         <div className="mt-6 text-center text-xs text-ink-muted">
-          ระบบมีการเข้ารหัสและจำกัดสิทธิ์ข้อมูลตามนโยบายความปลอดภัยของ ภัทร์ลดาอพาร์ทเมนท์
+          ระบบมีการเข้ารหัสและจำกัดสิทธิ์ข้อมูลตามนโยบายความปลอดภัยของ ภัทร์ลดา อพาร์ทเมนท์
         </div>
       </div>
 
