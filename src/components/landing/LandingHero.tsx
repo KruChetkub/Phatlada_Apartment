@@ -5,7 +5,7 @@ import {
   Sparkles,
   Phone,
   Play,
-  KeyRound,
+  Waves,
   Building,
   Car,
   CheckCircle2,
@@ -104,8 +104,8 @@ export const LandingHero: React.FC<LandingHeroProps> = ({ onOpenBooking }) => {
               </div>
 
               <div className="flex items-center space-x-1.5 p-1.5 rounded-lg bg-bg border border-line/50 text-ink text-[11px] font-medium">
-                <KeyRound className="h-3.5 w-3.5 text-primary shrink-0" />
-                <span>ประตูคีย์การ์ด</span>
+                <Waves className="h-3.5 w-3.5 text-primary shrink-0" />
+                <span>เครื่องซักผ้า-ตู้น้ำ</span>
               </div>
 
               <div className="flex items-center space-x-1.5 p-1.5 rounded-lg bg-bg border border-line/50 text-ink text-[11px] font-medium">

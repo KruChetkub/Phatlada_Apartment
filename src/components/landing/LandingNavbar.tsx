@@ -35,9 +35,6 @@ export const LandingNavbar: React.FC<LandingNavbarProps> = ({ onOpenBooking }) =
           <a href="#facilities" className="hover:text-primary transition">
             สิ่งอำนวยความสะดวก
           </a>
-          <a href="#smart" className="hover:text-primary transition">
-            ระบบดิจิทัล
-          </a>
           <a href="#location" className="hover:text-primary transition">
             ทำเลที่ตั้ง
           </a>
@@ -100,13 +97,6 @@ export const LandingNavbar: React.FC<LandingNavbarProps> = ({ onOpenBooking }) =
             className="block py-2 text-sm font-medium text-ink hover:text-primary"
           >
             สิ่งอำนวยความสะดวก
-          </a>
-          <a
-            href="#smart"
-            onClick={() => setMobileOpen(false)}
-            className="block py-2 text-sm font-medium text-ink hover:text-primary"
-          >
-            ระบบดิจิทัล & บิลออนไลน์
           </a>
           <a
             href="#location"
