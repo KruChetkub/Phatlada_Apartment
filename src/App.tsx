@@ -15,10 +15,13 @@ import { InvoicesPage } from './pages/InvoicesPage';
 import { NotificationsPage } from './pages/NotificationsPage';
 import { HelpPage } from './pages/HelpPage';
 import { LandingPage } from './pages/LandingPage';
+import { LoginPage } from './pages/LoginPage';
 import { PlaceholderPage } from './pages/PlaceholderPage';
 import { DormSwitchModal } from './components/dorm/DormSwitchModal';
 import { AuthRoleModal } from './components/auth/AuthRoleModal';
-import { getCurrentSession } from './services/authService';
+import { LogoutConfirmModal } from './components/auth/LogoutConfirmModal';
+import { ProtectedRoute } from './components/auth/ProtectedRoute';
+import { getCurrentSession, logout } from './services/authService';
 import { getLocalDormitories, getActiveDormitoryId } from './services/dormService';
 import { DashboardSummary } from './types/dashboard';
 
@@ -40,6 +43,7 @@ export const App: React.FC = () => {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [isDormSwitchOpen, setIsDormSwitchOpen] = useState(false);
   const [isRoleModalOpen, setIsRoleModalOpen] = useState(false);
+  const [isLogoutOpen, setIsLogoutOpen] = useState(false);
 
   const [dashboardData, setDashboardData] = useState<Partial<DashboardSummary>>(() => {
     const session = getCurrentSession();
@@ -116,7 +120,17 @@ export const App: React.FC = () => {
 
     const handleAuthChanged = (e: Event) => {
       const detail = (e as CustomEvent).detail;
-      if (detail?.role) {
+      if (detail?.session) {
+        setDashboardData((prev) => ({
+          ...prev,
+          user: {
+            ...initialUser,
+            displayName: detail.session.displayName,
+            role: detail.session.role,
+            avatarUrl: detail.session.avatarUrl,
+          },
+        }));
+      } else if (detail?.role) {
         setDashboardData((prev) => ({
           ...prev,
           user: {
@@ -162,6 +176,7 @@ export const App: React.FC = () => {
           unreadCount={dashboardData.unreadNotifications || 0}
           onOpenMobileMenu={() => setMobileMenuOpen(true)}
           onOpenRoleModal={() => setIsRoleModalOpen(true)}
+          onOpenLogoutModal={() => setIsLogoutOpen(true)}
         />
 
         {/* Page Routing */}
@@ -176,26 +191,138 @@ export const App: React.FC = () => {
         {/* Public Website (หน้าบ้าน - ภัทร์ลดาอพาร์ทเมนท์) */}
         <Route path="/" element={<LandingPage />} />
 
-        {/* Admin Back-Office (ระบบจัดการหอพักหลังบ้าน) */}
+        {/* Authentication Route */}
+        <Route path="/login" element={<LoginPage />} />
+
+        {/* Admin Back-Office (ระบบจัดการหอพักหลังบ้าน พร้อม Auth Guard) */}
         <Route
           path="/dashboard"
-          element={renderAdminLayout(<DashboardPage onDataLoaded={handleDataLoaded} />)}
+          element={
+            <ProtectedRoute>
+              {renderAdminLayout(<DashboardPage onDataLoaded={handleDataLoaded} />)}
+            </ProtectedRoute>
+          }
         />
-        <Route path="/rooms" element={renderAdminLayout(<RoomsPage />)} />
-        <Route path="/tenants" element={renderAdminLayout(<TenantsPage />)} />
-        <Route path="/tenants/new" element={renderAdminLayout(<TenantsPage />)} />
-        <Route path="/leases" element={renderAdminLayout(<LeasesPage />)} />
-        <Route path="/leases/new" element={renderAdminLayout(<LeasesPage />)} />
-        <Route path="/invoices" element={renderAdminLayout(<InvoicesPage />)} />
-        <Route path="/finance" element={renderAdminLayout(<FinancePage />)} />
-        <Route path="/finance/payments/new" element={renderAdminLayout(<FinancePage />)} />
-        <Route path="/maintenance" element={renderAdminLayout(<MaintenancePage />)} />
-        <Route path="/maintenance/new" element={renderAdminLayout(<MaintenancePage />)} />
-        <Route path="/reports" element={renderAdminLayout(<ReportsPage />)} />
-        <Route path="/messages" element={renderAdminLayout(<MessagesPage />)} />
-        <Route path="/settings" element={renderAdminLayout(<SettingsPage />)} />
-        <Route path="/notifications" element={renderAdminLayout(<NotificationsPage />)} />
-        <Route path="/help" element={renderAdminLayout(<HelpPage />)} />
+        <Route
+          path="/rooms"
+          element={
+            <ProtectedRoute>
+              {renderAdminLayout(<RoomsPage />)}
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/tenants"
+          element={
+            <ProtectedRoute>
+              {renderAdminLayout(<TenantsPage />)}
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/tenants/new"
+          element={
+            <ProtectedRoute>
+              {renderAdminLayout(<TenantsPage />)}
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/leases"
+          element={
+            <ProtectedRoute>
+              {renderAdminLayout(<LeasesPage />)}
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/leases/new"
+          element={
+            <ProtectedRoute>
+              {renderAdminLayout(<LeasesPage />)}
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/invoices"
+          element={
+            <ProtectedRoute>
+              {renderAdminLayout(<InvoicesPage />)}
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/finance"
+          element={
+            <ProtectedRoute allowedRoles={['OWNER', 'MANAGER']}>
+              {renderAdminLayout(<FinancePage />)}
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/finance/payments/new"
+          element={
+            <ProtectedRoute allowedRoles={['OWNER', 'MANAGER']}>
+              {renderAdminLayout(<FinancePage />)}
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/maintenance"
+          element={
+            <ProtectedRoute>
+              {renderAdminLayout(<MaintenancePage />)}
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/maintenance/new"
+          element={
+            <ProtectedRoute>
+              {renderAdminLayout(<MaintenancePage />)}
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/reports"
+          element={
+            <ProtectedRoute allowedRoles={['OWNER', 'MANAGER']}>
+              {renderAdminLayout(<ReportsPage />)}
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/messages"
+          element={
+            <ProtectedRoute>
+              {renderAdminLayout(<MessagesPage />)}
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/settings"
+          element={
+            <ProtectedRoute allowedRoles={['OWNER']}>
+              {renderAdminLayout(<SettingsPage />)}
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/notifications"
+          element={
+            <ProtectedRoute>
+              {renderAdminLayout(<NotificationsPage />)}
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/help"
+          element={
+            <ProtectedRoute>
+              {renderAdminLayout(<HelpPage />)}
+            </ProtectedRoute>
+          }
+        />
         <Route path="*" element={renderAdminLayout(<PlaceholderPage title="ไม่พบหน้าที่ต้องการ" />)} />
       </Routes>
 
@@ -229,6 +356,15 @@ export const App: React.FC = () => {
               role,
             },
           }));
+        }}
+      />
+
+      <LogoutConfirmModal
+        isOpen={isLogoutOpen}
+        onClose={() => setIsLogoutOpen(false)}
+        onConfirm={async () => {
+          await logout();
+          window.location.href = '/login';
         }}
       />
     </BrowserRouter>

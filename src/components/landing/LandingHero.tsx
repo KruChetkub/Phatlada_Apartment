@@ -93,3 +93,4 @@ export const LandingHero: React.FC<LandingHeroProps> = ({ onOpenBooking }) => {
     </section>
   );
 };
+

@@ -57,20 +57,20 @@ export const LandingNavbar: React.FC<LandingNavbarProps> = ({ onOpenBooking }) =
           </button>
 
           <Link
-            to="/dashboard"
+            to="/login"
             className="inline-flex items-center space-x-2 px-4 py-2 text-xs font-semibold text-white bg-primary hover:bg-primary/90 rounded-xl shadow-sm transition"
           >
             <LayoutDashboard className="h-4 w-4" />
-            <span>ระบบจัดการหอพัก</span>
+            <span>เข้าสู่ระบบผู้ดูแล</span>
           </Link>
         </div>
 
         {/* Mobile Hamburger Toggle */}
         <div className="flex md:hidden items-center space-x-2">
           <Link
-            to="/dashboard"
+            to="/login"
             className="p-2 text-primary bg-primary/10 rounded-lg"
-            title="ระบบจัดการหลังบ้าน"
+            title="เข้าสู่ระบบผู้ดูแล"
           >
             <LayoutDashboard className="h-5 w-5" />
           </Link>
@@ -134,12 +134,12 @@ export const LandingNavbar: React.FC<LandingNavbarProps> = ({ onOpenBooking }) =
               นัดดูห้องพักจริง
             </button>
             <Link
-              to="/dashboard"
+              to="/login"
               onClick={() => setMobileOpen(false)}
               className="w-full py-2.5 text-center text-xs font-semibold text-white bg-primary rounded-xl flex items-center justify-center space-x-2"
             >
               <LayoutDashboard className="h-4 w-4" />
-              <span>เข้าสู่ระบบจัดการหอพัก (Dashboard)</span>
+              <span>เข้าสู่ระบบจัดการผู้ดูแล</span>
             </Link>
           </div>
         </div>

@@ -1,6 +1,14 @@
-import React from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import { Bell, MessageSquare, ChevronDown, Menu, ShieldCheck } from 'lucide-react';
+import {
+  Bell,
+  MessageSquare,
+  ChevronDown,
+  Menu,
+  ShieldCheck,
+  LogOut,
+  Settings,
+} from 'lucide-react';
 import { UserRole } from '../../types/database';
 import { getAvatarInitial } from '../../lib/format';
 
@@ -13,6 +21,7 @@ interface TopbarProps {
   unreadCount?: number;
   onOpenMobileMenu?: () => void;
   onOpenRoleModal?: () => void;
+  onOpenLogoutModal?: () => void;
 }
 
 const ROLE_LABELS: Record<UserRole, string> = {
@@ -26,12 +35,25 @@ export const Topbar: React.FC<TopbarProps> = ({
   unreadCount = 0,
   onOpenMobileMenu,
   onOpenRoleModal,
+  onOpenLogoutModal,
 }) => {
+  const [profileOpen, setProfileOpen] = useState(false);
+  const dropdownRef = useRef<HTMLDivElement>(null);
   const roleLabel = ROLE_LABELS[user.role] || 'ผู้ใช้งาน';
   const initial = getAvatarInitial(user.displayName);
 
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
+        setProfileOpen(false);
+      }
+    };
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, []);
+
   return (
-    <header className="flex h-16 w-full items-center justify-between px-4 sm:px-6">
+    <header className="flex h-16 w-full items-center justify-between px-4 sm:px-6 relative z-30">
       {/* Mobile Menu Hamburger */}
       <div className="flex items-center lg:hidden">
         <button
@@ -85,30 +107,85 @@ export const Topbar: React.FC<TopbarProps> = ({
           <MessageSquare className="h-5 w-5" />
         </Link>
 
-        {/* User Profile Card */}
-        <div className="flex cursor-pointer items-center space-x-3 rounded-xl bg-surface px-3 py-1.5 shadow-card transition hover:shadow-card-hover">
-          {user.avatarUrl ? (
-            <img
-              src={user.avatarUrl}
-              alt={user.displayName}
-              className="h-10 w-10 rounded-full object-cover"
-            />
-          ) : (
-            <div className="flex h-10 w-10 items-center justify-center rounded-full bg-tone-blue-soft text-tone-blue-solid font-semibold text-sm">
-              {initial}
+        {/* User Profile Card with Dropdown */}
+        <div className="relative" ref={dropdownRef}>
+          <button
+            onClick={() => setProfileOpen(!profileOpen)}
+            className="flex items-center space-x-3 rounded-xl bg-surface px-3 py-1.5 shadow-card transition hover:shadow-card-hover focus:outline-none focus:ring-2 focus:ring-primary"
+            aria-expanded={profileOpen}
+            aria-haspopup="true"
+          >
+            {user.avatarUrl ? (
+              <img
+                src={user.avatarUrl}
+                alt={user.displayName}
+                className="h-10 w-10 rounded-full object-cover"
+              />
+            ) : (
+              <div className="flex h-10 w-10 items-center justify-center rounded-full bg-tone-blue-soft text-tone-blue-solid font-semibold text-sm">
+                {initial}
+              </div>
+            )}
+
+            <div className="hidden text-left md:block">
+              <h5 className="text-[14px] font-medium leading-tight text-ink">
+                {user.displayName}
+              </h5>
+              <p className="text-[12px] text-ink-muted leading-tight mt-0.5">
+                {roleLabel}
+              </p>
+            </div>
+
+            <ChevronDown className={`h-4 w-4 text-ink-muted transition-transform ${profileOpen ? 'rotate-180' : ''}`} />
+          </button>
+
+          {/* Profile Dropdown Menu */}
+          {profileOpen && (
+            <div className="absolute right-0 mt-2 w-56 rounded-2xl bg-surface p-2 shadow-xl border border-line animate-in fade-in zoom-in-95 duration-150 z-50">
+              <div className="px-3 py-2.5 border-b border-line mb-1">
+                <p className="text-xs font-semibold text-ink truncate">{user.displayName}</p>
+                <div className="flex items-center space-x-1 mt-0.5">
+                  <span className="inline-block h-2 w-2 rounded-full bg-tone-green-solid" />
+                  <span className="text-[11px] text-ink-muted">{roleLabel}</span>
+                </div>
+              </div>
+
+              <Link
+                to="/settings"
+                onClick={() => setProfileOpen(false)}
+                className="flex items-center space-x-2.5 px-3 py-2 text-xs font-medium text-ink-secondary hover:text-ink hover:bg-bg-subtle rounded-xl transition"
+              >
+                <Settings className="h-4 w-4 text-ink-muted" />
+                <span>ตั้งค่าระบบและบัญชี</span>
+              </Link>
+
+              {onOpenRoleModal && (
+                <button
+                  onClick={() => {
+                    setProfileOpen(false);
+                    onOpenRoleModal();
+                  }}
+                  className="w-full flex items-center space-x-2.5 px-3 py-2 text-xs font-medium text-ink-secondary hover:text-ink hover:bg-bg-subtle rounded-xl transition text-left"
+                >
+                  <ShieldCheck className="h-4 w-4 text-primary" />
+                  <span>สลับบทบาทสิทธิ์ (RBAC)</span>
+                </button>
+              )}
+
+              <div className="my-1 border-t border-line" />
+
+              <button
+                onClick={() => {
+                  setProfileOpen(false);
+                  if (onOpenLogoutModal) onOpenLogoutModal();
+                }}
+                className="w-full flex items-center space-x-2.5 px-3 py-2 text-xs font-medium text-tone-red-solid hover:bg-tone-red-soft rounded-xl transition text-left"
+              >
+                <LogOut className="h-4 w-4" />
+                <span>ออกจากระบบ</span>
+              </button>
             </div>
           )}
-
-          <div className="hidden text-left md:block">
-            <h5 className="text-[14px] font-medium leading-tight text-ink">
-              {user.displayName}
-            </h5>
-            <p className="text-[12px] text-ink-muted leading-tight mt-0.5">
-              {roleLabel}
-            </p>
-          </div>
-
-          <ChevronDown className="h-4 w-4 text-ink-muted" />
         </div>
       </div>
     </header>

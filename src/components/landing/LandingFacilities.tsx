@@ -100,3 +100,4 @@ export const LandingFacilities: React.FC = () => {
     </section>
   );
 };
+

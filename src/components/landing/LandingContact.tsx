@@ -142,3 +142,4 @@ export const LandingContact: React.FC<LandingContactProps> = ({ onOpenBooking })
     </section>
   );
 };
+
