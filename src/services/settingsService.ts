@@ -37,8 +37,8 @@ export interface DormSettings {
 export const defaultSettings: DormSettings = {
   dormitoryId: 'default-dorm',
   dormitoryName: 'ภัทร์ลดา อพาร์ทเมนท์',
-  address: 'เลขที่ 516 ถ.มิตรภาพ ต.ในเมือง อ.เมือง จ.นครราชสีมา',
-  phone: '081-234-5678',
+  address: '79 หมู่ 7 เวียง อำเภอ เชียงของ เชียงราย 57140',
+  phone: '087 188 9122',
   taxId: '',
   plan: 'PREMIUM',
 

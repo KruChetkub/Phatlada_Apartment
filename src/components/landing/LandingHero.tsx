@@ -132,8 +132,8 @@ export const LandingHero: React.FC<LandingHeroProps> = ({ onOpenBooking }) => {
             <div className="mt-3 flex items-center space-x-2 text-[11px] text-ink-muted">
               <span>
                 สอบถามด่วน โทร:{' '}
-                <a href="tel:0818940000" className="text-primary font-bold hover:underline">
-                  081-894-XXXX
+                <a href="tel:0871889122" className="text-primary font-bold hover:underline">
+                  087 188 9122
                 </a>{' '}
                 หรือ Line ID:{' '}
                 <span className="text-primary font-bold">@phatlada</span>
