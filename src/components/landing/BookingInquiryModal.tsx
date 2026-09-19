@@ -1,8 +1,9 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { Modal } from '../common/Modal';
 import { ThaiDatePicker } from '../common/ThaiDatePicker';
 import { createMessage } from '../../services/messageService';
+import { getLocalSettings } from '../../services/settingsService';
 import { Send, CheckCircle2, ShieldCheck } from 'lucide-react';
 
 interface BookingInquiryModalProps {
@@ -16,13 +17,25 @@ export const BookingInquiryModal: React.FC<BookingInquiryModalProps> = ({
   onClose,
   defaultRoomType = '',
 }) => {
+  const settings = getLocalSettings();
+  const monthlyPriceFormatted = Number(settings.landingStartingPrice || 3800).toLocaleString();
+  const dailyPriceFormatted = Number(settings.landingDailyPrice || 500).toLocaleString();
+
   const [name, setName] = useState('');
   const [phone, setPhone] = useState('');
-  const [roomType, setRoomType] = useState(defaultRoomType || 'ห้องแอร์มาตรฐาน (Standard Air)');
+  const [roomType, setRoomType] = useState(defaultRoomType || `ห้องแอร์มาตรฐาน (พักรายเดือน) - ${monthlyPriceFormatted} บ./เดือน`);
   const [visitDate, setVisitDate] = useState(new Date().toISOString().split('T')[0]);
   const [notes, setNotes] = useState('');
   const [submitting, setSubmitting] = useState(false);
   const [success, setSuccess] = useState(false);
+
+  useEffect(() => {
+    if (defaultRoomType) {
+      setRoomType(defaultRoomType);
+    } else {
+      setRoomType(`ห้องแอร์มาตรฐาน (พักรายเดือน) - ${monthlyPriceFormatted} บ./เดือน`);
+    }
+  }, [defaultRoomType, monthlyPriceFormatted, isOpen]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -101,9 +114,15 @@ export const BookingInquiryModal: React.FC<BookingInquiryModalProps> = ({
               onChange={(e) => setRoomType(e.target.value)}
               className="w-full text-xs p-2.5 rounded-lg border border-line bg-surface text-ink focus:outline-none focus:ring-1 focus:ring-primary"
             >
-              <option value="ห้องแอร์มาตรฐาน (Standard Air)">ห้องแอร์มาตรฐาน (Standard Air) - 3,800 บ./ด.</option>
-              <option value="ห้องสตูดิโอวิวสวน (Deluxe Studio)">ห้องสตูดิโอวิวสวน (Deluxe Studio) - 4,500 บ./ด.</option>
-              <option value="ห้องพัดลมประหยัด (Eco Fan)">ห้องพัดลมประหยัด (Eco Fan) - 2,800 บ./ด.</option>
+              <option value={`ห้องแอร์มาตรฐาน (พักรายเดือน) - ${monthlyPriceFormatted} บ./เดือน`}>
+                ห้องแอร์มาตรฐาน (พักรายเดือน) - {monthlyPriceFormatted} บ./เดือน
+              </option>
+              <option value={`ห้องแอร์มาตรฐาน (พักรายวัน) - ${dailyPriceFormatted} บ./วัน`}>
+                ห้องแอร์มาตรฐาน (พักรายวัน) - {dailyPriceFormatted} บ./วัน
+              </option>
+              <option value="สอบถามห้องว่าง / ปรึกษาข้อมูลทั่วไป">
+                สอบถามห้องว่าง / ปรึกษาข้อมูลทั่วไป
+              </option>
             </select>
           </div>
 
