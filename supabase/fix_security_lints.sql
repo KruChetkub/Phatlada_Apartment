@@ -4,6 +4,9 @@
 -- ============================================================================
 
 -- 1. Fix Function Search Path & Execution Privileges (Lints: function_search_path_mutable, anon_security_definer_function_executable, authenticated_security_definer_function_executable)
+DROP FUNCTION IF EXISTS public.get_user_role(UUID) CASCADE;
+DROP FUNCTION IF EXISTS public.get_user_role CASCADE;
+
 CREATE OR REPLACE FUNCTION public.get_user_role(dorm_id UUID)
 RETURNS TEXT
 LANGUAGE plpgsql
@@ -214,3 +217,4 @@ CREATE POLICY "invoices_update_policy" ON invoices FOR UPDATE TO authenticated U
 
 DROP POLICY IF EXISTS "invoices_delete_policy" ON invoices;
 CREATE POLICY "invoices_delete_policy" ON invoices FOR DELETE TO authenticated USING (auth.uid() IS NOT NULL);
+

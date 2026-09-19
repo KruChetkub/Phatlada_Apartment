@@ -200,6 +200,9 @@ CREATE TABLE IF NOT EXISTS invoices (
 );
 
 -- 15. Helper Security Functions (With fixed search_path & SECURITY INVOKER)
+DROP FUNCTION IF EXISTS public.get_user_role(UUID) CASCADE;
+DROP FUNCTION IF EXISTS public.get_user_role CASCADE;
+
 CREATE OR REPLACE FUNCTION public.get_user_role(dorm_id UUID)
 RETURNS TEXT
 LANGUAGE plpgsql
