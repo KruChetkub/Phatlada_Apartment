@@ -1,6 +1,6 @@
 import { UtilityReading, Invoice, InvoiceStatus } from '../types/billing';
 import { supabase, isSupabaseConfigured } from '../lib/supabase';
-import { getLocalSettings } from './settingsService';
+import { getLocalSettings, getOrEnsureDormitoryId } from './settingsService';
 import { generatePromptPayPayload } from '../lib/promptpay';
 
 const READINGS_STORAGE_KEY = 'phatlada_real_readings';
@@ -69,10 +69,11 @@ export async function saveUtilityReading(input: {
 }): Promise<UtilityReading> {
   const waterUnits = Math.max(0, input.currWater - input.prevWater);
   const electricUnits = Math.max(0, input.currElectric - input.prevElectric);
+  const dormId = input.dormitoryId || (await getOrEnsureDormitoryId());
 
   const reading: UtilityReading = {
     id: crypto.randomUUID(),
-    dormitoryId: input.dormitoryId || 'default-dorm',
+    dormitoryId: dormId,
     roomId: input.roomId,
     roomNumber: input.roomNumber,
     period: input.period,
@@ -196,11 +197,12 @@ export async function createInvoice(input: {
 
   // Default Due Date: period year-month-settings.dueDay
   const defaultDueDate = `${input.period}-${String(settings.dueDay).padStart(2, '0')}`;
+  const dormId = input.dormitoryId || (await getOrEnsureDormitoryId());
 
   const newInvoice: Invoice = {
     id: crypto.randomUUID(),
     invoiceNumber,
-    dormitoryId: input.dormitoryId || settings.dormitoryId || 'default-dorm',
+    dormitoryId: dormId,
     roomId: input.roomId,
     roomNumber: input.roomNumber,
     tenantId: input.tenantId || null,

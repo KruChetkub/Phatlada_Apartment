@@ -89,6 +89,43 @@ export function getLocalSettings(): DormSettings {
 
 const UUID_REGEX = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 
+export async function getOrEnsureDormitoryId(): Promise<string> {
+  const local = getLocalSettings();
+  if (local.dormitoryId && UUID_REGEX.test(local.dormitoryId)) {
+    return local.dormitoryId;
+  }
+
+  if (isSupabaseConfigured && supabase) {
+    try {
+      const { data: existing } = await supabase.from('dormitories').select('id').limit(1);
+      if (existing && existing.length > 0) {
+        local.dormitoryId = existing[0].id;
+        localStorage.setItem(SETTINGS_STORAGE_KEY, JSON.stringify(local));
+        return existing[0].id;
+      }
+
+      const { data: inserted, error: insertErr } = await supabase
+        .from('dormitories')
+        .insert({
+          name: local.dormitoryName || 'ภัทร์ลดา อพาร์ทเมนท์',
+          plan: local.plan || 'PREMIUM',
+        })
+        .select('id')
+        .single();
+
+      if (!insertErr && inserted) {
+        local.dormitoryId = inserted.id;
+        localStorage.setItem(SETTINGS_STORAGE_KEY, JSON.stringify(local));
+        return inserted.id;
+      }
+    } catch (err) {
+      console.warn('Supabase ensure dormitory error:', err);
+    }
+  }
+
+  return local.dormitoryId || crypto.randomUUID();
+}
+
 export async function fetchSettings(): Promise<DormSettings> {
   const local = getLocalSettings();
   if (isSupabaseConfigured && supabase) {

@@ -1,5 +1,6 @@
 import { Room, RoomStatus } from '../types/database';
 import { supabase, isSupabaseConfigured } from '../lib/supabase';
+import { getOrEnsureDormitoryId } from './settingsService';
 
 const LOCAL_STORAGE_KEY = 'phatlada_real_rooms';
 
@@ -39,9 +40,11 @@ export async function createRoom(room: {
   monthlyRent: number; // satang
   status?: RoomStatus;
 }): Promise<Room> {
+  const dormId = await getOrEnsureDormitoryId();
+
   const newRoom: Room = {
     id: crypto.randomUUID(),
-    dormitoryId: 'default-dorm',
+    dormitoryId: dormId,
     number: room.number,
     floor: room.floor,
     monthlyRent: room.monthlyRent,
@@ -55,7 +58,7 @@ export async function createRoom(room: {
       .insert([
         {
           id: newRoom.id,
-          dormitory_id: '00000000-0000-0000-0000-000000000002',
+          dormitory_id: dormId,
           number: newRoom.number,
           floor: newRoom.floor,
           monthly_rent: newRoom.monthlyRent,

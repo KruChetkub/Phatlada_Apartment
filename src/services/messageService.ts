@@ -1,5 +1,6 @@
 import { MessageItem } from '../types/database';
 import { supabase, isSupabaseConfigured } from '../lib/supabase';
+import { getOrEnsureDormitoryId } from './settingsService';
 
 const LOCAL_STORAGE_KEY = 'phatlada_real_messages';
 
@@ -51,9 +52,10 @@ export async function createMessage(input: {
   content: string;
   priority?: 'NORMAL' | 'URGENT';
 }): Promise<MessageItem> {
+  const dormId = input.dormitoryId || (await getOrEnsureDormitoryId());
   const newMessage: MessageItem = {
     id: crypto.randomUUID(),
-    dormitoryId: input.dormitoryId || 'default-dorm',
+    dormitoryId: dormId,
     recipientType: input.recipientType,
     recipientId: input.recipientId || null,
     recipientName: input.recipientName || null,

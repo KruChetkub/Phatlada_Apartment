@@ -195,55 +195,58 @@ ALTER TABLE messages ENABLE ROW LEVEL SECURITY;
 ALTER TABLE utility_readings ENABLE ROW LEVEL SECURITY;
 ALTER TABLE invoices ENABLE ROW LEVEL SECURITY;
 
--- Helper Function to check user role in a dormitory
-CREATE OR REPLACE FUNCTION get_user_role(dorm_id UUID)
-RETURNS user_role AS $$
-    SELECT role FROM dormitory_members
-    WHERE user_id = auth.uid() AND dormitory_id = dorm_id
-    LIMIT 1;
-$$ LANGUAGE sql SECURITY DEFINER;
+-- 15. RLS Policies (Allow access for application operations)
+-- Users
+DROP POLICY IF EXISTS "Allow all users" ON users;
+CREATE POLICY "Allow all users" ON users FOR ALL USING (true) WITH CHECK (true);
 
--- Granular RLS Policies
--- Dormitories: Members can read, only OWNER can update
-CREATE POLICY "Members can select dormitories" ON dormitories FOR SELECT USING (true);
-CREATE POLICY "Owners can update dormitories" ON dormitories FOR UPDATE USING (
-    EXISTS (
-        SELECT 1 FROM dormitory_members
-        WHERE dormitory_members.dormitory_id = dormitories.id
-        AND dormitory_members.user_id = auth.uid()
-        AND dormitory_members.role = 'OWNER'
-    )
-);
+-- Dormitories
+DROP POLICY IF EXISTS "Allow all dormitories" ON dormitories;
+CREATE POLICY "Allow all dormitories" ON dormitories FOR ALL USING (true) WITH CHECK (true);
 
--- Rooms: All staff can view; Owner & Manager can insert/update/delete
-CREATE POLICY "Staff can select rooms" ON rooms FOR SELECT USING (true);
-CREATE POLICY "Owner & Manager can modify rooms" ON rooms FOR ALL USING (
-    coalesce(get_user_role(dormitory_id) IN ('OWNER', 'MANAGER'), true)
-);
+-- Dormitory Members
+DROP POLICY IF EXISTS "Allow all dormitory_members" ON dormitory_members;
+CREATE POLICY "Allow all dormitory_members" ON dormitory_members FOR ALL USING (true) WITH CHECK (true);
 
--- Utility Readings: Staff can record meter readings
-CREATE POLICY "Staff can view utility readings" ON utility_readings FOR SELECT USING (true);
-CREATE POLICY "Staff can insert utility readings" ON utility_readings FOR INSERT WITH CHECK (
-    coalesce(get_user_role(dormitory_id) IN ('OWNER', 'MANAGER', 'STAFF'), true)
-);
-CREATE POLICY "Owner & Manager can update utility readings" ON utility_readings FOR UPDATE USING (
-    coalesce(get_user_role(dormitory_id) IN ('OWNER', 'MANAGER'), true)
-);
+-- Rooms
+DROP POLICY IF EXISTS "Allow all rooms" ON rooms;
+CREATE POLICY "Allow all rooms" ON rooms FOR ALL USING (true) WITH CHECK (true);
 
--- Invoices: Owner & Manager have full billing control; Staff can view
-CREATE POLICY "Staff can select invoices" ON invoices FOR SELECT USING (true);
-CREATE POLICY "Owner & Manager can manage invoices" ON invoices FOR ALL USING (
-    coalesce(get_user_role(dormitory_id) IN ('OWNER', 'MANAGER'), true)
-);
+-- Tenants
+DROP POLICY IF EXISTS "Allow all tenants" ON tenants;
+CREATE POLICY "Allow all tenants" ON tenants FOR ALL USING (true) WITH CHECK (true);
 
--- Maintenance: All roles can view and update status
-CREATE POLICY "All members can view maintenance" ON maintenance_requests FOR SELECT USING (true);
-CREATE POLICY "All members can insert maintenance" ON maintenance_requests FOR INSERT WITH CHECK (true);
-CREATE POLICY "All members can update maintenance" ON maintenance_requests FOR UPDATE USING (true);
+-- Leases
+DROP POLICY IF EXISTS "Allow all leases" ON leases;
+CREATE POLICY "Allow all leases" ON leases FOR ALL USING (true) WITH CHECK (true);
 
--- Messages: All members can view and create messages
-CREATE POLICY "All members can view messages" ON messages FOR SELECT USING (true);
-CREATE POLICY "All members can insert messages" ON messages FOR INSERT WITH CHECK (true);
-CREATE POLICY "All members can update messages" ON messages FOR UPDATE USING (true);
+-- Payments
+DROP POLICY IF EXISTS "Allow all payments" ON payments;
+CREATE POLICY "Allow all payments" ON payments FOR ALL USING (true) WITH CHECK (true);
+
+-- Expenses
+DROP POLICY IF EXISTS "Allow all expenses" ON expenses;
+CREATE POLICY "Allow all expenses" ON expenses FOR ALL USING (true) WITH CHECK (true);
+
+-- Maintenance
+DROP POLICY IF EXISTS "Allow all maintenance" ON maintenance_requests;
+CREATE POLICY "Allow all maintenance" ON maintenance_requests FOR ALL USING (true) WITH CHECK (true);
+
+-- Notifications
+DROP POLICY IF EXISTS "Allow all notifications" ON notifications;
+CREATE POLICY "Allow all notifications" ON notifications FOR ALL USING (true) WITH CHECK (true);
+
+-- Messages
+DROP POLICY IF EXISTS "Allow all messages" ON messages;
+CREATE POLICY "Allow all messages" ON messages FOR ALL USING (true) WITH CHECK (true);
+
+-- Utility Readings
+DROP POLICY IF EXISTS "Allow all utility_readings" ON utility_readings;
+CREATE POLICY "Allow all utility_readings" ON utility_readings FOR ALL USING (true) WITH CHECK (true);
+
+-- Invoices
+DROP POLICY IF EXISTS "Allow all invoices" ON invoices;
+CREATE POLICY "Allow all invoices" ON invoices FOR ALL USING (true) WITH CHECK (true);
+
 
 

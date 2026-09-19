@@ -1,5 +1,6 @@
 import { Payment, Expense, PaymentStatus } from '../types/database';
 import { supabase, isSupabaseConfigured } from '../lib/supabase';
+import { getOrEnsureDormitoryId } from './settingsService';
 
 export interface PaymentWithDetails extends Payment {
   roomNumber?: string;
@@ -132,10 +133,12 @@ export async function createExpense(expense: {
   amount: number; // satang
   spentAt: string;
   note?: string;
+  dormitoryId?: string;
 }): Promise<Expense> {
+  const dormId = expense.dormitoryId || (await getOrEnsureDormitoryId());
   const newExpense: Expense = {
     id: crypto.randomUUID(),
-    dormitoryId: '00000000-0000-0000-0000-000000000002',
+    dormitoryId: dormId,
     category: expense.category,
     amount: expense.amount,
     spentAt: expense.spentAt,
