@@ -25,3 +25,4 @@ describe('sanitizeInput Security & Validation', () => {
     expect(sanitizeInput('')).toBe('');
   });
 });
+

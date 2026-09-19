@@ -1,17 +1,20 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { Link } from 'react-router-dom';
 import { Modal } from '../common/Modal';
 import { ThaiDatePicker } from '../common/ThaiDatePicker';
 import { createMessage } from '../../services/messageService';
 import { getLocalSettings } from '../../services/settingsService';
 import { sanitizeInput } from '../../lib/utils';
-import { Send, CheckCircle2, ShieldCheck, Lock } from 'lucide-react';
+import { Send, CheckCircle2, ShieldCheck, Lock, AlertCircle } from 'lucide-react';
 
 interface BookingInquiryModalProps {
   isOpen: boolean;
   onClose: () => void;
   defaultRoomType?: string;
 }
+
+const LAST_INQUIRY_TIMESTAMP_KEY = 'phatlada_inquiry_cooldown';
+const COOLDOWN_SECONDS = 45;
 
 export const BookingInquiryModal: React.FC<BookingInquiryModalProps> = ({
   isOpen,
@@ -27,14 +30,24 @@ export const BookingInquiryModal: React.FC<BookingInquiryModalProps> = ({
   const [roomType, setRoomType] = useState(defaultRoomType || `ห้องแอร์มาตรฐาน (พักรายเดือน) - ${monthlyPriceFormatted} บ./เดือน`);
   const [visitDate, setVisitDate] = useState(new Date().toISOString().split('T')[0]);
   const [notes, setNotes] = useState('');
+  const [botTrap, setBotTrap] = useState(''); // Anti-Bot Honeypot Field
+  const [cooldownMessage, setCooldownMessage] = useState<string | null>(null);
   const [submitting, setSubmitting] = useState(false);
   const [success, setSuccess] = useState(false);
 
+  // Measure form interaction time to block instant automated bot submissions
+  const openTimeRef = useRef<number>(Date.now());
+
   useEffect(() => {
-    if (defaultRoomType) {
-      setRoomType(defaultRoomType);
-    } else {
-      setRoomType(`ห้องแอร์มาตรฐาน (พักรายเดือน) - ${monthlyPriceFormatted} บ./เดือน`);
+    if (isOpen) {
+      openTimeRef.current = Date.now();
+      setCooldownMessage(null);
+      setBotTrap('');
+      if (defaultRoomType) {
+        setRoomType(defaultRoomType);
+      } else {
+        setRoomType(`ห้องแอร์มาตรฐาน (พักรายเดือน) - ${monthlyPriceFormatted} บ./เดือน`);
+      }
     }
   }, [defaultRoomType, monthlyPriceFormatted, isOpen]);
 
@@ -58,11 +71,53 @@ export const BookingInquiryModal: React.FC<BookingInquiryModalProps> = ({
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    setCooldownMessage(null);
+
+    // 1. Anti-Bot Honeypot check: If the hidden honeypot field has a value, it's a bot!
+    if (botTrap.trim().length > 0) {
+      // Fake success silently without creating database records
+      setSuccess(true);
+      setTimeout(() => {
+        setSuccess(false);
+        onClose();
+      }, 1500);
+      return;
+    }
+
+    // 2. Anti-Bot Fast Submit check: Humans take at least 2 seconds to fill the form
+    const durationSinceOpen = Date.now() - openTimeRef.current;
+    if (durationSinceOpen < 1800) {
+      // Automated bot submission blocked
+      setSuccess(true);
+      setTimeout(() => {
+        setSuccess(false);
+        onClose();
+      }, 1500);
+      return;
+    }
+
+    // 3. Anti-Spam Rate Limit check: Prevent repeated submissions within 45 seconds
+    if (typeof window !== 'undefined') {
+      const lastSubmitStr = sessionStorage.getItem(LAST_INQUIRY_TIMESTAMP_KEY);
+      if (lastSubmitStr) {
+        const lastSubmitTime = parseInt(lastSubmitStr, 10);
+        const elapsedSeconds = Math.floor((Date.now() - lastSubmitTime) / 1000);
+        if (elapsedSeconds < COOLDOWN_SECONDS) {
+          const remaining = COOLDOWN_SECONDS - elapsedSeconds;
+          setCooldownMessage(`ระบบได้รับข้อมูลแล้ว กรุณารออีก ${remaining} วินาที ก่อนส่งรายการใหม่`);
+          return;
+        }
+      }
+    }
+
     const cleanName = sanitizeInput(name.trim(), 15);
     const cleanPhone = phone.replace(/\D/g, '').slice(0, 10);
     const cleanNotes = sanitizeInput(notes.trim(), 100);
 
-    if (!cleanName || !cleanPhone) return;
+    if (!cleanName || !cleanPhone || cleanPhone.length < 9) {
+      setCooldownMessage('กรุณากรอกเบอร์โทรศัพท์ติดต่อให้ถูกต้องครบถ้วน (9-10 หลัก)');
+      return;
+    }
 
     try {
       setSubmitting(true);
@@ -75,6 +130,11 @@ export const BookingInquiryModal: React.FC<BookingInquiryModalProps> = ({
         priority: 'NORMAL',
       });
 
+      // Record last submit timestamp to throttle repeated spam
+      if (typeof window !== 'undefined') {
+        sessionStorage.setItem(LAST_INQUIRY_TIMESTAMP_KEY, Date.now().toString());
+      }
+
       setSuccess(true);
       setTimeout(() => {
         setSuccess(false);
@@ -82,6 +142,7 @@ export const BookingInquiryModal: React.FC<BookingInquiryModalProps> = ({
         setName('');
         setPhone('');
         setNotes('');
+        setBotTrap('');
       }, 2500);
     } catch (err) {
       console.error('Failed to submit booking inquiry:', err);
@@ -102,6 +163,28 @@ export const BookingInquiryModal: React.FC<BookingInquiryModalProps> = ({
         </div>
       ) : (
         <form onSubmit={handleSubmit} className="space-y-4">
+          {/* Honeypot Invisible Anti-Bot Trap */}
+          <div className="sr-only" aria-hidden="true" style={{ display: 'none', position: 'absolute', left: '-9999px' }}>
+            <label htmlFor="company_verify_hp">Company Verification</label>
+            <input
+              id="company_verify_hp"
+              type="text"
+              name="company_verify_hp"
+              tabIndex={-1}
+              autoComplete="off"
+              value={botTrap}
+              onChange={(e) => setBotTrap(e.target.value)}
+            />
+          </div>
+
+          {/* Anti-Spam Cooldown Warning Alert */}
+          {cooldownMessage && (
+            <div className="p-3 rounded-xl bg-amber-50 border border-amber-200 text-amber-900 text-xs flex items-start gap-2 animate-fade-in">
+              <AlertCircle className="h-4 w-4 text-amber-600 flex-shrink-0 mt-0.5" />
+              <span>{cooldownMessage}</span>
+            </div>
+          )}
+
           <p className="text-xs text-ink-secondary">
             กรอกข้อมูลด้านล่างเพื่อทำการนัดหมายเข้าชมสถานที่จริง หรือสอบถามความพร้อมของห้องพักล่วงหน้า
           </p>
