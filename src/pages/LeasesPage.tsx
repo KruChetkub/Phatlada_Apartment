@@ -285,10 +285,10 @@ export const LeasesPage: React.FC = () => {
                 <input
                   type="number"
                   min={0}
-                  step={100}
+                  step="any"
                   required
                   value={rentBaht}
-                  onChange={(e) => setRentBaht(parseInt(e.target.value, 10) || 0)}
+                  onChange={(e) => setRentBaht(parseFloat(e.target.value) || 0)}
                   className="w-full h-9 rounded-md border border-line bg-surface px-3 text-xs text-ink focus:border-primary focus:outline-none"
                 />
               </div>
@@ -299,10 +299,10 @@ export const LeasesPage: React.FC = () => {
                 <input
                   type="number"
                   min={0}
-                  step={100}
+                  step="any"
                   required
                   value={depositBaht}
-                  onChange={(e) => setDepositBaht(parseInt(e.target.value, 10) || 0)}
+                  onChange={(e) => setDepositBaht(parseFloat(e.target.value) || 0)}
                   className="w-full h-9 rounded-md border border-line bg-surface px-3 text-xs text-ink focus:border-primary focus:outline-none"
                 />
               </div>

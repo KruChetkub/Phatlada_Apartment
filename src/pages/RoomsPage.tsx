@@ -274,11 +274,11 @@ export const RoomsPage: React.FC = () => {
               </label>
               <input
                 type="number"
-                step={100}
+                step="any"
                 min={0}
                 required
                 value={formRentBaht}
-                onChange={(e) => setFormRentBaht(parseInt(e.target.value, 10) || 0)}
+                onChange={(e) => setFormRentBaht(parseFloat(e.target.value) || 0)}
                 className="w-full h-9 rounded-md border border-line bg-surface px-3 text-xs text-ink focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary"
               />
             </div>

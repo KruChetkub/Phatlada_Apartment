@@ -428,10 +428,10 @@ export const FinancePage: React.FC = () => {
               <input
                 type="number"
                 min={0}
-                step={100}
+                step="any"
                 required
                 value={paymentAmountBaht}
-                onChange={(e) => setPaymentAmountBaht(parseInt(e.target.value, 10) || 0)}
+                onChange={(e) => setPaymentAmountBaht(parseFloat(e.target.value) || 0)}
                 className="w-full h-9 rounded-md border border-line bg-surface px-3 text-xs text-ink focus:border-primary focus:outline-none"
               />
             </div>
@@ -498,10 +498,10 @@ export const FinancePage: React.FC = () => {
             <input
               type="number"
               min={0}
-              step={50}
+              step="any"
               required
               value={expenseAmountBaht}
-              onChange={(e) => setExpenseAmountBaht(parseInt(e.target.value, 10) || 0)}
+              onChange={(e) => setExpenseAmountBaht(parseFloat(e.target.value) || 0)}
               className="w-full h-9 rounded-md border border-line bg-surface px-3 text-xs text-ink focus:border-primary focus:outline-none"
             />
           </div>
