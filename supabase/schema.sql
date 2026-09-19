@@ -1,15 +1,33 @@
 -- Phatlada Database Schema for Supabase (PostgreSQL)
 -- Conforms to SPEC.md §4 and RULES.md §2 (all monetary values in satang as INTEGER)
 
--- 1. Create Enums
-CREATE TYPE room_status AS ENUM ('OCCUPIED', 'VACANT');
-CREATE TYPE gender AS ENUM ('MALE', 'FEMALE', 'UNSPECIFIED');
-CREATE TYPE lease_status AS ENUM ('ACTIVE', 'ENDED', 'CANCELLED');
-CREATE TYPE payment_status AS ENUM ('PAID', 'PENDING', 'OVERDUE');
-CREATE TYPE maintenance_status AS ENUM ('PENDING', 'IN_PROGRESS', 'DONE', 'CANCELLED');
-CREATE TYPE notification_type AS ENUM ('MAINTENANCE_NEW', 'PAYMENT_RECEIVED', 'LEASE_EXPIRING', 'ROOM_AVAILABLE');
-CREATE TYPE plan_type AS ENUM ('FREE', 'PREMIUM');
-CREATE TYPE user_role AS ENUM ('OWNER', 'MANAGER', 'STAFF');
+-- 1. Create Enums (Idempotent)
+DO $$ BEGIN
+    IF NOT EXISTS (SELECT 1 FROM pg_type WHERE typname = 'room_status') THEN
+        CREATE TYPE room_status AS ENUM ('OCCUPIED', 'VACANT');
+    END IF;
+    IF NOT EXISTS (SELECT 1 FROM pg_type WHERE typname = 'gender') THEN
+        CREATE TYPE gender AS ENUM ('MALE', 'FEMALE', 'UNSPECIFIED');
+    END IF;
+    IF NOT EXISTS (SELECT 1 FROM pg_type WHERE typname = 'lease_status') THEN
+        CREATE TYPE lease_status AS ENUM ('ACTIVE', 'ENDED', 'CANCELLED');
+    END IF;
+    IF NOT EXISTS (SELECT 1 FROM pg_type WHERE typname = 'payment_status') THEN
+        CREATE TYPE payment_status AS ENUM ('PAID', 'PENDING', 'OVERDUE');
+    END IF;
+    IF NOT EXISTS (SELECT 1 FROM pg_type WHERE typname = 'maintenance_status') THEN
+        CREATE TYPE maintenance_status AS ENUM ('PENDING', 'IN_PROGRESS', 'DONE', 'CANCELLED');
+    END IF;
+    IF NOT EXISTS (SELECT 1 FROM pg_type WHERE typname = 'notification_type') THEN
+        CREATE TYPE notification_type AS ENUM ('MAINTENANCE_NEW', 'PAYMENT_RECEIVED', 'LEASE_EXPIRING', 'ROOM_AVAILABLE');
+    END IF;
+    IF NOT EXISTS (SELECT 1 FROM pg_type WHERE typname = 'plan_type') THEN
+        CREATE TYPE plan_type AS ENUM ('FREE', 'PREMIUM');
+    END IF;
+    IF NOT EXISTS (SELECT 1 FROM pg_type WHERE typname = 'user_role') THEN
+        CREATE TYPE user_role AS ENUM ('OWNER', 'MANAGER', 'STAFF');
+    END IF;
+END $$;
 
 -- 2. Users Table
 CREATE TABLE IF NOT EXISTS users (
