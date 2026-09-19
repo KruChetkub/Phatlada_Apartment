@@ -1,6 +1,6 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
-import { Building2, LayoutDashboard, ShieldCheck } from 'lucide-react';
+import { Building2, LayoutDashboard } from 'lucide-react';
 import { getLocalSettings } from '../../services/settingsService';
 
 export const LandingFooter: React.FC = () => {
@@ -62,10 +62,10 @@ export const LandingFooter: React.FC = () => {
               <li>
                 <Link
                   to="/dashboard"
-                  className="inline-flex items-center space-x-1.5 text-primary-soft hover:text-white transition font-medium"
+                  className="inline-flex items-center space-x-1.5 text-primary-soft hover:text-white transition font-semibold"
                 >
-                  <LayoutDashboard className="h-3.5 w-3.5" />
-                  <span>ระบบจัดการหอพัก (Dashboard)</span>
+                  <LayoutDashboard className="h-3.5 w-3.5 text-primary" />
+                  <span>เข้าสู่ระบบจัดการหอพัก (Login / Dashboard)</span>
                 </Link>
               </li>
               <li>
@@ -84,10 +84,6 @@ export const LandingFooter: React.FC = () => {
 
         <div className="flex flex-col sm:flex-row items-center justify-between gap-4 text-white/50 text-[11px]">
           <p>© 2568 - 2569 ภัทร์ลดา อพาร์ทเมนท์ (Phatlada Apartment). All rights reserved.</p>
-          <p className="flex items-center space-x-1">
-            <span>Powered by DormPlus</span>
-            <ShieldCheck className="h-3.5 w-3.5 text-primary" />
-          </p>
         </div>
       </div>
     </footer>

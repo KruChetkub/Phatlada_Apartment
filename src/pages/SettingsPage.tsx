@@ -11,6 +11,7 @@ import {
   Download,
   Upload,
   RotateCcw,
+  Tag,
 } from 'lucide-react';
 import {
   fetchSettings,
@@ -23,7 +24,7 @@ import {
 } from '../services/settingsService';
 import { ConfirmDialog } from '../components/common/ConfirmDialog';
 
-type SettingsTab = 'DORMITORY' | 'BILLING' | 'BANK' | 'PROFILE' | 'SYSTEM';
+type SettingsTab = 'DORMITORY' | 'PRICING' | 'BILLING' | 'BANK' | 'PROFILE' | 'SYSTEM';
 
 const THAI_BANKS = [
   'ธนาคารกสิกรไทย',
@@ -176,6 +177,18 @@ export const SettingsPage: React.FC = () => {
         </button>
 
         <button
+          onClick={() => setActiveTab('PRICING')}
+          className={`flex items-center space-x-2 px-3.5 py-2 rounded-t-lg text-xs font-medium border-b-2 transition whitespace-nowrap ${
+            activeTab === 'PRICING'
+              ? 'border-primary text-primary bg-primary/5'
+              : 'border-transparent text-ink-secondary hover:text-ink'
+          }`}
+        >
+          <Tag className="h-4 w-4" />
+          <span>ราคา</span>
+        </button>
+
+        <button
           onClick={() => setActiveTab('BILLING')}
           className={`flex items-center space-x-2 px-3.5 py-2 rounded-t-lg text-xs font-medium border-b-2 transition whitespace-nowrap ${
             activeTab === 'BILLING'
@@ -291,6 +304,138 @@ export const SettingsPage: React.FC = () => {
               <span className="px-3 py-1 bg-primary text-white text-[11px] font-bold rounded-full">
                 PREMIUM
               </span>
+            </div>
+          </div>
+        )}
+
+        {/* Tab: Pricing & Promo Rates */}
+        {activeTab === 'PRICING' && (
+          <div className="space-y-4 max-w-2xl">
+            <div>
+              <h2 className="text-sm font-bold text-ink flex items-center gap-2">
+                <Tag className="h-4 w-4 text-primary" />
+                <span>กำหนดราคาและโปรโมชั่นหน้าเว็บไซต์</span>
+              </h2>
+              <p className="text-xs text-ink-secondary mt-1">
+                กำหนดราคาเริ่มต้น ส่วนลด และข้อความโปรโมชั่นที่แสดงบนหน้าแรก (Landing Page)
+              </p>
+            </div>
+
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <div>
+                <label className="block text-xs font-semibold text-ink mb-1">
+                  ราคาห้องพักแอร์ รายเดือน (บาท / เดือน) *
+                </label>
+                <div className="relative">
+                  <span className="absolute left-3 top-2.5 text-xs text-ink-secondary">฿</span>
+                  <input
+                    type="number"
+                    min="0"
+                    required
+                    value={settings.landingStartingPrice ?? 3800}
+                    onChange={(e) => handleChange('landingStartingPrice', Number(e.target.value))}
+                    className="w-full text-xs pl-7 pr-3 py-2.5 rounded-lg border border-line bg-surface text-ink focus:ring-1 focus:ring-primary focus:outline-none font-semibold"
+                    placeholder="3800"
+                  />
+                </div>
+                <span className="text-[11px] text-ink-muted mt-1 block">ราคาห้องพักแอร์มาตรฐาน แบบรายเดือน</span>
+              </div>
+
+              <div>
+                <label className="block text-xs font-semibold text-ink mb-1">
+                  ราคาห้องพักแอร์ รายวัน (บาท / คืน) *
+                </label>
+                <div className="relative">
+                  <span className="absolute left-3 top-2.5 text-xs text-ink-secondary">฿</span>
+                  <input
+                    type="number"
+                    min="0"
+                    required
+                    value={settings.landingDailyPrice ?? 500}
+                    onChange={(e) => handleChange('landingDailyPrice', Number(e.target.value))}
+                    className="w-full text-xs pl-7 pr-3 py-2.5 rounded-lg border border-line bg-surface text-ink focus:ring-1 focus:ring-primary focus:outline-none font-semibold"
+                    placeholder="500"
+                  />
+                </div>
+                <span className="text-[11px] text-ink-muted mt-1 block">ราคาห้องพักแอร์มาตรฐาน แบบรายวัน</span>
+              </div>
+            </div>
+
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <div>
+                <label className="block text-xs font-semibold text-ink mb-1">
+                  ราคาปกติก่อนส่วนลดรายเดือน (บาท / เดือน)
+                </label>
+                <div className="relative">
+                  <span className="absolute left-3 top-2.5 text-xs text-ink-secondary">฿</span>
+                  <input
+                    type="number"
+                    min="0"
+                    value={settings.landingOriginalPrice ?? 4500}
+                    onChange={(e) => handleChange('landingOriginalPrice', Number(e.target.value))}
+                    className="w-full text-xs pl-7 pr-3 py-2.5 rounded-lg border border-line bg-surface text-ink focus:ring-1 focus:ring-primary focus:outline-none"
+                    placeholder="4500"
+                  />
+                </div>
+                <span className="text-[11px] text-ink-muted mt-1 block">ราคาขีดฆ่าเพื่อแสดงส่วนลด (เว้น 0 หากไม่ใช้)</span>
+              </div>
+            </div>
+
+            <div>
+              <label className="block text-xs font-semibold text-ink mb-1">
+                ข้อความโปรโมชั่น / สิทธิพิเศษ
+              </label>
+              <textarea
+                rows={2}
+                value={settings.landingPromoText ?? ''}
+                onChange={(e) => handleChange('landingPromoText', e.target.value)}
+                className="w-full text-xs p-2.5 rounded-lg border border-line bg-surface text-ink focus:ring-1 focus:ring-primary focus:outline-none"
+                placeholder="เช่น โปรโมชั่นห้องใหม่: จองวันนี้รับส่วนลดค่าประกันและฟรี Wi-Fi ทันที"
+              />
+              <span className="text-[11px] text-ink-muted mt-1 block">
+                จะแสดงพร้อมจุดไฟกระพริบสีเขียวใต้ราคาบนหน้า Landing Page
+              </span>
+            </div>
+
+            {/* Live Preview of Price Cards */}
+            <div className="p-4 bg-bg border border-line rounded-xl space-y-3 mt-4">
+              <span className="text-[11px] font-bold text-ink-secondary uppercase tracking-wider block">
+                ตัวอย่างที่จะปรากฏบนหน้าแรก:
+              </span>
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                <div className="p-3 bg-surface rounded-lg border border-line">
+                  <span className="text-[11px] text-ink-secondary block font-medium">ห้องแอร์มาตรฐาน (รายเดือน)</span>
+                  <div className="flex items-baseline space-x-1.5 mt-1">
+                    <span className="text-lg font-black text-ink font-prompt">
+                      ฿{Number(settings.landingStartingPrice || 0).toLocaleString()}
+                    </span>
+                    {Number(settings.landingOriginalPrice) > 0 && (
+                      <span className="text-xs text-ink-muted line-through">
+                        ฿{Number(settings.landingOriginalPrice).toLocaleString()}
+                      </span>
+                    )}
+                    <span className="text-[11px] text-ink-secondary">/ เดือน</span>
+                  </div>
+                </div>
+                <div className="p-3 bg-surface rounded-lg border border-line">
+                  <span className="text-[11px] text-ink-secondary block font-medium">ห้องแอร์มาตรฐาน (รายวัน)</span>
+                  <div className="flex items-baseline space-x-1.5 mt-1">
+                    <span className="text-lg font-black text-ink font-prompt">
+                      ฿{Number(settings.landingDailyPrice || 0).toLocaleString()}
+                    </span>
+                    <span className="text-[11px] text-ink-secondary">/ วัน</span>
+                  </div>
+                </div>
+              </div>
+              {settings.landingPromoText && (
+                <div className="flex items-center space-x-1.5 text-xs font-semibold text-tone-green-solid">
+                  <span className="relative flex h-2 w-2">
+                    <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-tone-green-solid opacity-75" />
+                    <span className="relative inline-flex rounded-full h-2 w-2 bg-tone-green-solid" />
+                  </span>
+                  <span>{settings.landingPromoText}</span>
+                </div>
+              )}
             </div>
           </div>
         )}

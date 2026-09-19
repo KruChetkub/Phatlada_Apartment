@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
-import { Building2, LayoutDashboard, Menu, X, Phone } from 'lucide-react';
+import { Building2, Menu, X, Phone } from 'lucide-react';
 
 interface LandingNavbarProps {
   onOpenBooking: () => void;
@@ -43,34 +43,27 @@ export const LandingNavbar: React.FC<LandingNavbarProps> = ({ onOpenBooking }) =
           </a>
         </nav>
 
-        {/* Action Buttons */}
+        {/* Desktop Action Button: Focused entirely on booking/inquiry */}
         <div className="hidden sm:flex items-center space-x-3">
           <button
             onClick={onOpenBooking}
-            className="inline-flex items-center space-x-1.5 px-4 py-2 text-xs font-semibold text-primary bg-primary/10 hover:bg-primary/20 border border-primary/20 rounded-full transition"
+            className="inline-flex items-center space-x-2 px-5 py-2.5 text-xs font-bold text-white bg-primary hover:bg-primary/90 rounded-full shadow-sm hover:shadow transition cursor-pointer hover:scale-[1.02] active:scale-[0.98]"
           >
             <Phone className="h-3.5 w-3.5" />
             <span>นัดดูห้องพัก</span>
           </button>
-
-          <Link
-            to="/login"
-            className="inline-flex items-center space-x-1.5 px-5 py-2 text-xs font-bold text-white bg-primary hover:bg-primary/90 rounded-full shadow-sm hover:shadow transition"
-          >
-            <LayoutDashboard className="h-3.5 w-3.5" />
-            <span>เข้าสู่ระบบ (Login)</span>
-          </Link>
         </div>
 
-        {/* Mobile Hamburger Toggle */}
+        {/* Mobile Actions: Clean booking CTA + Hamburger toggle */}
         <div className="flex md:hidden items-center space-x-2">
-          <Link
-            to="/login"
-            className="p-2 text-primary bg-primary/10 rounded-lg"
-            title="เข้าสู่ระบบผู้ดูแล"
+          <button
+            onClick={onOpenBooking}
+            className="px-3 py-1.5 text-xs font-semibold text-primary bg-primary/10 hover:bg-primary/20 rounded-full flex items-center space-x-1.5 transition"
           >
-            <LayoutDashboard className="h-5 w-5" />
-          </Link>
+            <Phone className="h-3.5 w-3.5" />
+            <span>นัดดูห้อง</span>
+          </button>
+
           <button
             onClick={() => setMobileOpen(!mobileOpen)}
             className="p-2 rounded-lg text-ink-secondary hover:text-ink focus:outline-none"
@@ -119,18 +112,11 @@ export const LandingNavbar: React.FC<LandingNavbarProps> = ({ onOpenBooking }) =
                 setMobileOpen(false);
                 onOpenBooking();
               }}
-              className="w-full py-2.5 text-center text-xs font-semibold text-primary bg-primary/10 rounded-xl"
+              className="w-full py-2.5 text-center text-xs font-bold text-white bg-primary hover:bg-primary/90 rounded-xl flex items-center justify-center space-x-2 cursor-pointer shadow-sm"
             >
-              นัดดูห้องพักจริง
+              <Phone className="h-3.5 w-3.5" />
+              <span>นัดหมายเข้าชมห้องพัก</span>
             </button>
-            <Link
-              to="/login"
-              onClick={() => setMobileOpen(false)}
-              className="w-full py-2.5 text-center text-xs font-semibold text-white bg-primary rounded-xl flex items-center justify-center space-x-2"
-            >
-              <LayoutDashboard className="h-4 w-4" />
-              <span>เข้าสู่ระบบจัดการผู้ดูแล (Login)</span>
-            </Link>
           </div>
         </div>
       )}

@@ -28,6 +28,12 @@ export interface DormSettings {
   userPhone: string;
   userRole: 'OWNER' | 'MANAGER' | 'STAFF';
 
+  // Landing Page Rates & Promo
+  landingStartingPrice: number;
+  landingDailyPrice: number;
+  landingOriginalPrice: number;
+  landingPromoText: string;
+
   // Preferences
   notifyNewMaintenance: boolean;
   notifyPaymentReceived: boolean;
@@ -58,6 +64,11 @@ export const defaultSettings: DormSettings = {
   userEmail: '',
   userPhone: '',
   userRole: 'OWNER',
+
+  landingStartingPrice: 3800,
+  landingDailyPrice: 500,
+  landingOriginalPrice: 4500,
+  landingPromoText: 'โปรโมชั่นห้องใหม่: จองวันนี้รับส่วนลดค่าประกันและฟรี Wi-Fi ทันที',
 
   notifyNewMaintenance: true,
   notifyPaymentReceived: true,
