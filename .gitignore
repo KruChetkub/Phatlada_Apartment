@@ -13,6 +13,8 @@ dist-ssr
 *.local
 *.tsbuildinfo
 CodeQL
+supabase
+tests
 
 # Editor directories and files
 .vscode/*
