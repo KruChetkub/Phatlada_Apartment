@@ -12,9 +12,13 @@ dist
 dist-ssr
 *.local
 *.tsbuildinfo
+# Excluded from Git (Local Only)
 CodeQL
+CodeQL/
 supabase
+supabase/
 tests
+tests/
 
 # Editor directories and files
 .vscode/*
