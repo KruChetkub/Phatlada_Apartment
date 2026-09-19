@@ -129,8 +129,8 @@ export const LandingContact: React.FC<LandingContactProps> = ({ onOpenBooking })
                 </a>
               </div>
 
-              {/* Embedded Google Maps iFrame - Universal & Reliable Embed */}
-              <div className="w-full h-80 sm:h-96 rounded-2xl overflow-hidden border border-line shadow-sm bg-surface relative">
+              {/* Embedded Google Maps with Click-to-Navigate Overlay */}
+              <div className="w-full h-80 sm:h-96 rounded-2xl overflow-hidden border border-line shadow-sm bg-surface relative group">
                 <iframe
                   src="https://maps.google.com/maps?q=20.2503358,100.4079899&hl=th&z=16&output=embed"
                   width="100%"
@@ -140,8 +140,23 @@ export const LandingContact: React.FC<LandingContactProps> = ({ onOpenBooking })
                   loading="lazy"
                   referrerPolicy="no-referrer-when-downgrade"
                   title="แผนที่ ภัทร์ลดา อพาร์ทเมนท์ เชียงของ เชียงราย"
-                  className="w-full h-full"
+                  className="w-full h-full pointer-events-none select-none"
                 />
+
+                {/* Direct Navigation Click Overlay */}
+                <a
+                  href={googleMapsShareUrl}
+                  target="_blank"
+                  rel="noreferrer"
+                  className="absolute inset-0 z-10 flex items-end justify-center p-3.5 bg-black/0 hover:bg-black/10 transition cursor-pointer"
+                  title="คลิกเพื่อเปิดดูใน Google Maps และนำทางด้วย GPS"
+                >
+                  <div className="bg-white/95 backdrop-blur-md text-ink px-4 py-2 rounded-xl shadow-md border border-line flex items-center space-x-2 text-xs font-bold group-hover:scale-105 transition-transform">
+                    <Navigation className="h-4 w-4 text-primary" />
+                    <span>คลิกเพื่อเปิดแผนที่ & นำทาง (Google Maps)</span>
+                    <ArrowUpRight className="h-3.5 w-3.5 text-primary" />
+                  </div>
+                </a>
               </div>
             </div>
 
