@@ -1,7 +1,7 @@
 import React from 'react';
 import { Modal } from '../common/Modal';
 import { Invoice } from '../../types/billing';
-import { formatBaht, formatThaiDateLong } from '../../lib/format';
+import { formatSatang, formatThaiDateLong } from '../../lib/format';
 import { getLocalSettings } from '../../services/settingsService';
 import { Printer, CheckCircle, QrCode, Building, Phone } from 'lucide-react';
 
@@ -75,34 +75,34 @@ export const InvoiceDetailModal: React.FC<InvoiceDetailModalProps> = ({
               <tr>
                 <td className="p-2.5 font-medium text-ink">ค่าเช่าห้องพักประจำเดือน ({invoice.period})</td>
                 <td className="p-2.5 text-center text-ink-secondary">-</td>
-                <td className="p-2.5 text-right font-semibold text-ink">{formatBaht(invoice.rentAmount)}</td>
+                <td className="p-2.5 text-right font-semibold text-ink">{formatSatang(invoice.rentAmount)}</td>
               </tr>
               <tr>
                 <td className="p-2.5 text-ink">
                   ค่าน้ำประปา ({invoice.waterPrev} → {invoice.waterCurr})
                 </td>
                 <td className="p-2.5 text-center text-ink-secondary">{invoice.waterUnits} หน่วย</td>
-                <td className="p-2.5 text-right font-semibold text-ink">{formatBaht(invoice.waterAmount)}</td>
+                <td className="p-2.5 text-right font-semibold text-ink">{formatSatang(invoice.waterAmount)}</td>
               </tr>
               <tr>
                 <td className="p-2.5 text-ink">
                   ค่าไฟฟ้า ({invoice.electricPrev} → {invoice.electricCurr})
                 </td>
                 <td className="p-2.5 text-center text-ink-secondary">{invoice.electricUnits} หน่วย</td>
-                <td className="p-2.5 text-right font-semibold text-ink">{formatBaht(invoice.electricAmount)}</td>
+                <td className="p-2.5 text-right font-semibold text-ink">{formatSatang(invoice.electricAmount)}</td>
               </tr>
               {invoice.commonFee > 0 && (
                 <tr>
                   <td className="p-2.5 text-ink">ค่าส่วนกลาง</td>
                   <td className="p-2.5 text-center text-ink-secondary">-</td>
-                  <td className="p-2.5 text-right font-semibold text-ink">{formatBaht(invoice.commonFee)}</td>
+                  <td className="p-2.5 text-right font-semibold text-ink">{formatSatang(invoice.commonFee)}</td>
                 </tr>
               )}
               {invoice.otherFee > 0 && (
                 <tr>
                   <td className="p-2.5 text-ink">ค่าบริการอื่นๆ</td>
                   <td className="p-2.5 text-center text-ink-secondary">-</td>
-                  <td className="p-2.5 text-right font-semibold text-ink">{formatBaht(invoice.otherFee)}</td>
+                  <td className="p-2.5 text-right font-semibold text-ink">{formatSatang(invoice.otherFee)}</td>
                 </tr>
               )}
             </tbody>
@@ -110,7 +110,7 @@ export const InvoiceDetailModal: React.FC<InvoiceDetailModalProps> = ({
               <tr>
                 <td colSpan={2} className="p-3 text-ink">ยอดรวมทั้งสิ้น (Total Amount)</td>
                 <td className="p-3 text-right text-base text-primary font-bold">
-                  {formatBaht(invoice.totalAmount)}
+                  {formatSatang(invoice.totalAmount)}
                 </td>
               </tr>
             </tfoot>

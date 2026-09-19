@@ -4,7 +4,7 @@ import { Room, Lease, Tenant } from '../../types/database';
 import { UtilityReading } from '../../types/billing';
 import { createInvoice } from '../../services/billingService';
 import { getLocalSettings } from '../../services/settingsService';
-import { formatBaht } from '../../lib/format';
+import { formatSatang } from '../../lib/format';
 import { Receipt, FileText } from 'lucide-react';
 
 interface InvoiceGenerateModalProps {
@@ -155,26 +155,26 @@ export const InvoiceGenerateModal: React.FC<InvoiceGenerateModalProps> = ({
           <div className="space-y-1.5 text-xs">
             <div className="flex justify-between text-ink-secondary">
               <span>ค่าเช่าห้องพัก:</span>
-              <span className="font-semibold text-ink">{formatBaht(rentSatang)}</span>
+              <span className="font-semibold text-ink">{formatSatang(rentSatang)}</span>
             </div>
 
             <div className="flex justify-between text-ink-secondary">
               <span>
                 ค่าน้ำ ({waterUnits} หน่วย @ {settings.waterRatePerUnit} บ.):
               </span>
-              <span className="font-semibold text-ink">{formatBaht(waterSatang)}</span>
+              <span className="font-semibold text-ink">{formatSatang(waterSatang)}</span>
             </div>
 
             <div className="flex justify-between text-ink-secondary">
               <span>
                 ค่าไฟฟ้า ({electricUnits} หน่วย @ {settings.electricRatePerUnit} บ.):
               </span>
-              <span className="font-semibold text-ink">{formatBaht(electricSatang)}</span>
+              <span className="font-semibold text-ink">{formatSatang(electricSatang)}</span>
             </div>
 
             <div className="flex justify-between text-ink-secondary">
               <span>ค่าบริการส่วนกลาง:</span>
-              <span className="font-semibold text-ink">{formatBaht(commonFeeSatang)}</span>
+              <span className="font-semibold text-ink">{formatSatang(commonFeeSatang)}</span>
             </div>
 
             <div className="flex items-center justify-between text-ink-secondary pt-1">
@@ -190,7 +190,7 @@ export const InvoiceGenerateModal: React.FC<InvoiceGenerateModalProps> = ({
 
           <div className="pt-2 border-t border-line flex justify-between items-center text-sm font-bold text-ink">
             <span>ยอดรวมทั้งสิ้น:</span>
-            <span className="text-primary text-base font-bold">{formatBaht(totalSatang)}</span>
+            <span className="text-primary text-base font-bold">{formatSatang(totalSatang)}</span>
           </div>
         </div>
 

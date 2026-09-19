@@ -41,6 +41,13 @@ export function satangToBaht(satang: number): number {
 }
 
 /**
+ * Format satang amount directly into Baht currency with symbol: "฿ 3,500"
+ */
+export function formatSatang(satang: number): string {
+  return formatBaht(satangToBaht(satang));
+}
+
+/**
  * Parse date safely
  */
 function toDate(d: Date | string): Date {

@@ -21,7 +21,7 @@ import { fetchLeases } from '../services/leaseService';
 import { fetchTenants } from '../services/tenantService';
 import { Invoice, UtilityReading } from '../types/billing';
 import { Room, Lease, Tenant } from '../types/database';
-import { formatBaht } from '../lib/format';
+import { formatSatang } from '../lib/format';
 import { getCurrentUserRole, canManageFinances, canRecordMeters } from '../services/authService';
 import { EmptyState } from '../components/common/EmptyState';
 import { ConfirmDialog } from '../components/common/ConfirmDialog';
@@ -204,13 +204,13 @@ export const InvoicesPage: React.FC = () => {
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
         <div className="p-4 bg-surface rounded-xl border border-line shadow-xs">
           <span className="text-xs text-ink-secondary">ยอดเรียกเก็บรวม ({THAI_MONTHS[selectedMonth - 1]})</span>
-          <p className="text-xl sm:text-2xl font-bold text-ink mt-1.5">{formatBaht(stats.totalBilled)}</p>
+          <p className="text-xl sm:text-2xl font-bold text-ink mt-1.5">{formatSatang(stats.totalBilled)}</p>
           <span className="text-[11px] text-ink-secondary mt-1 block">ทั้งหมด {invoices.length} ห้อง</span>
         </div>
 
         <div className="p-4 bg-tone-green-soft/40 rounded-xl border border-tone-green-solid/20 shadow-xs">
           <span className="text-xs text-tone-green-solid font-medium">ชำระแล้ว</span>
-          <p className="text-xl sm:text-2xl font-bold text-tone-green-solid mt-1.5">{formatBaht(stats.totalPaid)}</p>
+          <p className="text-xl sm:text-2xl font-bold text-tone-green-solid mt-1.5">{formatSatang(stats.totalPaid)}</p>
           <span className="text-[11px] text-tone-green-solid block mt-1">ได้รับเงินเรียบร้อย</span>
         </div>
 
@@ -218,7 +218,7 @@ export const InvoicesPage: React.FC = () => {
           <span className="text-xs text-tone-amber-solid font-medium">ค้างชำระ / รอชำระ</span>
           <p className="text-xl sm:text-2xl font-bold text-tone-amber-solid mt-1.5">{stats.unpaidCount} ห้อง</p>
           <span className="text-[11px] text-tone-amber-solid block mt-1">
-            {formatBaht(stats.totalBilled - stats.totalPaid)}
+            {formatSatang(stats.totalBilled - stats.totalPaid)}
           </span>
         </div>
 
@@ -277,12 +277,12 @@ export const InvoicesPage: React.FC = () => {
                     <td className="p-3 font-bold text-primary">ห้อง {inv.roomNumber}</td>
                     <td className="p-3 text-ink">{inv.tenantName}</td>
                     <td className="p-3 text-ink-secondary">
-                      {inv.waterUnits} หน่วย ({formatBaht(inv.waterAmount)})
+                      {inv.waterUnits} หน่วย ({formatSatang(inv.waterAmount)})
                     </td>
                     <td className="p-3 text-ink-secondary">
-                      {inv.electricUnits} หน่วย ({formatBaht(inv.electricAmount)})
+                      {inv.electricUnits} หน่วย ({formatSatang(inv.electricAmount)})
                     </td>
-                    <td className="p-3 font-bold text-ink text-sm">{formatBaht(inv.totalAmount)}</td>
+                    <td className="p-3 font-bold text-ink text-sm">{formatSatang(inv.totalAmount)}</td>
                     <td className="p-3">
                       {inv.status === 'PAID' ? (
                         <span className="inline-flex items-center px-2 py-0.5 rounded text-[11px] font-semibold bg-tone-green-soft text-tone-green-solid">

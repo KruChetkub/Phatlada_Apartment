@@ -2,7 +2,7 @@ import React from 'react';
 import { Link } from 'react-router-dom';
 import { DashboardSummary } from '../../types/dashboard';
 import {
-  formatBaht,
+  formatSatang,
   formatThaiDateShort,
   formatThaiTime,
   getAvatarInitial,
@@ -66,7 +66,7 @@ export const RecentPaymentsList: React.FC<RecentPaymentsListProps> = ({ payments
                     {payment.tenantName}
                   </h4>
                   <p className="text-[11px] text-ink-muted mt-0.5">
-                    ห้อง {payment.roomNumber} | {formatBaht(payment.amount)} |{' '}
+                    ห้อง {payment.roomNumber} | {formatSatang(payment.amount)} |{' '}
                     {formatThaiDateShort(payment.paidAt)}{' '}
                     {formatThaiTime(payment.paidAt)}
                   </p>
