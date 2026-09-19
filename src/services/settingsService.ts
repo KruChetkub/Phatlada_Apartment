@@ -39,6 +39,11 @@ export interface DormSettings {
   notifyNewMaintenance: boolean;
   notifyPaymentReceived: boolean;
   notifyLeaseExpiringDays: number;
+
+  // Security & Session
+  autoLogoutEnabled: boolean;
+  autoLogoutMinutes: number;
+  clearCookiesOnLogout: boolean;
 }
 
 export const defaultSettings: DormSettings = {
@@ -75,6 +80,10 @@ export const defaultSettings: DormSettings = {
   notifyNewMaintenance: true,
   notifyPaymentReceived: true,
   notifyLeaseExpiringDays: 30,
+
+  autoLogoutEnabled: true,
+  autoLogoutMinutes: 30,
+  clearCookiesOnLogout: true,
 };
 
 const SETTINGS_STORAGE_KEY = 'phatlada_system_settings';

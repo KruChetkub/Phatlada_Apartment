@@ -10,6 +10,7 @@ import {
   AlertCircle,
   Loader2,
   ArrowLeft,
+  Clock,
 } from 'lucide-react';
 import {
   loginWithEmail,
@@ -29,6 +30,10 @@ export const LoginPage: React.FC = () => {
 
   // Return to intended page or /dashboard
   const fromLocation = (location.state as { from?: { pathname: string } })?.from?.pathname || '/dashboard';
+
+  const queryParams = new URLSearchParams(location.search);
+  const isIdleTimeout = queryParams.get('reason') === 'idle_timeout';
+  const timeoutMins = queryParams.get('mins') || '30';
 
   // If already logged in, redirect to dashboard
   useEffect(() => {
@@ -97,6 +102,18 @@ export const LoginPage: React.FC = () => {
       {/* Main Login Card */}
       <div className="mt-6 sm:mx-auto sm:w-full sm:max-w-md px-4">
         <div className="bg-surface py-8 px-5 sm:px-8 shadow-card rounded-2xl border border-line">
+          {isIdleTimeout && (
+            <div className="mb-5 flex items-start space-x-2.5 rounded-xl bg-tone-amber-soft p-3.5 text-sm text-tone-amber-solid animate-in fade-in border border-tone-amber-solid/20">
+              <Clock className="h-5 w-5 shrink-0 mt-0.5" />
+              <div>
+                <span className="font-bold block">ออกจากระบบอัตโนมัติเนื่องจากไม่มีการใช้งาน</span>
+                <span className="text-xs text-ink-secondary block mt-0.5">
+                  ระบบได้ทำการตัดเซสชันและล้างคุกกี้เพื่อความปลอดภัยเนื่องจากไม่มีการใช้งานเกิน {timeoutMins} นาที กรุณาเข้าสู่ระบบใหม่อีกครั้ง
+                </span>
+              </div>
+            </div>
+          )}
+
           {errorMessage && (
             <div className="mb-5 flex items-start space-x-2.5 rounded-xl bg-tone-red-soft p-3.5 text-sm text-tone-red-solid animate-in fade-in">
               <AlertCircle className="h-5 w-5 shrink-0 mt-0.5" />

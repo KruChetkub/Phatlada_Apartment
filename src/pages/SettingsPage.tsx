@@ -12,6 +12,10 @@ import {
   Upload,
   RotateCcw,
   Tag,
+  ShieldCheck,
+  LogOut,
+  Clock,
+  Lock,
 } from 'lucide-react';
 import {
   fetchSettings,
@@ -22,9 +26,10 @@ import {
   importBackupJson,
   resetAllData,
 } from '../services/settingsService';
+import { logout } from '../services/authService';
 import { ConfirmDialog } from '../components/common/ConfirmDialog';
 
-type SettingsTab = 'DORMITORY' | 'PRICING' | 'BILLING' | 'BANK' | 'PROFILE' | 'SYSTEM';
+type SettingsTab = 'DORMITORY' | 'PRICING' | 'BILLING' | 'BANK' | 'PROFILE' | 'SYSTEM' | 'SECURITY';
 
 const THAI_BANKS = [
   'ธนาคารกสิกรไทย',
@@ -234,6 +239,18 @@ export const SettingsPage: React.FC = () => {
         >
           <Bell className="h-4 w-4" />
           <span>การแจ้งเตือน & ข้อมูล</span>
+        </button>
+
+        <button
+          onClick={() => setActiveTab('SECURITY')}
+          className={`flex items-center space-x-2 px-3.5 py-2 rounded-t-lg text-xs font-medium border-b-2 transition whitespace-nowrap ${
+            activeTab === 'SECURITY'
+              ? 'border-primary text-primary bg-primary/5'
+              : 'border-transparent text-ink-secondary hover:text-ink'
+          }`}
+        >
+          <ShieldCheck className="h-4 w-4" />
+          <span>ความปลอดภัย & เซสชัน</span>
         </button>
       </div>
 
@@ -762,6 +779,146 @@ export const SettingsPage: React.FC = () => {
               >
                 <RotateCcw className="h-3.5 w-3.5" />
                 <span>รีเซ็ตระบบและล้างข้อมูลทั้งหมด</span>
+              </button>
+            </div>
+          </div>
+        )}
+
+        {/* Tab 7: Security & Session */}
+        {activeTab === 'SECURITY' && (
+          <div className="space-y-6 max-w-2xl">
+            <div>
+              <h2 className="text-sm font-bold text-ink mb-1 flex items-center gap-2">
+                <ShieldCheck className="h-4 w-4 text-primary" />
+                <span>ความปลอดภัยของระบบและการออกจากระบบอัตโนมัติ (Security & Session)</span>
+              </h2>
+              <p className="text-xs text-ink-secondary">
+                จัดการมาตรการความปลอดภัยสำหรับเจ้าของหอพัก ตั้งเวลาออกจากระบบเมื่อไม่ได้ใช้งาน และป้องกันการสวมรอยเซสชัน/คุกกี้
+              </p>
+            </div>
+
+            {/* Section 1: Auto Logout on Inactivity */}
+            <div className="p-4 rounded-xl bg-surface border border-line space-y-4">
+              <div className="flex items-start justify-between gap-4">
+                <div className="space-y-1">
+                  <span className="text-sm font-bold text-ink flex items-center gap-2">
+                    <Clock className="h-4 w-4 text-primary" />
+                    <span>ออกจากระบบอัตโนมัติเมื่อไม่มีการใช้งาน (Auto-Logout on Inactivity)</span>
+                  </span>
+                  <p className="text-xs text-ink-secondary">
+                    เมื่อเปิดใช้งาน ระบบจะทำการตัดการเชื่อมต่อและออกจากระบบอัตโนมัติหากไม่มีการขยับเมาส์ คลิก หรือพิมพ์แป้นพิมพ์ภายในเวลาที่กำหนด
+                  </p>
+                </div>
+                <label className="relative inline-flex items-center cursor-pointer shrink-0 mt-1">
+                  <input
+                    type="checkbox"
+                    checked={settings.autoLogoutEnabled}
+                    onChange={(e) => handleChange('autoLogoutEnabled', e.target.checked)}
+                    className="sr-only peer"
+                  />
+                  <div className="w-11 h-6 bg-line peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-primary"></div>
+                </label>
+              </div>
+
+              {settings.autoLogoutEnabled && (
+                <div className="pt-3 border-t border-line/60 space-y-2">
+                  <label className="block text-xs font-semibold text-ink">
+                    เลือกระยะเวลาไม่มีการใช้งานก่อนออกจากระบบ:
+                  </label>
+                  <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
+                    {[
+                      { minutes: 15, label: '15 นาที', desc: 'ปลอดภัยสูงสุด' },
+                      { minutes: 30, label: '30 นาที', desc: 'แนะนำทั่วไป' },
+                      { minutes: 60, label: '1 ชั่วโมง', desc: 'ทำงานต่อเนื่อง' },
+                      { minutes: 120, label: '2 ชั่วโมง', desc: 'ใช้งานบ่อย' },
+                      { minutes: 240, label: '4 ชั่วโมง', desc: 'อยู่หน้าจอตลอด' },
+                    ].map((opt) => (
+                      <button
+                        key={opt.minutes}
+                        type="button"
+                        onClick={() => handleChange('autoLogoutMinutes', opt.minutes)}
+                        className={`p-2.5 rounded-xl border text-left transition flex flex-col justify-between ${
+                          settings.autoLogoutMinutes === opt.minutes
+                            ? 'border-primary bg-primary/5 text-primary ring-1 ring-primary'
+                            : 'border-line hover:border-line-dark text-ink bg-bg'
+                        }`}
+                      >
+                        <span className="text-xs font-bold">{opt.label}</span>
+                        <span className="text-[10px] text-ink-muted mt-0.5">{opt.desc}</span>
+                      </button>
+                    ))}
+                  </div>
+                </div>
+              )}
+            </div>
+
+            {/* Section 2: Session & Cookie Protection */}
+            <div className="p-4 rounded-xl bg-surface border border-line space-y-4">
+              <div className="space-y-1">
+                <span className="text-sm font-bold text-ink flex items-center gap-2">
+                  <Lock className="h-4 w-4 text-primary" />
+                  <span>การป้องกันเซสชันและคุกกี้ (Anti-Session Hijacking & Cookie Protection)</span>
+                </span>
+                <p className="text-xs text-ink-secondary">
+                  ป้องกันไม่ให้ผู้อื่นหรือผู้ไม่ประสงค์ดีคัดลอก Cookie หรือ Access Token ไปสวมรอยใช้งานต่อได้
+                </p>
+              </div>
+
+              <div className="space-y-3 pt-2 border-t border-line/60">
+                <label className="flex items-start space-x-3 cursor-pointer">
+                  <input
+                    type="checkbox"
+                    checked={settings.clearCookiesOnLogout}
+                    onChange={(e) => handleChange('clearCookiesOnLogout', e.target.checked)}
+                    className="mt-0.5 h-4 w-4 rounded border-line text-primary focus:ring-primary"
+                  />
+                  <div>
+                    <span className="text-xs font-bold text-ink block">
+                      ล้างคุกกี้และเพิกถอนเซสชันฝั่งเซิร์ฟเวอร์ทันทีเมื่อออกจากระบบ (แนะนำ)
+                    </span>
+                    <span className="text-[11px] text-ink-muted block mt-0.5">
+                      เมื่อออกจากระบบ (ทั้งแบบกดเองหรือหมดเวลา) ระบบจะส่งคำสั่งไปยัง Supabase Auth เพื่อเพิกถอน Token ทันที และกวาดล้าง Cookie กับ Web Storage ทั้งหมดออกจากเครื่อง ทำให้ Token หรือ Cookie เดิมไม่สามารถนำมาใช้อนุมัติสิทธิ์ได้อีก
+                    </span>
+                  </div>
+                </label>
+              </div>
+
+              <div className="p-3 rounded-lg bg-tone-blue-soft/40 border border-tone-blue-solid/20 text-ink text-xs space-y-1.5">
+                <span className="font-bold flex items-center gap-1.5 text-tone-blue-solid">
+                  <CheckCircle2 className="h-3.5 w-3.5" />
+                  <span>มาตรฐานความปลอดภัยที่เปิดใช้งานอยู่:</span>
+                </span>
+                <ul className="list-disc list-inside text-[11px] text-ink-secondary space-y-1 pl-1">
+                  <li><strong>Server-Side Revocation:</strong> เพิกถอน Refresh Token บน Supabase ทันทีเมื่อ Logout</li>
+                  <li><strong>Sanitize Web Storage:</strong> เคลียร์ LocalStorage, SessionStorage และ SecureStorage ทั้งหมด</li>
+                  <li><strong>Zero-Trust Cookie Wipe:</strong> ล้างคุกกี้ทุก Path และทุก Domain ในบราวเซอร์</li>
+                  <li><strong>Multi-Tab Sync:</strong> เมื่อออกจากระบบ แท็บอื่นทั้งหมดจะปิดเซสชันตามทันที</li>
+                </ul>
+              </div>
+            </div>
+
+            {/* Section 3: Force Sign Out All Devices */}
+            <div className="pt-4 border-t border-line space-y-3">
+              <h3 className="text-sm font-bold text-ink flex items-center gap-2">
+                <LogOut className="h-4 w-4 text-ink-secondary" />
+                <span>จัดการเซสชันที่กำลังใช้งาน (Active Sessions)</span>
+              </h3>
+              <p className="text-xs text-ink-secondary">
+                หากสงสัยว่ามีผู้อื่นเข้าใช้งานบัญชีของคุณ หรือต้องการออกจากระบบทันทีทุกเครื่อง สามารถตัดการเชื่อมต่อได้ทันที
+              </p>
+
+              <button
+                type="button"
+                onClick={async () => {
+                  if (window.confirm('คุณต้องการตัดการเชื่อมต่อและออกจากระบบทันทีใช่หรือไม่?')) {
+                    await logout();
+                    window.location.href = '/login';
+                  }
+                }}
+                className="inline-flex items-center space-x-1.5 px-3.5 py-2 text-xs font-medium text-tone-red-solid bg-tone-red-soft hover:bg-tone-red-soft/80 rounded-lg transition"
+              >
+                <LogOut className="h-3.5 w-3.5" />
+                <span>ออกจากระบบทันทีและล้างคุกกี้ทั้งหมด (Force Sign Out)</span>
               </button>
             </div>
           </div>

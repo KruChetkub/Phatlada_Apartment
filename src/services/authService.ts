@@ -238,18 +238,81 @@ function saveLocalSession(session: AuthSession): void {
 }
 
 /**
- * Sign out user and clear session
+ * Clear all browser cookies to prevent session/cookie hijacking
+ */
+export function clearAllCookies(): void {
+  if (typeof document === 'undefined') return;
+  const cookies = document.cookie.split(';');
+  const hostname = window.location.hostname;
+  const hostParts = hostname.split('.');
+
+  for (const c of cookies) {
+    const eqPos = c.indexOf('=');
+    const name = eqPos > -1 ? c.substring(0, eqPos).trim() : c.trim();
+    if (!name) continue;
+
+    // Clear without domain (current path & root path)
+    document.cookie = `${name}=;expires=Thu, 01 Jan 1970 00:00:00 GMT;path=/;SameSite=Lax`;
+    document.cookie = `${name}=;expires=Thu, 01 Jan 1970 00:00:00 GMT;path=;SameSite=Lax`;
+
+    // Clear with domain variations
+    document.cookie = `${name}=;expires=Thu, 01 Jan 1970 00:00:00 GMT;path=/;domain=${hostname};SameSite=Lax`;
+    document.cookie = `${name}=;expires=Thu, 01 Jan 1970 00:00:00 GMT;path=/;domain=.${hostname};SameSite=Lax`;
+
+    if (hostParts.length > 2) {
+      const rootDomain = hostParts.slice(-2).join('.');
+      document.cookie = `${name}=;expires=Thu, 01 Jan 1970 00:00:00 GMT;path=/;domain=.${rootDomain};SameSite=Lax`;
+    }
+  }
+}
+
+/**
+ * Sign out user, revoke server tokens, and clear all local session tokens & cookies
  */
 export async function logout(): Promise<void> {
   if (isSupabaseConfigured && supabase) {
     try {
-      await supabase.auth.signOut();
+      // Revoke all refresh tokens on Supabase backend so old cookies/tokens cannot be reused
+      await supabase.auth.signOut({ scope: 'global' });
     } catch {
       // Ignore Supabase sign out error
     }
   }
 
   if (typeof window !== 'undefined') {
+    // 1. Wipe all browser cookies
+    clearAllCookies();
+
+    // 2. Clear Supabase auth tokens & session keys from localStorage
+    try {
+      const keysToRemove: string[] = [];
+      for (let i = 0; i < localStorage.length; i++) {
+        const key = localStorage.key(i);
+        if (
+          key &&
+          (key.startsWith('sb-') ||
+            key.includes('auth') ||
+            key.includes('session') ||
+            key.includes('token') ||
+            key.includes('user_role') ||
+            key.includes('user_data'))
+        ) {
+          keysToRemove.push(key);
+        }
+      }
+      keysToRemove.forEach((k) => localStorage.removeItem(k));
+    } catch {
+      // Ignore storage errors
+    }
+
+    // 3. Clear session storage completely
+    try {
+      sessionStorage.clear();
+    } catch {
+      // Ignore session storage errors
+    }
+
+    // 4. Clear secure storage & specific legacy keys
     secureStorage.removeItem(AUTH_LOGGED_IN_KEY);
     secureStorage.removeItem(AUTH_ROLE_STORAGE_KEY);
     secureStorage.removeItem(AUTH_USER_DATA_KEY);
@@ -259,6 +322,8 @@ export async function logout(): Promise<void> {
     localStorage.removeItem('dormplus_auth_logged_in');
     localStorage.removeItem('dormplus_auth_user_data');
     localStorage.removeItem('dormplus_current_user_role');
+
+    // 5. Notify app of logout
     window.dispatchEvent(
       new CustomEvent('phatlada_auth_changed', {
         detail: { isAuthenticated: false, loggedOut: true },

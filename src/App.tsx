@@ -26,7 +26,8 @@ import { LogoutConfirmModal } from './components/auth/LogoutConfirmModal';
 import { ProtectedRoute } from './components/auth/ProtectedRoute';
 import { getCurrentSession, logout } from './services/authService';
 import { getLocalDormitories, getActiveDormitoryId } from './services/dormService';
-import { getLocalSettings } from './services/settingsService';
+import { getLocalSettings, fetchSettings, DormSettings } from './services/settingsService';
+import { useIdleTimer } from './hooks/useIdleTimer';
 import { DashboardSummary } from './types/dashboard';
 
 const initialDormitory = {
@@ -47,6 +48,13 @@ export const App: React.FC = () => {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [isDormSwitchOpen, setIsDormSwitchOpen] = useState(false);
   const [isLogoutOpen, setIsLogoutOpen] = useState(false);
+  const [systemSettings, setSystemSettings] = useState<DormSettings>(() => getLocalSettings());
+
+  // Global Inactivity Auto-Logout Timer for Security & Anti-Session Hijacking
+  useIdleTimer({
+    enabled: systemSettings.autoLogoutEnabled,
+    timeoutMinutes: systemSettings.autoLogoutMinutes,
+  });
 
   const [dashboardData, setDashboardData] = useState<Partial<DashboardSummary>>(() => {
     const session = getCurrentSession();
@@ -84,7 +92,10 @@ export const App: React.FC = () => {
   }, []);
 
   useEffect(() => {
+    fetchSettings().then((s) => setSystemSettings(s)).catch(() => {});
+
     const handleSettingsUpdate = (e: Event) => {
+      setSystemSettings(getLocalSettings());
       const detail = (e as CustomEvent).detail;
       if (detail) {
         setDashboardData((prev) => ({
@@ -148,6 +159,7 @@ export const App: React.FC = () => {
     const handleStorage = (e: StorageEvent) => {
       if (e.key === 'phatlada_system_settings' || e.key === 'dormplus_system_settings') {
         const local = getLocalSettings();
+        setSystemSettings(local);
         setDashboardData((prev) => ({
           ...prev,
           dormitory: {
