@@ -5,7 +5,6 @@ import {
   MessageSquare,
   ChevronDown,
   Menu,
-  ShieldCheck,
   LogOut,
   Settings,
 } from 'lucide-react';
@@ -20,7 +19,6 @@ interface TopbarProps {
   };
   unreadCount?: number;
   onOpenMobileMenu?: () => void;
-  onOpenRoleModal?: () => void;
   onOpenLogoutModal?: () => void;
 }
 
@@ -34,7 +32,6 @@ export const Topbar: React.FC<TopbarProps> = ({
   user,
   unreadCount = 0,
   onOpenMobileMenu,
-  onOpenRoleModal,
   onOpenLogoutModal,
 }) => {
   const [profileOpen, setProfileOpen] = useState(false);
@@ -67,18 +64,6 @@ export const Topbar: React.FC<TopbarProps> = ({
 
       {/* Right Side Actions & Profile */}
       <div className="ml-auto flex items-center space-x-2.5 sm:space-x-3">
-        {/* Security Role Switcher Badge */}
-        {onOpenRoleModal && (
-          <button
-            onClick={onOpenRoleModal}
-            title="คลิกเพื่อสลับบทบาท หรือดูสิทธิ์ความปลอดภัย RLS"
-            className="flex items-center space-x-1.5 px-2.5 py-1.5 rounded-xl bg-primary/10 border border-primary/20 text-primary text-xs font-semibold hover:bg-primary/20 transition shadow-xs"
-          >
-            <ShieldCheck className="h-4 w-4" />
-            <span className="hidden sm:inline">สิทธิ์:</span>
-            <span>{roleLabel}</span>
-          </button>
-        )}
 
         {/* Notification Bell */}
         <Link
@@ -158,19 +143,6 @@ export const Topbar: React.FC<TopbarProps> = ({
                 <Settings className="h-4 w-4 text-ink-muted" />
                 <span>ตั้งค่าระบบและบัญชี</span>
               </Link>
-
-              {onOpenRoleModal && (
-                <button
-                  onClick={() => {
-                    setProfileOpen(false);
-                    onOpenRoleModal();
-                  }}
-                  className="w-full flex items-center space-x-2.5 px-3 py-2 text-xs font-medium text-ink-secondary hover:text-ink hover:bg-bg-subtle rounded-xl transition text-left"
-                >
-                  <ShieldCheck className="h-4 w-4 text-primary" />
-                  <span>สลับบทบาทสิทธิ์ (RBAC)</span>
-                </button>
-              )}
 
               <div className="my-1 border-t border-line" />
 

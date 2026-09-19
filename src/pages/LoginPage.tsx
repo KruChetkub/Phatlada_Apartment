@@ -15,7 +15,6 @@ import {
   loginWithEmail,
   isAuthenticated,
 } from '../services/authService';
-import { ForgotPasswordModal } from '../components/auth/ForgotPasswordModal';
 
 export const LoginPage: React.FC = () => {
   const navigate = useNavigate();
@@ -27,7 +26,6 @@ export const LoginPage: React.FC = () => {
   const [rememberMe, setRememberMe] = useState(true);
   const [loading, setLoading] = useState(false);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
-  const [isForgotOpen, setIsForgotOpen] = useState(false);
 
   // Return to intended page or /dashboard
   const fromLocation = (location.state as { from?: { pathname: string } })?.from?.pathname || '/dashboard';
@@ -133,20 +131,13 @@ export const LoginPage: React.FC = () => {
 
             {/* Password Field */}
             <div>
-              <div className="flex items-center justify-between mb-1.5">
+              <div className="mb-1.5">
                 <label
                   htmlFor="login-password"
                   className="block text-xs font-bold text-ink uppercase tracking-wider"
                 >
                   รหัสผ่าน (Password)
                 </label>
-                <button
-                  type="button"
-                  onClick={() => setIsForgotOpen(true)}
-                  className="text-xs font-medium text-primary hover:underline focus:outline-none"
-                >
-                  ลืมรหัสผ่าน?
-                </button>
               </div>
               <div className="relative">
                 <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-ink-muted">
@@ -211,13 +202,6 @@ export const LoginPage: React.FC = () => {
           ระบบมีการเข้ารหัสและจำกัดสิทธิ์ข้อมูลตามนโยบายความปลอดภัยของ ภัทร์ลดา อพาร์ทเมนท์
         </div>
       </div>
-
-      {/* Forgot Password Modal */}
-      <ForgotPasswordModal
-        isOpen={isForgotOpen}
-        onClose={() => setIsForgotOpen(false)}
-        defaultEmail={email}
-      />
     </div>
   );
 };

@@ -22,7 +22,6 @@ import { TermsPage } from './pages/TermsPage';
 import { PlaceholderPage } from './pages/PlaceholderPage';
 import { CookieConsentBanner } from './components/common/CookieConsentBanner';
 import { DormSwitchModal } from './components/dorm/DormSwitchModal';
-import { AuthRoleModal } from './components/auth/AuthRoleModal';
 import { LogoutConfirmModal } from './components/auth/LogoutConfirmModal';
 import { ProtectedRoute } from './components/auth/ProtectedRoute';
 import { getCurrentSession, logout } from './services/authService';
@@ -47,7 +46,6 @@ const initialUser = {
 export const App: React.FC = () => {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [isDormSwitchOpen, setIsDormSwitchOpen] = useState(false);
-  const [isRoleModalOpen, setIsRoleModalOpen] = useState(false);
   const [isLogoutOpen, setIsLogoutOpen] = useState(false);
 
   const [dashboardData, setDashboardData] = useState<Partial<DashboardSummary>>(() => {
@@ -203,7 +201,6 @@ export const App: React.FC = () => {
           user={dashboardData.user || initialUser}
           unreadCount={dashboardData.unreadNotifications || 0}
           onOpenMobileMenu={() => setMobileMenuOpen(true)}
-          onOpenRoleModal={() => setIsRoleModalOpen(true)}
           onOpenLogoutModal={() => setIsLogoutOpen(true)}
         />
 
@@ -370,21 +367,6 @@ export const App: React.FC = () => {
               id: dorm.id,
               name: dorm.name,
               plan: dorm.plan,
-            },
-          }));
-        }}
-      />
-
-      <AuthRoleModal
-        isOpen={isRoleModalOpen}
-        onClose={() => setIsRoleModalOpen(false)}
-        onRoleChanged={(role) => {
-          setDashboardData((prev) => ({
-            ...prev,
-            user: {
-              ...initialUser,
-              ...prev.user,
-              role,
             },
           }));
         }}
