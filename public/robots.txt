@@ -1,0 +1,17 @@
+# robots.txt for https://phatlada.vercel.app/
+User-agent: *
+Allow: /
+Allow: /help
+Disallow: /rooms
+Disallow: /tenants
+Disallow: /leases
+Disallow: /invoices
+Disallow: /finance
+Disallow: /maintenance
+Disallow: /reports
+Disallow: /messages
+Disallow: /settings
+Disallow: /notifications
+
+Sitemap: https://phatlada.vercel.app/sitemap.xml
+
