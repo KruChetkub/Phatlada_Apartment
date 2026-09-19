@@ -22,8 +22,8 @@ export const LandingHero: React.FC<LandingHeroProps> = ({ onOpenBooking }) => {
     const handleUpdate = () => {
       setSettings(getLocalSettings());
     };
-    window.addEventListener('dormplus_settings_updated', handleUpdate);
-    return () => window.removeEventListener('dormplus_settings_updated', handleUpdate);
+    window.addEventListener('phatlada_settings_updated', handleUpdate);
+    return () => window.removeEventListener('phatlada_settings_updated', handleUpdate);
   }, []);
 
   const phoneDisplay = settings.phone || '087 188 9122';
@@ -158,7 +158,7 @@ export const LandingHero: React.FC<LandingHeroProps> = ({ onOpenBooking }) => {
       {/* MOBILE & TABLET VIEW (< lg): Stack Layout - Photo on top 100% unobstructed, Card stacked cleanly below */}
       <div className="lg:hidden flex flex-col bg-bg">
         {/* Top: 100% unobstructed photo of the apartment */}
-        <div className="relative w-full h-[260px] sm:h-[380px] overflow-hidden bg-surface">
+        <div className="relative w-full aspect-[4/3] sm:aspect-[16/9] sm:max-h-[420px] overflow-hidden bg-surface">
           <img
             src="/1.jpg"
             alt={settings.dormitoryName || 'ภัทร์ลดา อพาร์ทเมนท์'}
@@ -166,8 +166,8 @@ export const LandingHero: React.FC<LandingHeroProps> = ({ onOpenBooking }) => {
           />
         </div>
 
-        {/* Bottom: Card placed directly below photo */}
-        <div className="px-3 sm:px-6 -mt-6 sm:-mt-8 pb-10 relative z-10 max-w-lg mx-auto w-full">
+        {/* Bottom: Card placed cleanly below photo with no overlap */}
+        <div className="px-4 sm:px-6 py-6 sm:py-8 max-w-xl mx-auto w-full">
           {renderCardContent()}
         </div>
       </div>

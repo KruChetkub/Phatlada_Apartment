@@ -2,13 +2,13 @@ import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { Home, ChevronRight, X } from 'lucide-react';
 
-const STORAGE_KEY = 'dormplus_promo_dismissed';
+const STORAGE_KEY = 'phatlada_promo_dismissed';
 
 export const PromoCard: React.FC = () => {
   const [isDismissed, setIsDismissed] = useState(false);
 
   useEffect(() => {
-    const dismissed = localStorage.getItem(STORAGE_KEY);
+    const dismissed = localStorage.getItem(STORAGE_KEY) || localStorage.getItem('dormplus_promo_dismissed');
     if (dismissed === 'true') {
       setIsDismissed(true);
     }
@@ -40,7 +40,7 @@ export const PromoCard: React.FC = () => {
           <Home className="h-4 w-4" />
         </div>
         <span className="rounded-full bg-primary-soft px-2.5 py-0.5 text-[11px] font-semibold text-primary">
-          ด้วย DormPlus
+          ด้วย Phatlada
         </span>
       </div>
 

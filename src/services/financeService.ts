@@ -6,11 +6,11 @@ export interface PaymentWithDetails extends Payment {
   tenantName?: string;
 }
 
-const LOCAL_PAYMENTS_KEY = 'dormplus_real_payments';
-const LOCAL_EXPENSES_KEY = 'dormplus_real_expenses';
+const LOCAL_PAYMENTS_KEY = 'phatlada_real_payments';
+const LOCAL_EXPENSES_KEY = 'phatlada_real_expenses';
 
 function getLocalPayments(): PaymentWithDetails[] {
-  const data = localStorage.getItem(LOCAL_PAYMENTS_KEY);
+  const data = localStorage.getItem(LOCAL_PAYMENTS_KEY) || localStorage.getItem('dormplus_real_payments');
   return data ? JSON.parse(data) : [];
 }
 
@@ -19,7 +19,7 @@ function saveLocalPayments(items: PaymentWithDetails[]): void {
 }
 
 function getLocalExpenses(): Expense[] {
-  const data = localStorage.getItem(LOCAL_EXPENSES_KEY);
+  const data = localStorage.getItem(LOCAL_EXPENSES_KEY) || localStorage.getItem('dormplus_real_expenses');
   return data ? JSON.parse(data) : [];
 }
 

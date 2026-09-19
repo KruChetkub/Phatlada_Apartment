@@ -1,6 +1,6 @@
-# DormPlus — ระบบจัดการหอพักและอพาร์ตเมนต์ครบวงจร
+# Phatlada — ระบบจัดการหอพักและอพาร์ตเมนต์ครบวงจร
 
-เว็บแอปพลิเคชันจัดการหอพัก **DormPlus** พัฒนาด้วยสถาปัตยกรรม **React + Vite + Supabase + Vercel + GitHub** ตามข้อกำหนดและดีไซน์ใน `DESIGN.md`, `SPEC.md`, และ `RULES.md`
+เว็บแอปพลิเคชันจัดการหอพัก **Phatlada** พัฒนาด้วยสถาปัตยกรรม **React + Vite + Supabase + Vercel + GitHub** ตามข้อกำหนดและดีไซน์ใน `DESIGN.md`, `SPEC.md`, และ `RULES.md`
 
 ---
 
@@ -111,8 +111,21 @@ npm run dev
 
 1. Push โค้ดทั้งหมดขึ้น GitHub Repository
 2. เข้าสู่ [Vercel Dashboard](https://vercel.com) แล้วคลิก **Add New Project**
-3. เลือก Repository `domplus-apartment-project`
+3. เลือก Repository `Phatlada_Apartment`
 4. เพิ่ม Environment Variables:
    - `VITE_SUPABASE_URL`
    - `VITE_SUPABASE_ANON_KEY`
 5. คลิก **Deploy** — ตัวโปรเจกต์จะถูก Build และออนไลน์พร้อมใช้งานทันที
+
+
+เมื่อเปิด เครื่องที่ 2 (ก่อนเริ่มเขียนโค้ดต่อ):
+ดึงโค้ดล่าสุดที่เพิ่งทำค้างไว้ลงมา:
+
+bash
+
+git pull
+
+
+git add .
+git commit -m "อัปเดตงานล่าสุด"
+git push

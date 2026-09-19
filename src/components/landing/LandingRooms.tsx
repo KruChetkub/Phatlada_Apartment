@@ -13,8 +13,8 @@ export const LandingRooms: React.FC<LandingRoomsProps> = ({ onSelectRoom }) => {
     const handleUpdate = () => {
       setSettings(getLocalSettings());
     };
-    window.addEventListener('dormplus_settings_updated', handleUpdate);
-    return () => window.removeEventListener('dormplus_settings_updated', handleUpdate);
+    window.addEventListener('phatlada_settings_updated', handleUpdate);
+    return () => window.removeEventListener('phatlada_settings_updated', handleUpdate);
   }, []);
 
   const monthlyPriceFormatted = Number(settings.landingStartingPrice || 3800).toLocaleString();

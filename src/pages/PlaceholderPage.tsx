@@ -20,7 +20,7 @@ const ROUTE_NAMES: Record<string, string> = {
   '/messages': 'ข้อความ',
   '/settings': 'ตั้งค่าระบบ',
   '/notifications': 'การแจ้งเตือนทั้งหมด',
-  '/help': 'วิธีใช้งาน DormPlus',
+  '/help': 'วิธีใช้งาน Phatlada',
 };
 
 export const PlaceholderPage: React.FC<PlaceholderPageProps> = ({ title }) => {

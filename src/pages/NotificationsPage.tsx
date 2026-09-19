@@ -14,10 +14,10 @@ import { supabase, isSupabaseConfigured } from '../lib/supabase';
 import { formatThaiDateShort, formatThaiTime, formatRelativeTh } from '../lib/format';
 import { EmptyState } from '../components/common/EmptyState';
 
-const NOTIF_STORAGE_KEY = 'dormplus_real_notifications';
+const NOTIF_STORAGE_KEY = 'phatlada_real_notifications';
 
 function getLocalNotifications(): NotificationItem[] {
-  const raw = localStorage.getItem(NOTIF_STORAGE_KEY);
+  const raw = localStorage.getItem(NOTIF_STORAGE_KEY) || localStorage.getItem('dormplus_real_notifications');
   return raw ? JSON.parse(raw) : [];
 }
 

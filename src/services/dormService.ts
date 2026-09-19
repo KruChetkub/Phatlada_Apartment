@@ -2,8 +2,8 @@ import { Dormitory, PlanType } from '../types/database';
 import { supabase, isSupabaseConfigured } from '../lib/supabase';
 import { getLocalSettings } from './settingsService';
 
-const DORM_LIST_STORAGE_KEY = 'dormplus_dormitories_list';
-const ACTIVE_DORM_STORAGE_KEY = 'dormplus_active_dorm_id';
+const DORM_LIST_STORAGE_KEY = 'phatlada_dormitories_list';
+const ACTIVE_DORM_STORAGE_KEY = 'phatlada_active_dorm_id';
 
 export function getLocalDormitories(): Dormitory[] {
   const currentSettings = getLocalSettings();
@@ -17,7 +17,7 @@ export function getLocalDormitories(): Dormitory[] {
   ];
 
   try {
-    const raw = localStorage.getItem(DORM_LIST_STORAGE_KEY);
+    const raw = localStorage.getItem(DORM_LIST_STORAGE_KEY) || localStorage.getItem('dormplus_dormitories_list');
     if (!raw) return defaultList;
     const parsed = JSON.parse(raw);
     return Array.isArray(parsed) && parsed.length > 0 ? parsed : defaultList;
@@ -32,7 +32,7 @@ export function saveLocalDormitories(list: Dormitory[]): void {
 
 export function getActiveDormitoryId(): string {
   const list = getLocalDormitories();
-  const saved = localStorage.getItem(ACTIVE_DORM_STORAGE_KEY);
+  const saved = localStorage.getItem(ACTIVE_DORM_STORAGE_KEY) || localStorage.getItem('dormplus_active_dorm_id');
   if (saved && list.some((d) => d.id === saved)) return saved;
   return list[0]?.id || 'default-dorm';
 }
@@ -43,7 +43,7 @@ export function setActiveDormitoryId(dormId: string): void {
   const target = list.find((d) => d.id === dormId);
   if (typeof window !== 'undefined') {
     window.dispatchEvent(
-      new CustomEvent('dormplus_dormitory_switched', {
+      new CustomEvent('phatlada_dormitory_switched', {
         detail: target || { id: dormId, name: 'หอพักที่เลือก' },
       })
     );

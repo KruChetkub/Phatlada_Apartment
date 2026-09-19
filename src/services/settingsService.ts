@@ -75,11 +75,11 @@ export const defaultSettings: DormSettings = {
   notifyLeaseExpiringDays: 30,
 };
 
-const SETTINGS_STORAGE_KEY = 'dormplus_system_settings';
+const SETTINGS_STORAGE_KEY = 'phatlada_system_settings';
 
 export function getLocalSettings(): DormSettings {
   try {
-    const raw = localStorage.getItem(SETTINGS_STORAGE_KEY);
+    const raw = localStorage.getItem(SETTINGS_STORAGE_KEY) || localStorage.getItem('dormplus_system_settings');
     if (!raw) return defaultSettings;
     return { ...defaultSettings, ...JSON.parse(raw) };
   } catch {
@@ -130,7 +130,7 @@ export async function saveSettings(updates: Partial<DormSettings>): Promise<Dorm
 
   // Dispatch custom event to notify components (Topbar, Sidebar)
   if (typeof window !== 'undefined') {
-    window.dispatchEvent(new CustomEvent('dormplus_settings_updated', { detail: merged }));
+    window.dispatchEvent(new CustomEvent('phatlada_settings_updated', { detail: merged }));
   }
 
   return merged;
@@ -141,13 +141,13 @@ export function exportBackupJson(): string {
     version: '1.0',
     exportDate: new Date().toISOString(),
     settings: getLocalSettings(),
-    rooms: localStorage.getItem('dormplus_real_rooms') || '[]',
-    tenants: localStorage.getItem('dormplus_real_tenants') || '[]',
-    leases: localStorage.getItem('dormplus_real_leases') || '[]',
-    payments: localStorage.getItem('dormplus_real_payments') || '[]',
-    expenses: localStorage.getItem('dormplus_real_expenses') || '[]',
-    maintenance: localStorage.getItem('dormplus_real_maintenance') || '[]',
-    messages: localStorage.getItem('dormplus_real_messages') || '[]',
+    rooms: localStorage.getItem('phatlada_real_rooms') || localStorage.getItem('dormplus_real_rooms') || '[]',
+    tenants: localStorage.getItem('phatlada_real_tenants') || localStorage.getItem('dormplus_real_tenants') || '[]',
+    leases: localStorage.getItem('phatlada_real_leases') || localStorage.getItem('dormplus_real_leases') || '[]',
+    payments: localStorage.getItem('phatlada_real_payments') || localStorage.getItem('dormplus_real_payments') || '[]',
+    expenses: localStorage.getItem('phatlada_real_expenses') || localStorage.getItem('dormplus_real_expenses') || '[]',
+    maintenance: localStorage.getItem('phatlada_real_maintenance') || localStorage.getItem('dormplus_real_maintenance') || '[]',
+    messages: localStorage.getItem('phatlada_real_messages') || localStorage.getItem('dormplus_real_messages') || '[]',
   };
   return JSON.stringify(backup, null, 2);
 }
@@ -161,29 +161,29 @@ export function importBackupJson(jsonString: string): boolean {
       localStorage.setItem(SETTINGS_STORAGE_KEY, JSON.stringify(parsed.settings));
     }
     if (parsed.rooms) {
-      localStorage.setItem('dormplus_real_rooms', typeof parsed.rooms === 'string' ? parsed.rooms : JSON.stringify(parsed.rooms));
+      localStorage.setItem('phatlada_real_rooms', typeof parsed.rooms === 'string' ? parsed.rooms : JSON.stringify(parsed.rooms));
     }
     if (parsed.tenants) {
-      localStorage.setItem('dormplus_real_tenants', typeof parsed.tenants === 'string' ? parsed.tenants : JSON.stringify(parsed.tenants));
+      localStorage.setItem('phatlada_real_tenants', typeof parsed.tenants === 'string' ? parsed.tenants : JSON.stringify(parsed.tenants));
     }
     if (parsed.leases) {
-      localStorage.setItem('dormplus_real_leases', typeof parsed.leases === 'string' ? parsed.leases : JSON.stringify(parsed.leases));
+      localStorage.setItem('phatlada_real_leases', typeof parsed.leases === 'string' ? parsed.leases : JSON.stringify(parsed.leases));
     }
     if (parsed.payments) {
-      localStorage.setItem('dormplus_real_payments', typeof parsed.payments === 'string' ? parsed.payments : JSON.stringify(parsed.payments));
+      localStorage.setItem('phatlada_real_payments', typeof parsed.payments === 'string' ? parsed.payments : JSON.stringify(parsed.payments));
     }
     if (parsed.expenses) {
-      localStorage.setItem('dormplus_real_expenses', typeof parsed.expenses === 'string' ? parsed.expenses : JSON.stringify(parsed.expenses));
+      localStorage.setItem('phatlada_real_expenses', typeof parsed.expenses === 'string' ? parsed.expenses : JSON.stringify(parsed.expenses));
     }
     if (parsed.maintenance) {
-      localStorage.setItem('dormplus_real_maintenance', typeof parsed.maintenance === 'string' ? parsed.maintenance : JSON.stringify(parsed.maintenance));
+      localStorage.setItem('phatlada_real_maintenance', typeof parsed.maintenance === 'string' ? parsed.maintenance : JSON.stringify(parsed.maintenance));
     }
     if (parsed.messages) {
-      localStorage.setItem('dormplus_real_messages', typeof parsed.messages === 'string' ? parsed.messages : JSON.stringify(parsed.messages));
+      localStorage.setItem('phatlada_real_messages', typeof parsed.messages === 'string' ? parsed.messages : JSON.stringify(parsed.messages));
     }
 
     if (typeof window !== 'undefined') {
-      window.dispatchEvent(new CustomEvent('dormplus_settings_updated', { detail: parsed.settings }));
+      window.dispatchEvent(new CustomEvent('phatlada_settings_updated', { detail: parsed.settings }));
     }
     return true;
   } catch (err) {
@@ -194,6 +194,13 @@ export function importBackupJson(jsonString: string): boolean {
 
 export function resetAllData(): void {
   const keys = [
+    'phatlada_real_rooms',
+    'phatlada_real_tenants',
+    'phatlada_real_leases',
+    'phatlada_real_payments',
+    'phatlada_real_expenses',
+    'phatlada_real_maintenance',
+    'phatlada_real_messages',
     'dormplus_real_rooms',
     'dormplus_real_tenants',
     'dormplus_real_leases',
@@ -202,10 +209,11 @@ export function resetAllData(): void {
     'dormplus_real_maintenance',
     'dormplus_real_messages',
     SETTINGS_STORAGE_KEY,
+    'dormplus_system_settings',
   ];
   keys.forEach((k) => localStorage.removeItem(k));
   if (typeof window !== 'undefined') {
-    window.dispatchEvent(new CustomEvent('dormplus_settings_updated', { detail: defaultSettings }));
+    window.dispatchEvent(new CustomEvent('phatlada_settings_updated', { detail: defaultSettings }));
   }
 }
 

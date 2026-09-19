@@ -7,10 +7,10 @@ export interface LeaseWithDetails extends Lease {
   tenantName?: string;
 }
 
-const LOCAL_STORAGE_KEY = 'dormplus_real_leases';
+const LOCAL_STORAGE_KEY = 'phatlada_real_leases';
 
 function getLocalLeases(): LeaseWithDetails[] {
-  const data = localStorage.getItem(LOCAL_STORAGE_KEY);
+  const data = localStorage.getItem(LOCAL_STORAGE_KEY) || localStorage.getItem('dormplus_real_leases');
   return data ? JSON.parse(data) : [];
 }
 

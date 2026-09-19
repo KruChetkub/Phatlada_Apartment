@@ -88,7 +88,7 @@ export const SettingsPage: React.FC = () => {
     const url = URL.createObjectURL(blob);
     const link = document.createElement('a');
     link.href = url;
-    link.download = `dormplus-backup-${new Date().toISOString().split('T')[0]}.json`;
+    link.download = `phatlada-backup-${new Date().toISOString().split('T')[0]}.json`;
     link.click();
     URL.revokeObjectURL(url);
   };
@@ -109,7 +109,7 @@ export const SettingsPage: React.FC = () => {
           setTimeout(() => setShowSuccessToast(false), 3500);
           alert('นำเข้าข้อมูลสำเร็จ ระบบได้ปรับปรุงข้อมูลเรียบร้อยแล้ว');
         } else {
-          alert('ไฟล์ข้อมูลไม่ถูกต้อง กรุณาเลือกไฟล์ Backup JSON ของ DormPlus');
+          alert('ไฟล์ข้อมูลไม่ถูกต้อง กรุณาเลือกไฟล์ Backup JSON ของ Phatlada');
         }
       }
     };
@@ -298,7 +298,7 @@ export const SettingsPage: React.FC = () => {
               <div>
                 <span className="text-xs font-bold text-primary block">แพ็กเกจการใช้งานปัจจุบัน</span>
                 <span className="text-[11px] text-ink-secondary">
-                  DormPlus Premium — ใช้งานฟีเจอร์ครบทุกส่วนโดยไม่มีข้อจำกัด
+                  Phatlada Premium — ใช้งานฟีเจอร์ครบทุกส่วนโดยไม่มีข้อจำกัด
                 </span>
               </div>
               <span className="px-3 py-1 bg-primary text-white text-[11px] font-bold rounded-full">
@@ -611,7 +611,7 @@ export const SettingsPage: React.FC = () => {
                   value={settings.userEmail}
                   onChange={(e) => handleChange('userEmail', e.target.value)}
                   className="w-full text-xs p-2.5 rounded-lg border border-line bg-surface text-ink focus:ring-1 focus:ring-primary focus:outline-none"
-                  placeholder="admin@dormplus.com"
+                  placeholder="admin@phatlada.com"
                 />
               </div>
 

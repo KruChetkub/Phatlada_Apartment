@@ -1,10 +1,10 @@
 import { MessageItem } from '../types/database';
 import { supabase, isSupabaseConfigured } from '../lib/supabase';
 
-const LOCAL_STORAGE_KEY = 'dormplus_real_messages';
+const LOCAL_STORAGE_KEY = 'phatlada_real_messages';
 
 function getLocalMessages(): MessageItem[] {
-  const data = localStorage.getItem(LOCAL_STORAGE_KEY);
+  const data = localStorage.getItem(LOCAL_STORAGE_KEY) || localStorage.getItem('dormplus_real_messages');
   return data ? JSON.parse(data) : [];
 }
 

@@ -1,4 +1,4 @@
--- DormPlus Seed Data for Supabase
+-- Phatlada Seed Data for Supabase
 -- Matches SPEC.md §8 and design references exactly
 
 -- Clean existing data
@@ -6,7 +6,7 @@ TRUNCATE TABLE notifications, maintenance_requests, expenses, payments, leases, 
 
 -- Insert Owner User
 INSERT INTO users (id, email, display_name, role)
-VALUES ('00000000-0000-0000-0000-000000000001', 'owner@dormplus.com', 'คุณนท ถาวร ศรีเสนพิลา', 'OWNER');
+VALUES ('00000000-0000-0000-0000-000000000001', 'owner@phatlada.com', 'คุณนท ถาวร ศรีเสนพิลา', 'OWNER');
 
 -- Insert Dormitory: หอพักสุขสันต์ (PREMIUM)
 INSERT INTO dormitories (id, name, plan)

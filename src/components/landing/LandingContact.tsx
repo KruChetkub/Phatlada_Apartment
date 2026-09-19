@@ -19,8 +19,8 @@ export const LandingContact: React.FC<LandingContactProps> = ({ onOpenBooking })
     const handleUpdate = () => {
       setSettings(getLocalSettings());
     };
-    window.addEventListener('dormplus_settings_updated', handleUpdate);
-    return () => window.removeEventListener('dormplus_settings_updated', handleUpdate);
+    window.addEventListener('phatlada_settings_updated', handleUpdate);
+    return () => window.removeEventListener('phatlada_settings_updated', handleUpdate);
   }, []);
 
   const fullAddress = settings.address || '79 หมู่ 7 เวียง อำเภอ เชียงของ เชียงราย 57140';

@@ -53,7 +53,7 @@ export const HelpPage: React.FC = () => {
     },
     {
       q: 'ทำไมถึงควรใช้ QR Code พร้อมเพย์ในใบแจ้งหนี้?',
-      a: 'ใบแจ้งหนี้ของ DormPlus สร้าง Payload ตามมาตรฐาน EMVCo PromptPay พร้อมระบุยอดเงินที่ต้องชำระตรงตามบิล ทำให้ผู้เช่าสามารถเปิดแอปธนาคารใดก็ได้แล้วสแกนจ่ายได้ทันทียอดเงินไม่คลาดเคลื่อน',
+      a: 'ใบแจ้งหนี้ของ Phatlada สร้าง Payload ตามมาตรฐาน EMVCo PromptPay พร้อมระบุยอดเงินที่ต้องชำระตรงตามบิล ทำให้ผู้เช่าสามารถเปิดแอปธนาคารใดก็ได้แล้วสแกนจ่ายได้ทันทียอดเงินไม่คลาดเคลื่อน',
     },
     {
       q: 'ระบบรักษาความปลอดภัยและการแบ่งสิทธิ์ (RBAC / RLS) ทำงานอย่างไร?',
@@ -78,7 +78,7 @@ export const HelpPage: React.FC = () => {
           <span>ศูนย์ช่วยเหลือ & วิธีใช้งานระบบ (Help & Guide)</span>
         </h1>
         <p className="text-xs text-ink-secondary mt-1">
-          คู่มือแนะนำขั้นตอนการทำงาน คำถามที่พบบ่อย และเทคนิคการบริหารหอพักด้วย DormPlus
+          คู่มือแนะนำขั้นตอนการทำงาน คำถามที่พบบ่อย และเทคนิคการบริหารหอพักด้วย Phatlada
         </p>
       </div>
 
@@ -153,7 +153,7 @@ export const HelpPage: React.FC = () => {
           </span>
         </div>
         <a
-          href="mailto:support@dormplus.com"
+          href="mailto:support@phatlada.com"
           className="inline-flex items-center space-x-1.5 px-3.5 py-2 bg-primary text-white text-xs font-semibold rounded-lg shadow-sm hover:bg-primary/90 transition"
         >
           <MessageSquare className="h-3.5 w-3.5" />

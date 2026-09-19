@@ -79,7 +79,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
             </div>
             <div>
               <span className="text-[22px] font-semibold tracking-tight text-white">
-                DormPlus
+                Phatlada
               </span>
               <p className="text-[12px] text-white/70">
                 จัดการหอพัก...ให้ง่ายขึ้น

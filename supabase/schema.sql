@@ -1,4 +1,4 @@
--- DormPlus Database Schema for Supabase (PostgreSQL)
+-- Phatlada Database Schema for Supabase (PostgreSQL)
 -- Conforms to SPEC.md §4 and RULES.md §2 (all monetary values in satang as INTEGER)
 
 -- 1. Create Enums

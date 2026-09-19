@@ -3,11 +3,11 @@ import { supabase, isSupabaseConfigured } from '../lib/supabase';
 import { getLocalSettings } from './settingsService';
 import { generatePromptPayPayload } from '../lib/promptpay';
 
-const READINGS_STORAGE_KEY = 'dormplus_real_readings';
-const INVOICES_STORAGE_KEY = 'dormplus_real_invoices';
+const READINGS_STORAGE_KEY = 'phatlada_real_readings';
+const INVOICES_STORAGE_KEY = 'phatlada_real_invoices';
 
 function getLocalReadings(): UtilityReading[] {
-  const data = localStorage.getItem(READINGS_STORAGE_KEY);
+  const data = localStorage.getItem(READINGS_STORAGE_KEY) || localStorage.getItem('dormplus_real_readings');
   return data ? JSON.parse(data) : [];
 }
 
@@ -16,7 +16,7 @@ function saveLocalReadings(list: UtilityReading[]): void {
 }
 
 function getLocalInvoices(): Invoice[] {
-  const data = localStorage.getItem(INVOICES_STORAGE_KEY);
+  const data = localStorage.getItem(INVOICES_STORAGE_KEY) || localStorage.getItem('dormplus_real_invoices');
   return data ? JSON.parse(data) : [];
 }
 

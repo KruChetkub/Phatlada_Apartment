@@ -61,7 +61,7 @@ export const AuthRoleModal: React.FC<AuthRoleModalProps> = ({
     <Modal isOpen={isOpen} onClose={onClose} title="โหมดความปลอดภัย & สิทธิ์ผู้ใช้งาน (RBAC / RLS)">
       <div className="space-y-4">
         <p className="text-xs text-ink-secondary">
-          ระบบความปลอดภัยของ DormPlus เปิดใช้งาน Row Level Security (RLS) คุณสามารถสลับบทบาทด้านล่างเพื่อทดสอบการแสดงผลและสิทธิ์การเข้าถึงปุ่มต่างๆ ได้ทันที:
+          ระบบความปลอดภัยของ Phatlada เปิดใช้งาน Row Level Security (RLS) คุณสามารถสลับบทบาทด้านล่างเพื่อทดสอบการแสดงผลและสิทธิ์การเข้าถึงปุ่มต่างๆ ได้ทันที:
         </p>
 
         <div className="space-y-2.5">

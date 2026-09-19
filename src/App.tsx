@@ -142,14 +142,14 @@ export const App: React.FC = () => {
       }
     };
 
-    window.addEventListener('dormplus_settings_updated', handleSettingsUpdate);
-    window.addEventListener('dormplus_dormitory_switched', handleDormSwitched);
-    window.addEventListener('dormplus_auth_changed', handleAuthChanged);
+    window.addEventListener('phatlada_settings_updated', handleSettingsUpdate);
+    window.addEventListener('phatlada_dormitory_switched', handleDormSwitched);
+    window.addEventListener('phatlada_auth_changed', handleAuthChanged);
 
     return () => {
-      window.removeEventListener('dormplus_settings_updated', handleSettingsUpdate);
-      window.removeEventListener('dormplus_dormitory_switched', handleDormSwitched);
-      window.removeEventListener('dormplus_auth_changed', handleAuthChanged);
+      window.removeEventListener('phatlada_settings_updated', handleSettingsUpdate);
+      window.removeEventListener('phatlada_dormitory_switched', handleDormSwitched);
+      window.removeEventListener('phatlada_auth_changed', handleAuthChanged);
     };
   }, []);
 

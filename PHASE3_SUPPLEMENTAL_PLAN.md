@@ -1,4 +1,4 @@
-# แผนเสริมการพัฒนาระบบ DormPlus (Phase 3 & Advanced Security Architecture)
+# แผนเสริมการพัฒนาระบบ Phatlada (Phase 3 & Advanced Security Architecture)
 
 เอกสารฉบับนี้เป็น **แผนเสริมการพัฒนา** ตามคำสั่ง เพื่อใช้เป็นแนวทางมาตรฐานในการพัฒนา 5 ฟังก์ชันขั้นสูง พร้อมการเปิดโหมดความปลอดภัย Supabase RLS และการควบคุมแบบ Modal-Driven
 

@@ -1,10 +1,10 @@
-# CLAUDE.md — DormPlus
+# CLAUDE.md — Phatlada
 
 ไฟล์นี้ Claude Code อ่านอัตโนมัติทุกครั้งที่เริ่ม session ในโปรเจกต์นี้
 
 ## โปรเจกต์
 
-DormPlus — เว็บแอปจัดการหอพัก UI ภาษาไทย (ปี พ.ศ.)
+Phatlada — เว็บแอปจัดการหอพัก UI ภาษาไทย (ปี พ.ศ.)
 Stack: Next.js (App Router) · TypeScript strict · Tailwind + shadcn/ui · Recharts · Prisma + PostgreSQL · Vitest · Playwright · pnpm
 งานปัจจุบัน: Phase 1 — หน้า Dashboard ให้ตรงกับ `assets/reference-dashboard.png`
 

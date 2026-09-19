@@ -5,10 +5,10 @@ export interface MaintenanceWithRoom extends MaintenanceRequest {
   roomNumber?: string;
 }
 
-const LOCAL_STORAGE_KEY = 'dormplus_real_maintenance';
+const LOCAL_STORAGE_KEY = 'phatlada_real_maintenance';
 
 function getLocalMaintenance(): MaintenanceWithRoom[] {
-  const data = localStorage.getItem(LOCAL_STORAGE_KEY);
+  const data = localStorage.getItem(LOCAL_STORAGE_KEY) || localStorage.getItem('dormplus_real_maintenance');
   return data ? JSON.parse(data) : [];
 }
 
