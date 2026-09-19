@@ -121,7 +121,7 @@ export const LandingContact: React.FC<LandingContactProps> = ({ onOpenBooking })
                 <a
                   href={googleMapsShareUrl}
                   target="_blank"
-                  rel="noreferrer"
+                  rel="noopener noreferrer"
                   className="inline-flex items-center space-x-1 text-xs text-primary font-semibold hover:underline"
                 >
                   <span>เปิด Google Maps</span>
@@ -132,7 +132,7 @@ export const LandingContact: React.FC<LandingContactProps> = ({ onOpenBooking })
               {/* Embedded Google Maps with Click-to-Navigate Overlay */}
               <div className="w-full h-80 sm:h-96 rounded-2xl overflow-hidden border border-line shadow-sm bg-surface relative group">
                 <iframe
-                  src="https://maps.google.com/maps?q=20.2503358,100.4079899&hl=th&z=16&output=embed"
+                  src="https://www.google.com/maps/embed?origin=mfe&pb=!1m3!2m1!1s20.2503358,100.4079899!6i16!3m1!1sth!5m1!1sth"
                   width="100%"
                   height="100%"
                   style={{ border: 0 }}
@@ -147,7 +147,7 @@ export const LandingContact: React.FC<LandingContactProps> = ({ onOpenBooking })
                 <a
                   href={googleMapsShareUrl}
                   target="_blank"
-                  rel="noreferrer"
+                  rel="noopener noreferrer"
                   className="absolute inset-0 z-10 flex items-end justify-center p-3.5 bg-black/0 hover:bg-black/10 transition cursor-pointer"
                   title="คลิกเพื่อเปิดดูใน Google Maps และนำทางด้วย GPS"
                 >
@@ -168,7 +168,7 @@ export const LandingContact: React.FC<LandingContactProps> = ({ onOpenBooking })
               <a
                 href={googleMapsShareUrl}
                 target="_blank"
-                rel="noreferrer"
+                rel="noopener noreferrer"
                 className="text-xs text-primary font-bold hover:underline shrink-0"
               >
                 นำทางด้วย GPS &rarr;

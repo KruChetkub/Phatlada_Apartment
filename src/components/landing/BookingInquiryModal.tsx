@@ -288,7 +288,7 @@ export const BookingInquiryModal: React.FC<BookingInquiryModalProps> = ({
             <div className="space-y-0.5">
               <span className="block">
                 ข้อมูลปลอดภัย: ระบบเข้ารหัสและส่งตรงถึงผู้ดูแลหอพัก ไม่บันทึกค้างบนเครื่องผู้ใช้ ตาม{' '}
-                <Link to="/privacy-policy" target="_blank" className="text-primary font-medium underline hover:text-primary-dark">
+                <Link to="/privacy-policy" target="_blank" rel="noopener noreferrer" className="text-primary font-medium underline hover:text-primary-dark">
                   นโยบาย PDPA
                 </Link>
               </span>
