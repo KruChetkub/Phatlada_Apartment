@@ -40,6 +40,35 @@ export function satangToBaht(satang: number): number {
   return Math.round(satang / 100);
 }
 
+const THAI_MONTH_NAMES = [
+  'มกราคม',
+  'กุมภาพันธ์',
+  'มีนาคม',
+  'เมษายน',
+  'พฤษภาคม',
+  'มิถุนายน',
+  'กรกฎาคม',
+  'สิงหาคม',
+  'กันยายน',
+  'ตุลาคม',
+  'พฤศจิกายน',
+  'ธันวาคม',
+];
+
+/**
+ * Format "YYYY-MM" to Thai Month and Buddhist Year: "กันยายน 2569"
+ */
+export function formatThaiPeriod(period: string): string {
+  if (!period) return '';
+  const parts = period.split('-');
+  if (parts.length < 2) return period;
+  const year = parseInt(parts[0], 10);
+  const month = parseInt(parts[1], 10);
+  if (isNaN(year) || isNaN(month) || month < 1 || month > 12) return period;
+  const beYear = year + 543;
+  return `${THAI_MONTH_NAMES[month - 1]} ${beYear}`;
+}
+
 /**
  * Format satang amount directly into Baht currency with symbol: "฿ 3,500"
  */

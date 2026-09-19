@@ -11,8 +11,9 @@ import {
 } from '../services/financeService';
 import { fetchLeases, LeaseWithDetails } from '../services/leaseService';
 import { Expense, PaymentStatus } from '../types/database';
-import { formatBaht, formatThaiDateShort, satangToBaht } from '../lib/format';
+import { formatBaht, formatThaiDateShort, formatThaiPeriod, satangToBaht } from '../lib/format';
 import { ThaiDatePicker } from '../components/common/ThaiDatePicker';
+import { ThaiPeriodPicker } from '../components/common/ThaiPeriodPicker';
 import { Modal } from '../components/common/Modal';
 import { ConfirmDialog } from '../components/common/ConfirmDialog';
 import { EmptyState } from '../components/common/EmptyState';
@@ -208,7 +209,7 @@ export const FinancePage: React.FC = () => {
                       </span>
                     </div>
                     <p className="text-xs text-ink-muted mt-1">
-                      งวดเดือน {p.period} · วันที่ชำระ:{' '}
+                      งวดเดือน {formatThaiPeriod(p.period)} · วันที่ชำระ:{' '}
                       {formatThaiDateShort(p.paidAt || p.createdAt)}
                     </p>
                   </div>
@@ -318,16 +319,11 @@ export const FinancePage: React.FC = () => {
               />
             </div>
             <div>
-              <label className="block text-xs font-medium text-ink-secondary mb-1">
-                งวดเดือน (YYYY-MM)
-              </label>
-              <input
-                type="text"
-                required
+              <ThaiPeriodPicker
+                label="งวดเดือน (พ.ศ.)"
                 value={paymentPeriod}
-                onChange={(e) => setPaymentPeriod(e.target.value)}
-                placeholder="เช่น 2025-09"
-                className="w-full h-9 rounded-md border border-line bg-surface px-3 text-xs text-ink focus:border-primary focus:outline-none"
+                onChange={setPaymentPeriod}
+                required
               />
             </div>
           </div>
