@@ -11,14 +11,18 @@ import {
   Wrench,
   CheckCircle2,
   Clock,
+  Receipt,
 } from 'lucide-react';
 import { fetchRooms } from '../services/roomService';
 import { fetchTenants } from '../services/tenantService';
 import { fetchPayments, fetchExpenses, PaymentWithDetails } from '../services/financeService';
 import { fetchMaintenance, MaintenanceWithRoom } from '../services/maintenanceService';
+import { fetchInvoices } from '../services/billingService';
 import { Room, Tenant, Expense } from '../types/database';
+import { Invoice } from '../types/billing';
 import {
   formatBaht,
+  formatSatang,
   formatThaiDateShort,
   satangToBaht,
 } from '../lib/format';
@@ -35,6 +39,7 @@ export const ReportsPage: React.FC = () => {
   const [payments, setPayments] = useState<PaymentWithDetails[]>([]);
   const [expenses, setExpenses] = useState<Expense[]>([]);
   const [maintenance, setMaintenance] = useState<MaintenanceWithRoom[]>([]);
+  const [invoices, setInvoices] = useState<Invoice[]>([]);
   const [loading, setLoading] = useState(true);
 
   // Selected Month & Year (พ.ศ.) for report filter
@@ -54,18 +59,20 @@ export const ReportsPage: React.FC = () => {
   const loadData = async () => {
     try {
       setLoading(true);
-      const [r, t, p, e, m] = await Promise.all([
+      const [r, t, p, e, m, inv] = await Promise.all([
         fetchRooms(),
         fetchTenants(),
         fetchPayments(),
         fetchExpenses(),
         fetchMaintenance(),
+        fetchInvoices(),
       ]);
       setRooms(r);
       setTenants(t);
       setPayments(p);
       setExpenses(e);
       setMaintenance(m);
+      setInvoices(inv);
     } finally {
       setLoading(false);
     }
@@ -77,6 +84,32 @@ export const ReportsPage: React.FC = () => {
 
   // Filter payments & expenses by selected month & year
   const filterPrefix = `${selectedYearCE}-${String(selectedMonth).padStart(2, '0')}`;
+
+  const periodInvoices = useMemo(() => {
+    return invoices.filter((i) => i.period === filterPrefix);
+  }, [invoices, filterPrefix]);
+
+  const invoiceStats = useMemo(() => {
+    const rentSatang = periodInvoices.reduce((sum, i) => sum + (i.rentAmount || 0), 0);
+    const waterSatang = periodInvoices.reduce((sum, i) => sum + (i.waterAmount || 0), 0);
+    const waterUnits = periodInvoices.reduce((sum, i) => sum + (i.waterUnits || 0), 0);
+    const electricSatang = periodInvoices.reduce((sum, i) => sum + (i.electricAmount || 0), 0);
+    const electricUnits = periodInvoices.reduce((sum, i) => sum + (i.electricUnits || 0), 0);
+    const commonSatang = periodInvoices.reduce((sum, i) => sum + (i.commonFee || 0), 0);
+    const otherSatang = periodInvoices.reduce((sum, i) => sum + (i.otherFee || 0), 0);
+    const totalSatang = rentSatang + waterSatang + electricSatang + commonSatang + otherSatang;
+
+    return {
+      rentSatang,
+      waterSatang,
+      waterUnits,
+      electricSatang,
+      electricUnits,
+      commonSatang,
+      otherSatang,
+      totalSatang,
+    };
+  }, [periodInvoices]);
 
   const periodPayments = useMemo(() => {
     return payments.filter(
@@ -239,6 +272,59 @@ export const ReportsPage: React.FC = () => {
               <span className="mt-1 block text-xs text-ink-muted">
                 รายรับสุทธิหลังหักค่าใช้จ่าย
               </span>
+            </div>
+          </div>
+
+          {/* Revenue Breakdown by Category (ค่าห้อง / ค่าน้ำ / ค่าไฟ) */}
+          <div className="rounded-lg bg-surface p-5 border border-line shadow-card space-y-3">
+            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between border-b border-line pb-3 gap-1">
+              <div className="flex items-center space-x-2">
+                <Receipt className="h-5 w-5 text-primary" />
+                <h3 className="text-sm font-semibold text-ink">
+                  สัดส่วนรายรับแยกตามประเภท (ค่าห้อง / ค่าน้ำ / ค่าไฟ)
+                </h3>
+              </div>
+              <span className="text-xs text-ink-muted">
+                งวดเดือน {THAI_MONTHS[selectedMonth - 1]} {selectedYearCE + 543}
+              </span>
+            </div>
+
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
+              {/* Room Rent */}
+              <div className="p-3.5 bg-bg rounded-lg border border-line">
+                <span className="text-xs text-ink-secondary block">1. ค่าเช่าห้องพัก</span>
+                <p className="text-lg font-bold text-ink mt-1">
+                  {formatSatang(invoiceStats.rentSatang)}
+                </p>
+                <span className="text-[11px] text-ink-muted">รายรับค่าเช่าห้องพักตามสัญญา</span>
+              </div>
+
+              {/* Water Utility */}
+              <div className="p-3.5 bg-tone-blue-soft/30 rounded-lg border border-tone-blue-solid/20">
+                <span className="text-xs text-tone-blue-solid font-medium block">2. ค่าน้ำประปา</span>
+                <p className="text-lg font-bold text-tone-blue-solid mt-1">
+                  {formatSatang(invoiceStats.waterSatang)}
+                </p>
+                <span className="text-[11px] text-ink-muted">รวม {invoiceStats.waterUnits} หน่วย</span>
+              </div>
+
+              {/* Electric Utility */}
+              <div className="p-3.5 bg-tone-amber-soft/30 rounded-lg border border-tone-amber-solid/20">
+                <span className="text-xs text-tone-amber-solid font-medium block">3. ค่าไฟฟ้า</span>
+                <p className="text-lg font-bold text-tone-amber-solid mt-1">
+                  {formatSatang(invoiceStats.electricSatang)}
+                </p>
+                <span className="text-[11px] text-ink-muted">รวม {invoiceStats.electricUnits} หน่วย</span>
+              </div>
+
+              {/* Common / Other Fee */}
+              <div className="p-3.5 bg-bg rounded-lg border border-line">
+                <span className="text-xs text-ink-secondary block">4. ค่าส่วนกลาง & อื่นๆ</span>
+                <p className="text-lg font-bold text-ink mt-1">
+                  {formatSatang(invoiceStats.commonSatang + invoiceStats.otherSatang)}
+                </p>
+                <span className="text-[11px] text-ink-muted">ค่าบริการส่วนกลางและปรับยอด</span>
+              </div>
             </div>
           </div>
 
