@@ -2,7 +2,7 @@ import { defineConfig } from 'vite';
 import react from '@vitejs/plugin-react';
 import path from 'path';
 
-const securityHeaders = {
+const prodSecurityHeaders = {
   'X-Content-Type-Options': 'nosniff',
   'X-Frame-Options': 'SAMEORIGIN',
   'X-XSS-Protection': '1; mode=block',
@@ -11,6 +11,16 @@ const securityHeaders = {
   'Strict-Transport-Security': 'max-age=63072000; includeSubDomains; preload',
   'Content-Security-Policy':
     "default-src 'self'; script-src 'self' https://maps.googleapis.com https://maps.gstatic.com; style-src 'self' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com data:; img-src 'self' data: blob: https://*.supabase.co https://maps.googleapis.com https://maps.gstatic.com https://*.google.com https://images.unsplash.com; connect-src 'self' https://*.supabase.co wss://*.supabase.co https://maps.googleapis.com; frame-src 'self' https://www.google.com https://maps.google.com; form-action 'self'; frame-ancestors 'self'; object-src 'none'; base-uri 'self';",
+};
+
+const devSecurityHeaders = {
+  'X-Content-Type-Options': 'nosniff',
+  'X-Frame-Options': 'SAMEORIGIN',
+  'X-XSS-Protection': '1; mode=block',
+  'Referrer-Policy': 'strict-origin-when-cross-origin',
+  'Permissions-Policy': 'camera=(), microphone=(), geolocation=(self)',
+  'Content-Security-Policy':
+    "default-src 'self'; script-src 'self' 'unsafe-inline' https://maps.googleapis.com https://maps.gstatic.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com data:; img-src 'self' data: blob: https://*.supabase.co https://maps.googleapis.com https://maps.gstatic.com https://*.google.com https://images.unsplash.com; connect-src 'self' https://*.supabase.co wss://*.supabase.co https://maps.googleapis.com ws://localhost:* http://localhost:*; frame-src 'self' https://www.google.com https://maps.google.com; form-action 'self'; frame-ancestors 'self'; object-src 'none'; base-uri 'self';",
 };
 
 // https://vitejs.dev/config/
@@ -23,11 +33,11 @@ export default defineConfig({
   },
   server: {
     port: 3000,
-    headers: securityHeaders,
+    headers: devSecurityHeaders,
   },
   preview: {
     port: 4173,
-    headers: securityHeaders,
+    headers: prodSecurityHeaders,
   },
   build: {
     rollupOptions: {
