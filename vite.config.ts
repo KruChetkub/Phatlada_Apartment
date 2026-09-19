@@ -2,6 +2,17 @@ import { defineConfig } from 'vite';
 import react from '@vitejs/plugin-react';
 import path from 'path';
 
+const securityHeaders = {
+  'X-Content-Type-Options': 'nosniff',
+  'X-Frame-Options': 'SAMEORIGIN',
+  'X-XSS-Protection': '1; mode=block',
+  'Referrer-Policy': 'strict-origin-when-cross-origin',
+  'Permissions-Policy': 'camera=(), microphone=(), geolocation=(self)',
+  'Strict-Transport-Security': 'max-age=63072000; includeSubDomains; preload',
+  'Content-Security-Policy':
+    "default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval' https://maps.googleapis.com https://maps.gstatic.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com data:; img-src 'self' data: blob: https:; connect-src 'self' https://*.supabase.co wss://*.supabase.co https://maps.googleapis.com; frame-src 'self' https://www.google.com https://maps.google.com; object-src 'none'; base-uri 'self';",
+};
+
 // https://vitejs.dev/config/
 export default defineConfig({
   plugins: [react()],
@@ -12,6 +23,11 @@ export default defineConfig({
   },
   server: {
     port: 3000,
+    headers: securityHeaders,
+  },
+  preview: {
+    port: 4173,
+    headers: securityHeaders,
   },
   build: {
     rollupOptions: {
