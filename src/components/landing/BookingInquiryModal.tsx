@@ -3,7 +3,7 @@ import { Link } from 'react-router-dom';
 import { Modal } from '../common/Modal';
 import { ThaiDatePicker } from '../common/ThaiDatePicker';
 import { createMessage } from '../../services/messageService';
-import { getLocalSettings } from '../../services/settingsService';
+import { getLocalSettings, fetchSettings, DormSettings } from '../../services/settingsService';
 import { sanitizeInput } from '../../lib/utils';
 import { Send, CheckCircle2, ShieldCheck, Lock, AlertCircle } from 'lucide-react';
 
@@ -21,7 +21,7 @@ export const BookingInquiryModal: React.FC<BookingInquiryModalProps> = ({
   onClose,
   defaultRoomType = '',
 }) => {
-  const settings = getLocalSettings();
+  const [settings, setSettings] = useState<DormSettings>(getLocalSettings);
   const monthlyPriceFormatted = Number(settings.landingStartingPrice || 3800).toLocaleString();
   const dailyPriceFormatted = Number(settings.landingDailyPrice || 500).toLocaleString();
 
@@ -37,6 +37,26 @@ export const BookingInquiryModal: React.FC<BookingInquiryModalProps> = ({
 
   // Measure form interaction time to block instant automated bot submissions
   const openTimeRef = useRef<number>(Date.now());
+
+  useEffect(() => {
+    fetchSettings().then((s) => setSettings(s)).catch(() => {});
+
+    const handleUpdate = () => {
+      setSettings(getLocalSettings());
+    };
+    const handleStorage = (e: StorageEvent) => {
+      if (e.key === 'phatlada_system_settings' || e.key === 'dormplus_system_settings') {
+        setSettings(getLocalSettings());
+      }
+    };
+
+    window.addEventListener('phatlada_settings_updated', handleUpdate);
+    window.addEventListener('storage', handleStorage);
+    return () => {
+      window.removeEventListener('phatlada_settings_updated', handleUpdate);
+      window.removeEventListener('storage', handleStorage);
+    };
+  }, []);
 
   useEffect(() => {
     if (isOpen) {

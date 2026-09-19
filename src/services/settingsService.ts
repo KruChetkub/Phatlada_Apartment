@@ -132,18 +132,40 @@ export async function fetchSettings(): Promise<DormSettings> {
     try {
       const { data, error } = await supabase
         .from('dormitories')
-        .select('id, name, plan')
+        .select('*')
         .limit(1);
 
       if (!error && data && data.length > 0) {
-        const dorm = data[0];
+        const dorm = data[0] as Record<string, unknown>;
+        let remoteSettings: Partial<DormSettings> = {};
+
+        if (dorm.settings) {
+          if (typeof dorm.settings === 'string') {
+            try {
+              remoteSettings = JSON.parse(dorm.settings);
+            } catch {
+              remoteSettings = {};
+            }
+          } else if (typeof dorm.settings === 'object' && dorm.settings !== null) {
+            remoteSettings = dorm.settings as Partial<DormSettings>;
+          }
+        }
+
         const updated: DormSettings = {
+          ...defaultSettings,
           ...local,
-          dormitoryId: dorm.id,
-          dormitoryName: dorm.name,
-          plan: dorm.plan,
+          ...remoteSettings,
+          dormitoryId: (dorm.id as string) || local.dormitoryId,
+          dormitoryName: (dorm.name as string) || (remoteSettings.dormitoryName as string) || local.dormitoryName,
+          plan: ((dorm.plan as 'FREE' | 'PREMIUM') || (remoteSettings.plan as 'FREE' | 'PREMIUM') || local.plan) as 'FREE' | 'PREMIUM',
         };
+
         localStorage.setItem(SETTINGS_STORAGE_KEY, JSON.stringify(updated));
+
+        if (typeof window !== 'undefined') {
+          window.dispatchEvent(new CustomEvent('phatlada_settings_updated', { detail: updated }));
+        }
+
         return updated;
       }
     } catch {
@@ -165,11 +187,19 @@ export async function saveSettings(updates: Partial<DormSettings>): Promise<Dorm
       if (merged.dormitoryId && UUID_REGEX.test(merged.dormitoryId)) {
         const { error: updateErr } = await supabase
           .from('dormitories')
-          .update({ name: merged.dormitoryName, plan: merged.plan })
+          .update({
+            name: merged.dormitoryName,
+            plan: merged.plan,
+            settings: merged,
+          })
           .eq('id', merged.dormitoryId);
 
         if (updateErr) {
-          console.warn('Supabase update dormitory error:', updateErr);
+          // If 'settings' column doesn't exist, fallback to updating name and plan only
+          await supabase
+            .from('dormitories')
+            .update({ name: merged.dormitoryName, plan: merged.plan })
+            .eq('id', merged.dormitoryId);
         }
       } else {
         // 2. Check if a dormitory already exists in Supabase
@@ -181,10 +211,22 @@ export async function saveSettings(updates: Partial<DormSettings>): Promise<Dorm
         if (existing && existing.length > 0) {
           merged.dormitoryId = existing[0].id;
           localStorage.setItem(SETTINGS_STORAGE_KEY, JSON.stringify(merged));
-          await supabase
+
+          const { error: updateErr } = await supabase
             .from('dormitories')
-            .update({ name: merged.dormitoryName, plan: merged.plan })
+            .update({
+              name: merged.dormitoryName,
+              plan: merged.plan,
+              settings: merged,
+            })
             .eq('id', existing[0].id);
+
+          if (updateErr) {
+            await supabase
+              .from('dormitories')
+              .update({ name: merged.dormitoryName, plan: merged.plan })
+              .eq('id', existing[0].id);
+          }
         } else {
           // 3. No dormitory exists yet -> insert the initial one
           const { data: inserted, error: insertErr } = await supabase
@@ -192,11 +234,26 @@ export async function saveSettings(updates: Partial<DormSettings>): Promise<Dorm
             .insert({
               name: merged.dormitoryName || 'ภัทร์ลดา อพาร์ทเมนท์',
               plan: merged.plan || 'PREMIUM',
+              settings: merged,
             })
             .select('id, name, plan')
             .single();
 
-          if (!insertErr && inserted) {
+          if (insertErr) {
+            const { data: fallbackInserted } = await supabase
+              .from('dormitories')
+              .insert({
+                name: merged.dormitoryName || 'ภัทร์ลดา อพาร์ทเมนท์',
+                plan: merged.plan || 'PREMIUM',
+              })
+              .select('id, name, plan')
+              .single();
+
+            if (fallbackInserted) {
+              merged.dormitoryId = fallbackInserted.id;
+              localStorage.setItem(SETTINGS_STORAGE_KEY, JSON.stringify(merged));
+            }
+          } else if (inserted) {
             merged.dormitoryId = inserted.id;
             localStorage.setItem(SETTINGS_STORAGE_KEY, JSON.stringify(merged));
           }
@@ -207,7 +264,7 @@ export async function saveSettings(updates: Partial<DormSettings>): Promise<Dorm
     }
   }
 
-  // Dispatch custom event to notify components (Topbar, Sidebar)
+  // Dispatch custom event to notify components (Topbar, Sidebar, Landing components)
   if (typeof window !== 'undefined') {
     window.dispatchEvent(new CustomEvent('phatlada_settings_updated', { detail: merged }));
   }

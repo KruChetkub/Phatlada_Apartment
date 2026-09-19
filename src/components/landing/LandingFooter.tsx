@@ -1,10 +1,30 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { Building2, LayoutDashboard } from 'lucide-react';
-import { getLocalSettings } from '../../services/settingsService';
+import { getLocalSettings, fetchSettings, DormSettings } from '../../services/settingsService';
 
 export const LandingFooter: React.FC = () => {
-  const settings = getLocalSettings();
+  const [settings, setSettings] = useState<DormSettings>(getLocalSettings);
+
+  useEffect(() => {
+    fetchSettings().then((s) => setSettings(s)).catch(() => {});
+
+    const handleUpdate = () => {
+      setSettings(getLocalSettings());
+    };
+    const handleStorage = (e: StorageEvent) => {
+      if (e.key === 'phatlada_system_settings' || e.key === 'dormplus_system_settings') {
+        setSettings(getLocalSettings());
+      }
+    };
+
+    window.addEventListener('phatlada_settings_updated', handleUpdate);
+    window.addEventListener('storage', handleStorage);
+    return () => {
+      window.removeEventListener('phatlada_settings_updated', handleUpdate);
+      window.removeEventListener('storage', handleStorage);
+    };
+  }, []);
 
   return (
     <footer className="bg-ink text-white/80 py-12 border-t border-white/10 text-xs">

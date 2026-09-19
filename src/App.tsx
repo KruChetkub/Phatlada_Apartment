@@ -27,6 +27,7 @@ import { LogoutConfirmModal } from './components/auth/LogoutConfirmModal';
 import { ProtectedRoute } from './components/auth/ProtectedRoute';
 import { getCurrentSession, logout } from './services/authService';
 import { getLocalDormitories, getActiveDormitoryId } from './services/dormService';
+import { getLocalSettings } from './services/settingsService';
 import { DashboardSummary } from './types/dashboard';
 
 const initialDormitory = {
@@ -146,14 +147,37 @@ export const App: React.FC = () => {
       }
     };
 
+    const handleStorage = (e: StorageEvent) => {
+      if (e.key === 'phatlada_system_settings' || e.key === 'dormplus_system_settings') {
+        const local = getLocalSettings();
+        setDashboardData((prev) => ({
+          ...prev,
+          dormitory: {
+            ...initialDormitory,
+            ...prev.dormitory,
+            name: local.dormitoryName || prev.dormitory?.name || initialDormitory.name,
+            plan: local.plan || prev.dormitory?.plan || initialDormitory.plan,
+          },
+          user: {
+            ...initialUser,
+            ...prev.user,
+            displayName: local.userDisplayName || prev.user?.displayName || initialUser.displayName,
+            role: local.userRole || prev.user?.role || initialUser.role,
+          },
+        }));
+      }
+    };
+
     window.addEventListener('phatlada_settings_updated', handleSettingsUpdate);
     window.addEventListener('phatlada_dormitory_switched', handleDormSwitched);
     window.addEventListener('phatlada_auth_changed', handleAuthChanged);
+    window.addEventListener('storage', handleStorage);
 
     return () => {
       window.removeEventListener('phatlada_settings_updated', handleSettingsUpdate);
       window.removeEventListener('phatlada_dormitory_switched', handleDormSwitched);
       window.removeEventListener('phatlada_auth_changed', handleAuthChanged);
+      window.removeEventListener('storage', handleStorage);
     };
   }, []);
 

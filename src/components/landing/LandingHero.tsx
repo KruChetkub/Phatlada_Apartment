@@ -9,7 +9,7 @@ import {
   Car,
   CheckCircle2,
 } from 'lucide-react';
-import { getLocalSettings, DormSettings } from '../../services/settingsService';
+import { getLocalSettings, fetchSettings, DormSettings } from '../../services/settingsService';
 
 interface LandingHeroProps {
   onOpenBooking: () => void;
@@ -19,11 +19,23 @@ export const LandingHero: React.FC<LandingHeroProps> = ({ onOpenBooking }) => {
   const [settings, setSettings] = useState<DormSettings>(getLocalSettings);
 
   useEffect(() => {
+    fetchSettings().then((s) => setSettings(s)).catch(() => {});
+
     const handleUpdate = () => {
       setSettings(getLocalSettings());
     };
+    const handleStorage = (e: StorageEvent) => {
+      if (e.key === 'phatlada_system_settings' || e.key === 'dormplus_system_settings') {
+        setSettings(getLocalSettings());
+      }
+    };
+
     window.addEventListener('phatlada_settings_updated', handleUpdate);
-    return () => window.removeEventListener('phatlada_settings_updated', handleUpdate);
+    window.addEventListener('storage', handleStorage);
+    return () => {
+      window.removeEventListener('phatlada_settings_updated', handleUpdate);
+      window.removeEventListener('storage', handleStorage);
+    };
   }, []);
 
   const phoneDisplay = settings.phone || '087 188 9122';

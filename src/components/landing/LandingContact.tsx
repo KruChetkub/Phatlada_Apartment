@@ -6,7 +6,7 @@ import {
   ArrowUpRight,
   Navigation,
 } from 'lucide-react';
-import { getLocalSettings, DormSettings } from '../../services/settingsService';
+import { getLocalSettings, fetchSettings, DormSettings } from '../../services/settingsService';
 
 interface LandingContactProps {
   onOpenBooking: () => void;
@@ -16,11 +16,23 @@ export const LandingContact: React.FC<LandingContactProps> = ({ onOpenBooking })
   const [settings, setSettings] = useState<DormSettings>(() => getLocalSettings());
 
   useEffect(() => {
+    fetchSettings().then((s) => setSettings(s)).catch(() => {});
+
     const handleUpdate = () => {
       setSettings(getLocalSettings());
     };
+    const handleStorage = (e: StorageEvent) => {
+      if (e.key === 'phatlada_system_settings' || e.key === 'dormplus_system_settings') {
+        setSettings(getLocalSettings());
+      }
+    };
+
     window.addEventListener('phatlada_settings_updated', handleUpdate);
-    return () => window.removeEventListener('phatlada_settings_updated', handleUpdate);
+    window.addEventListener('storage', handleStorage);
+    return () => {
+      window.removeEventListener('phatlada_settings_updated', handleUpdate);
+      window.removeEventListener('storage', handleStorage);
+    };
   }, []);
 
   const fullAddress = settings.address || '79 หมู่ 7 เวียง อำเภอ เชียงของ เชียงราย 57140';

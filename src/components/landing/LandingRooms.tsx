@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Check, Phone, Sparkles, Calendar, Moon } from 'lucide-react';
-import { getLocalSettings, DormSettings } from '../../services/settingsService';
+import { getLocalSettings, fetchSettings, DormSettings } from '../../services/settingsService';
 
 interface LandingRoomsProps {
   onSelectRoom: (roomTitle: string) => void;
@@ -10,11 +10,23 @@ export const LandingRooms: React.FC<LandingRoomsProps> = ({ onSelectRoom }) => {
   const [settings, setSettings] = useState<DormSettings>(getLocalSettings);
 
   useEffect(() => {
+    fetchSettings().then((s) => setSettings(s)).catch(() => {});
+
     const handleUpdate = () => {
       setSettings(getLocalSettings());
     };
+    const handleStorage = (e: StorageEvent) => {
+      if (e.key === 'phatlada_system_settings' || e.key === 'dormplus_system_settings') {
+        setSettings(getLocalSettings());
+      }
+    };
+
     window.addEventListener('phatlada_settings_updated', handleUpdate);
-    return () => window.removeEventListener('phatlada_settings_updated', handleUpdate);
+    window.addEventListener('storage', handleStorage);
+    return () => {
+      window.removeEventListener('phatlada_settings_updated', handleUpdate);
+      window.removeEventListener('storage', handleStorage);
+    };
   }, []);
 
   const monthlyPriceFormatted = Number(settings.landingStartingPrice || 3800).toLocaleString();
