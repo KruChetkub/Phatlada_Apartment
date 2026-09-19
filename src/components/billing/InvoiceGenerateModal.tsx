@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useMemo } from 'react';
 import { Modal } from '../common/Modal';
+import { ThaiDatePicker } from '../common/ThaiDatePicker';
 import { Room, Lease, Tenant } from '../../types/database';
 import { UtilityReading } from '../../types/billing';
 import { createInvoice } from '../../services/billingService';
@@ -162,15 +163,11 @@ export const InvoiceGenerateModal: React.FC<InvoiceGenerateModalProps> = ({
         </div>
 
         <div>
-          <label className="block text-xs font-semibold text-ink mb-1">
-            กำหนดชำระเงินภายในวันที่ *
-          </label>
-          <input
-            type="date"
+          <ThaiDatePicker
+            label="กำหนดชำระเงินภายในวันที่ (พ.ศ.)"
             value={dueDate}
-            onChange={(e) => setDueDate(e.target.value)}
+            onChange={setDueDate}
             required
-            className="w-full text-xs p-2.5 rounded-lg border border-line bg-surface text-ink focus:ring-1 focus:ring-primary focus:outline-none"
           />
           <span className="text-[11px] text-ink-secondary mt-1 block">
             (ค่าเริ่มต้น: วันที่ {settings.dueDay || 5} ของเดือนถัดไป หรือปรับเปลี่ยนตามต้องการได้)
