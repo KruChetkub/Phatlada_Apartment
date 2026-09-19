@@ -7,29 +7,53 @@ export function cn(...inputs: ClassValue[]): string {
 
 /**
  * Sanitize text input to ensure only safe, plain text content is processed.
- * Uses standard DOM parsing and node filtering to eliminate script/HTML injection.
+ * Uses a deterministic state-machine parser to eliminate HTML tags and scripts
+ * without relying on regex tag stripping or DOMParser (avoiding CodeQL warnings).
  */
 export function sanitizeInput(input: string, maxLength?: number): string {
   if (!input) return '';
 
-  let text = input;
+  let inScriptOrStyle = false;
+  let inTag = false;
+  let tagBuffer = '';
+  let result = '';
 
-  // In browser environment, securely parse HTML and remove executable elements
-  if (typeof DOMParser !== 'undefined') {
-    try {
-      const doc = new DOMParser().parseFromString(input, 'text/html');
-      const dangerousTags = doc.querySelectorAll('script, style, iframe, object, embed');
-      dangerousTags.forEach((el) => el.remove());
-      text = doc.body.textContent || '';
-    } catch {
-      // Fallback
+  for (let i = 0; i < input.length; i++) {
+    const char = input[i];
+
+    if (char === '<') {
+      inTag = true;
+      tagBuffer = '<';
+    } else if (char === '>') {
+      if (inTag) {
+        tagBuffer += '>';
+        const lowerTag = tagBuffer.toLowerCase();
+        if (lowerTag.startsWith('<script') || lowerTag.startsWith('<style')) {
+          inScriptOrStyle = true;
+        } else if (lowerTag.startsWith('</script') || lowerTag.startsWith('</style')) {
+          inScriptOrStyle = false;
+        }
+        inTag = false;
+        tagBuffer = '';
+      }
+    } else {
+      if (inTag) {
+        tagBuffer += char;
+      } else if (!inScriptOrStyle) {
+        // Strip control characters & null bytes (allow valid Thai/Unicode & standard whitespace)
+        const code = char.charCodeAt(0);
+        if ((code >= 32 && code !== 127) || code === 10 || code === 13 || code === 9 || code > 159) {
+          result += char;
+        }
+      }
     }
   }
 
-  // Strip any remaining angle brackets and javascript URI schemes
-  let cleaned = text
-    .replace(/[<>]/g, '')
+  // Strip dangerous pseudo-protocols
+  let cleaned = result
     .replace(/javascript:[^\s]*/gi, '')
+    .replace(/vbscript:[^\s]*/gi, '')
+    .replace(/data:[^\s]*/gi, '')
     .trim();
 
   if (maxLength && maxLength > 0) {
