@@ -33,6 +33,26 @@ export const InvoiceGenerateModal: React.FC<InvoiceGenerateModalProps> = ({
   const [otherFeeBaht, setOtherFeeBaht] = useState<number>(0);
   const [saving, setSaving] = useState(false);
 
+  // Compute default due date (next month at settings.dueDay)
+  const computeDefaultDueDate = (period: string, dueDay: number) => {
+    const [yearStr, monthStr] = period.split('-');
+    let year = parseInt(yearStr, 10);
+    let month = parseInt(monthStr, 10) + 1;
+    if (month > 12) {
+      month = 1;
+      year += 1;
+    }
+    return `${year}-${String(month).padStart(2, '0')}-${String(dueDay).padStart(2, '0')}`;
+  };
+
+  const [dueDate, setDueDate] = useState<string>(() =>
+    computeDefaultDueDate(currentPeriod, settings.dueDay || 5)
+  );
+
+  useEffect(() => {
+    setDueDate(computeDefaultDueDate(currentPeriod, settings.dueDay || 5));
+  }, [currentPeriod, settings.dueDay]);
+
   // Active leases map
   const activeLeases = useMemo(() => {
     return leases.filter((l) => l.status === 'ACTIVE');
@@ -103,6 +123,7 @@ export const InvoiceGenerateModal: React.FC<InvoiceGenerateModalProps> = ({
         electricCurr: currentReading?.currElectric ?? 0,
         commonFeeSatang,
         otherFeeSatang: otherFeeBaht * 100,
+        dueDate,
       });
       onGenerated();
       onClose();
@@ -138,6 +159,22 @@ export const InvoiceGenerateModal: React.FC<InvoiceGenerateModalProps> = ({
               })
             )}
           </select>
+        </div>
+
+        <div>
+          <label className="block text-xs font-semibold text-ink mb-1">
+            กำหนดชำระเงินภายในวันที่ *
+          </label>
+          <input
+            type="date"
+            value={dueDate}
+            onChange={(e) => setDueDate(e.target.value)}
+            required
+            className="w-full text-xs p-2.5 rounded-lg border border-line bg-surface text-ink focus:ring-1 focus:ring-primary focus:outline-none"
+          />
+          <span className="text-[11px] text-ink-secondary mt-1 block">
+            (ค่าเริ่มต้น: วันที่ {settings.dueDay || 5} ของเดือนถัดไป หรือปรับเปลี่ยนตามต้องการได้)
+          </span>
         </div>
 
         {/* Calculation Breakdown Preview */}

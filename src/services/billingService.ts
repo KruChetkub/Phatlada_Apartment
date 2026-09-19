@@ -208,8 +208,18 @@ export async function createInvoice(input: {
   const sanitizedPeriod = input.period.replace('-', '');
   const invoiceNumber = `INV-${sanitizedPeriod}-${input.roomNumber}`;
 
-  // Default Due Date: period year-month-settings.dueDay
-  const defaultDueDate = `${input.period}-${String(settings.dueDay).padStart(2, '0')}`;
+  // Default Due Date: period year-month + 1 month at settings.dueDay
+  let defaultDueDate = input.dueDate;
+  if (!defaultDueDate) {
+    const [yearStr, monthStr] = input.period.split('-');
+    let year = parseInt(yearStr, 10);
+    let month = parseInt(monthStr, 10) + 1;
+    if (month > 12) {
+      month = 1;
+      year += 1;
+    }
+    defaultDueDate = `${year}-${String(month).padStart(2, '0')}-${String(settings.dueDay).padStart(2, '0')}`;
+  }
   const dormId = input.dormitoryId || (await getOrEnsureDormitoryId());
 
   const newInvoice: Invoice = {
