@@ -100,3 +100,4 @@ export const CookiePolicyPage: React.FC = () => {
     </div>
   );
 };
+

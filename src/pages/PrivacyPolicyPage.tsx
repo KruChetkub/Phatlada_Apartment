@@ -106,7 +106,7 @@ export const PrivacyPolicyPage: React.FC = () => {
               <h2 className="text-lg font-bold text-slate-900 mb-3">6. สิทธิของเจ้าของข้อมูลส่วนบุคคล</h2>
               <p className="mb-2">ตามกฎหมาย PDPA ท่านมีสิทธิขอเข้าถึง, ขอรับสำเนา, ขอแก้ไข, ขอลบหรือทำลาย, ระงับการใช้ หรือถอนความยินยอมข้อมูลส่วนบุคคลของท่าน</p>
               <div className="bg-emerald-50 border border-emerald-200 rounded-xl p-4 text-xs text-emerald-900">
-                <strong>การใช้สิทธิหรือสอบถามเพิ่มเติม:</strong> กรุณาติดต่อผู้ควบคุมข้อมูลส่วนบุคคล หอพักภัทร์ลดา อพาร์ตเมนต์ ผ่านอีเมล: <code className="font-mono bg-white px-1.5 py-0.5 rounded border">privacy@phatlada.com</code> หรือโทรศัพท์ 081-xxx-xxxx
+                <strong>การใช้สิทธิหรือสอบถามเพิ่มเติม:</strong> กรุณาติดต่อผู้ควบคุมข้อมูลส่วนบุคคล หอพักภัทร์ลดา อพาร์ตเมนต์ ผ่านอีเมล: <code className="font-mono bg-white px-1.5 py-0.5 rounded border">chetnarak2531@gmail.com</code> หรือโทรศัพท์ 087-188-9122
               </div>
             </section>
           </div>
@@ -126,3 +126,4 @@ export const PrivacyPolicyPage: React.FC = () => {
     </div>
   );
 };
+
