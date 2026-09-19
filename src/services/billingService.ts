@@ -87,19 +87,32 @@ export async function saveUtilityReading(input: {
   };
 
   if (isSupabaseConfigured && supabase) {
-    await supabase.from('utility_readings').upsert({
-      id: reading.id,
-      dormitory_id: reading.dormitoryId,
-      room_id: reading.roomId,
-      period: reading.period,
-      prev_water: reading.prevWater,
-      curr_water: reading.currWater,
-      water_units: reading.waterUnits,
-      prev_electric: reading.prevElectric,
-      curr_electric: reading.currElectric,
-      electric_units: reading.electricUnits,
-      recorded_at: reading.recordedAt,
-    });
+    const { data, error } = await supabase
+      .from('utility_readings')
+      .upsert(
+        {
+          dormitory_id: reading.dormitoryId,
+          room_id: reading.roomId,
+          period: reading.period,
+          prev_water: reading.prevWater,
+          curr_water: reading.currWater,
+          water_units: reading.waterUnits,
+          prev_electric: reading.prevElectric,
+          curr_electric: reading.currElectric,
+          electric_units: reading.electricUnits,
+          recorded_at: reading.recordedAt,
+        },
+        { onConflict: 'dormitory_id,room_id,period' }
+      )
+      .select()
+      .single();
+
+    if (data) {
+      reading.id = data.id;
+    }
+    if (error) {
+      console.warn('Supabase utility_readings upsert warning:', error);
+    }
   }
 
   const list = getLocalReadings().filter(
@@ -228,35 +241,46 @@ export async function createInvoice(input: {
   };
 
   if (isSupabaseConfigured && supabase) {
-    await supabase.from('invoices').insert([
-      {
-        id: newInvoice.id,
-        invoice_number: newInvoice.invoiceNumber,
-        dormitory_id: newInvoice.dormitoryId,
-        room_id: newInvoice.roomId,
-        room_number: newInvoice.roomNumber,
-        tenant_id: newInvoice.tenantId,
-        tenant_name: newInvoice.tenantName,
-        tenant_phone: newInvoice.tenantPhone,
-        period: newInvoice.period,
-        rent_amount: newInvoice.rentAmount,
-        water_prev: newInvoice.waterPrev,
-        water_curr: newInvoice.waterCurr,
-        water_units: newInvoice.waterUnits,
-        water_amount: newInvoice.waterAmount,
-        electric_prev: newInvoice.electricPrev,
-        electric_curr: newInvoice.electricCurr,
-        electric_units: newInvoice.electricUnits,
-        electric_amount: newInvoice.electricAmount,
-        common_fee: newInvoice.commonFee,
-        other_fee: newInvoice.otherFee,
-        total_amount: newInvoice.totalAmount,
-        status: newInvoice.status,
-        due_date: newInvoice.dueDate,
-        promptpay_payload: newInvoice.promptpayPayload,
-        created_at: newInvoice.createdAt,
-      },
-    ]);
+    const { data, error } = await supabase
+      .from('invoices')
+      .upsert(
+        {
+          invoice_number: newInvoice.invoiceNumber,
+          dormitory_id: newInvoice.dormitoryId,
+          room_id: newInvoice.roomId,
+          room_number: newInvoice.roomNumber,
+          tenant_id: newInvoice.tenantId,
+          tenant_name: newInvoice.tenantName,
+          tenant_phone: newInvoice.tenantPhone,
+          period: newInvoice.period,
+          rent_amount: newInvoice.rentAmount,
+          water_prev: newInvoice.waterPrev,
+          water_curr: newInvoice.waterCurr,
+          water_units: newInvoice.waterUnits,
+          water_amount: newInvoice.waterAmount,
+          electric_prev: newInvoice.electricPrev,
+          electric_curr: newInvoice.electricCurr,
+          electric_units: newInvoice.electricUnits,
+          electric_amount: newInvoice.electricAmount,
+          common_fee: newInvoice.commonFee,
+          other_fee: newInvoice.otherFee,
+          total_amount: newInvoice.totalAmount,
+          status: newInvoice.status,
+          due_date: newInvoice.dueDate,
+          promptpay_payload: newInvoice.promptpayPayload,
+          created_at: newInvoice.createdAt,
+        },
+        { onConflict: 'invoice_number' }
+      )
+      .select()
+      .single();
+
+    if (data) {
+      newInvoice.id = data.id;
+    }
+    if (error) {
+      console.warn('Supabase createInvoice upsert warning:', error);
+    }
   }
 
   const list = getLocalInvoices().filter((i) => i.id !== newInvoice.id);
