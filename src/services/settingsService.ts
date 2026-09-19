@@ -41,11 +41,11 @@ export interface DormSettings {
 }
 
 export const defaultSettings: DormSettings = {
-  dormitoryId: 'default-dorm',
+  dormitoryId: '7a4f08df-e922-4ba7-b3ad-3fb45ff64f88',
   dormitoryName: 'ภัทร์ลดา อพาร์ทเมนท์',
   address: '79 หมู่ 7 เวียง อำเภอ เชียงของ เชียงราย 57140',
-  phone: '087 188 9122',
-  taxId: '',
+  phone: '087 188 9122, 0918517221',
+  taxId: '0105559999999',
   plan: 'PREMIUM',
 
   waterRatePerUnit: 18,
@@ -62,12 +62,12 @@ export const defaultSettings: DormSettings = {
 
   userDisplayName: 'คุณเจ้าของหอพัก',
   userEmail: '',
-  userPhone: '',
+  userPhone: '087 188 9122, 0918517221',
   userRole: 'OWNER',
 
-  landingStartingPrice: 3800,
+  landingStartingPrice: 3500,
   landingDailyPrice: 500,
-  landingOriginalPrice: 4500,
+  landingOriginalPrice: 4000,
   landingPromoText: 'โปรโมชั่นห้องใหม่: จองวันนี้รับส่วนลดค่าประกันและฟรี Wi-Fi ทันที',
 
   notifyNewMaintenance: true,
@@ -130,10 +130,26 @@ export async function fetchSettings(): Promise<DormSettings> {
   const local = getLocalSettings();
   if (isSupabaseConfigured && supabase) {
     try {
+      // 1. Fetch dormitory record
       const { data, error } = await supabase
         .from('dormitories')
         .select('*')
         .limit(1);
+
+      let minRoomRentBaht: number | null = null;
+      try {
+        const { data: roomData } = await supabase
+          .from('rooms')
+          .select('monthly_rent')
+          .order('monthly_rent', { ascending: true })
+          .limit(1);
+
+        if (roomData && roomData.length > 0 && roomData[0].monthly_rent) {
+          minRoomRentBaht = Math.round(roomData[0].monthly_rent / 100);
+        }
+      } catch {
+        // ignore room query error
+      }
 
       if (!error && data && data.length > 0) {
         const dorm = data[0] as Record<string, unknown>;
@@ -159,6 +175,10 @@ export async function fetchSettings(): Promise<DormSettings> {
           dormitoryName: (dorm.name as string) || (remoteSettings.dormitoryName as string) || local.dormitoryName,
           plan: ((dorm.plan as 'FREE' | 'PREMIUM') || (remoteSettings.plan as 'FREE' | 'PREMIUM') || local.plan) as 'FREE' | 'PREMIUM',
         };
+
+        if (minRoomRentBaht && minRoomRentBaht > 0 && !remoteSettings.landingStartingPrice) {
+          updated.landingStartingPrice = minRoomRentBaht;
+        }
 
         localStorage.setItem(SETTINGS_STORAGE_KEY, JSON.stringify(updated));
 

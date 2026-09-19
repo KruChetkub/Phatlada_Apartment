@@ -38,9 +38,6 @@ export const LandingHero: React.FC<LandingHeroProps> = ({ onOpenBooking }) => {
     };
   }, []);
 
-  const phoneDisplay = settings.phone || '087 188 9122';
-  const phoneTel = phoneDisplay.replace(/[^\d+]/g, '') || '0871889122';
-
   const renderCardContent = () => (
     <div className="bg-white/95 backdrop-blur-md border border-white/80 rounded-3xl p-5 sm:p-7 lg:p-8 shadow-2xl shadow-black/10 ring-1 ring-black/5 text-left space-y-4">
       {/* Top Pill Badge */}
@@ -145,9 +142,22 @@ export const LandingHero: React.FC<LandingHeroProps> = ({ onOpenBooking }) => {
         <div className="mt-3 flex items-center space-x-2 text-[11px] text-ink-muted">
           <span>
             สอบถามด่วน โทร:{' '}
-            <a href={`tel:${phoneTel}`} className="text-primary font-bold hover:underline">
-              {phoneDisplay}
-            </a> (ยินดีต้อนรับทุกวัน)
+            {(settings.phone || '087 188 9122, 0918517221')
+              .split(/[,/]/)
+              .map((p) => p.trim())
+              .filter(Boolean)
+              .map((p, idx) => {
+                const tel = p.replace(/\D/g, '');
+                return (
+                  <React.Fragment key={idx}>
+                    {idx > 0 && <span className="text-ink-muted mx-1">,</span>}
+                    <a href={`tel:${tel}`} className="text-primary font-bold hover:underline">
+                      {p}
+                    </a>
+                  </React.Fragment>
+                );
+              })}{' '}
+            (ยินดีต้อนรับทุกวัน)
           </span>
         </div>
       </div>

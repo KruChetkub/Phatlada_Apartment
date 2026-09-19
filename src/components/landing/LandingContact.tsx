@@ -36,8 +36,7 @@ export const LandingContact: React.FC<LandingContactProps> = ({ onOpenBooking })
   }, []);
 
   const fullAddress = settings.address || '79 หมู่ 7 เวียง อำเภอ เชียงของ เชียงราย 57140';
-  const phoneNumber = settings.phone || '087 188 9122';
-  const cleanPhone = phoneNumber.replace(/[^0-9]/g, '');
+  const phoneNumber = settings.phone || '087 188 9122, 0918517221';
   const googleMapsShareUrl = 'https://maps.app.goo.gl/E2qLGRGJMNUEMSzE7';
 
   return (
@@ -88,12 +87,26 @@ export const LandingContact: React.FC<LandingContactProps> = ({ onOpenBooking })
                   </div>
                   <div>
                     <span className="font-bold text-ink block mb-0.5">เบอร์โทรศัพท์ติดต่อ</span>
-                    <a
-                      href={`tel:${cleanPhone}`}
-                      className="text-primary font-mono text-base font-bold hover:underline"
-                    >
-                      {phoneNumber}
-                    </a>
+                    <div className="flex flex-wrap items-center gap-x-2 gap-y-1">
+                      {(phoneNumber || '087 188 9122, 0918517221')
+                        .split(/[,/]/)
+                        .map((p) => p.trim())
+                        .filter(Boolean)
+                        .map((p, idx) => {
+                          const tel = p.replace(/\D/g, '');
+                          return (
+                            <React.Fragment key={idx}>
+                              {idx > 0 && <span className="text-ink-muted">,</span>}
+                              <a
+                                href={`tel:${tel}`}
+                                className="text-primary font-mono text-base font-bold hover:underline"
+                              >
+                                {p}
+                              </a>
+                            </React.Fragment>
+                          );
+                        })}
+                    </div>
                     <span className="text-[11px] text-ink-secondary block mt-0.5">
                       โทรติดต่อสอบถามห้องว่าง หรือนัดหมายเข้าชมห้องได้ทุกวัน
                     </span>
