@@ -36,7 +36,6 @@ export const LandingContact: React.FC<LandingContactProps> = ({ onOpenBooking })
   }, []);
 
   const fullAddress = settings.address || '79 หมู่ 7 เวียง อำเภอ เชียงของ เชียงราย 57140';
-  const phoneNumber = settings.phone || '087 188 9122, 0918517221';
   const googleMapsShareUrl = 'https://maps.app.goo.gl/E2qLGRGJMNUEMSzE7';
 
   return (
@@ -88,7 +87,9 @@ export const LandingContact: React.FC<LandingContactProps> = ({ onOpenBooking })
                   <div>
                     <span className="font-bold text-ink block mb-0.5">เบอร์โทรศัพท์ติดต่อ</span>
                     <div className="flex flex-wrap items-center gap-x-2 gap-y-1">
-                      {(phoneNumber || '087 188 9122, 0918517221')
+                      {[settings.phone, settings.phone2]
+                        .filter(Boolean)
+                        .join(', ')
                         .split(/[,/]/)
                         .map((p) => p.trim())
                         .filter(Boolean)

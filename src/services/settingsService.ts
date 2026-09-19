@@ -5,6 +5,7 @@ export interface DormSettings {
   dormitoryName: string;
   address: string;
   phone: string;
+  phone2?: string;
   taxId: string;
   plan: 'FREE' | 'PREMIUM';
 
@@ -44,7 +45,8 @@ export const defaultSettings: DormSettings = {
   dormitoryId: '7a4f08df-e922-4ba7-b3ad-3fb45ff64f88',
   dormitoryName: 'ภัทร์ลดา อพาร์ทเมนท์',
   address: '79 หมู่ 7 เวียง อำเภอ เชียงของ เชียงราย 57140',
-  phone: '087 188 9122, 0918517221',
+  phone: '087 188 9122',
+  phone2: '0918517221',
   taxId: '0105559999999',
   plan: 'PREMIUM',
 
@@ -60,9 +62,9 @@ export const defaultSettings: DormSettings = {
   bankAccountName: '',
   promptPayId: '',
 
-  userDisplayName: 'คุณเจ้าของหอพัก',
-  userEmail: '',
-  userPhone: '087 188 9122, 0918517221',
+  userDisplayName: 'คุณเชษฐ์ (เจ้าของหอพัก)',
+  userEmail: 'chetnarak2531@gmail.com',
+  userPhone: '087 188 9122',
   userRole: 'OWNER',
 
   landingStartingPrice: 3500,
@@ -131,11 +133,12 @@ export async function fetchSettings(): Promise<DormSettings> {
   if (isSupabaseConfigured && supabase) {
     try {
       // 1. Fetch dormitory record
-      const { data, error } = await supabase
+      const { data: dormData, error: dormError } = await supabase
         .from('dormitories')
         .select('*')
         .limit(1);
 
+      // 2. Fetch min room rent
       let minRoomRentBaht: number | null = null;
       try {
         const { data: roomData } = await supabase
@@ -151,8 +154,22 @@ export async function fetchSettings(): Promise<DormSettings> {
         // ignore room query error
       }
 
-      if (!error && data && data.length > 0) {
-        const dorm = data[0] as Record<string, unknown>;
+      // 3. Fetch admin user from public.users
+      let dbUser: Record<string, unknown> | null = null;
+      try {
+        const { data: userData } = await supabase
+          .from('users')
+          .select('*')
+          .limit(1);
+        if (userData && userData.length > 0) {
+          dbUser = userData[0] as Record<string, unknown>;
+        }
+      } catch {
+        // ignore users query error
+      }
+
+      if (!dormError && dormData && dormData.length > 0) {
+        const dorm = dormData[0] as Record<string, unknown>;
         let remoteSettings: Partial<DormSettings> = {};
 
         if (dorm.settings) {
@@ -174,9 +191,12 @@ export async function fetchSettings(): Promise<DormSettings> {
           dormitoryId: (dorm.id as string) || local.dormitoryId,
           dormitoryName: (dorm.name as string) || (remoteSettings.dormitoryName as string) || local.dormitoryName,
           plan: ((dorm.plan as 'FREE' | 'PREMIUM') || (remoteSettings.plan as 'FREE' | 'PREMIUM') || local.plan) as 'FREE' | 'PREMIUM',
+          userDisplayName: (dbUser?.display_name as string) || defaultSettings.userDisplayName,
+          userEmail: (dbUser?.email as string) || defaultSettings.userEmail,
+          userRole: ((dbUser?.role as 'OWNER' | 'MANAGER' | 'STAFF') || defaultSettings.userRole) as 'OWNER' | 'MANAGER' | 'STAFF',
         };
 
-        if (minRoomRentBaht && minRoomRentBaht > 0 && !remoteSettings.landingStartingPrice) {
+        if (minRoomRentBaht && minRoomRentBaht > 0) {
           updated.landingStartingPrice = minRoomRentBaht;
         }
 
@@ -203,6 +223,21 @@ export async function saveSettings(updates: Partial<DormSettings>): Promise<Dorm
 
   if (isSupabaseConfigured && supabase) {
     try {
+      // Sync user profile if updated
+      try {
+        const { data: sessionData } = await supabase.auth.getSession();
+        if (sessionData.session?.user) {
+          await supabase.from('users').upsert({
+            id: sessionData.session.user.id,
+            email: merged.userEmail || sessionData.session.user.email,
+            display_name: merged.userDisplayName,
+            role: merged.userRole,
+          });
+        }
+      } catch {
+        // ignore user sync error
+      }
+
       // 1. If we have a valid UUID for dormitoryId, update it
       if (merged.dormitoryId && UUID_REGEX.test(merged.dormitoryId)) {
         const { error: updateErr } = await supabase

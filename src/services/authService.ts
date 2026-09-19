@@ -23,8 +23,8 @@ const AUTH_USER_DATA_KEY = 'phatlada_auth_user_data';
 
 export const DEMO_USERS: Record<UserRole, { email: string; displayName: string; role: UserRole }> = {
   OWNER: {
-    email: 'owner@phatlada.com',
-    displayName: 'คุณภัทร์ลดา (เจ้าของหอพัก)',
+    email: 'chetnarak2531@gmail.com',
+    displayName: 'คุณเชษฐ์ (เจ้าของหอพัก)',
     role: 'OWNER',
   },
   MANAGER: {
@@ -127,10 +127,35 @@ export async function loginWithEmail(email: string, password: string): Promise<L
       });
 
       if (!error && data.user) {
-        const userRole = (data.user.user_metadata?.role as UserRole) || 'OWNER';
+        let userRole = (data.user.user_metadata?.role as UserRole) || 'OWNER';
+        let displayName = data.user.user_metadata?.display_name || (trimmedEmail === 'chetnarak2531@gmail.com' ? 'คุณเชษฐ์ (เจ้าของหอพัก)' : 'ผู้ใช้งาน');
+
+        // Check or upsert to public.users table in Supabase
+        try {
+          const { data: dbUser } = await supabase
+            .from('users')
+            .select('*')
+            .eq('id', data.user.id)
+            .single();
+
+          if (dbUser) {
+            displayName = dbUser.display_name || displayName;
+            userRole = (dbUser.role as UserRole) || userRole;
+          } else {
+            await supabase.from('users').upsert({
+              id: data.user.id,
+              email: data.user.email || trimmedEmail,
+              display_name: displayName,
+              role: userRole,
+            });
+          }
+        } catch (dbErr) {
+          console.warn('Sync public.users error:', dbErr);
+        }
+
         const session: AuthSession = {
           userId: data.user.id,
-          displayName: data.user.user_metadata?.display_name || data.user.email?.split('@')[0] || 'ผู้ใช้งาน',
+          displayName,
           email: data.user.email || trimmedEmail,
           role: userRole,
           avatarUrl: data.user.user_metadata?.avatar_url || null,

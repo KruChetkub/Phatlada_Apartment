@@ -272,26 +272,42 @@ export const SettingsPage: React.FC = () => {
 
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div>
-                <label className="block text-xs font-semibold text-ink mb-1">เบอร์โทรศัพท์ติดต่อหอพัก</label>
+                <label className="block text-xs font-semibold text-ink mb-1">
+                  เบอร์โทรศัพท์ติดต่อหอพัก (เบอร์ที่ 1) *
+                </label>
                 <input
                   type="text"
+                  required
                   value={settings.phone}
                   onChange={(e) => handleChange('phone', e.target.value)}
                   className="w-full text-xs p-2.5 rounded-lg border border-line bg-surface text-ink focus:ring-1 focus:ring-primary focus:outline-none"
-                  placeholder="081-234-5678"
+                  placeholder="087 188 9122"
                 />
               </div>
 
               <div>
-                <label className="block text-xs font-semibold text-ink mb-1">เลขประจำตัวผู้เสียภาษี / นิติบุคคล</label>
+                <label className="block text-xs font-semibold text-ink mb-1">
+                  เบอร์โทรศัพท์ติดต่อหอพัก (เบอร์ที่ 2)
+                </label>
                 <input
                   type="text"
-                  value={settings.taxId}
-                  onChange={(e) => handleChange('taxId', e.target.value)}
+                  value={settings.phone2 || ''}
+                  onChange={(e) => handleChange('phone2', e.target.value)}
                   className="w-full text-xs p-2.5 rounded-lg border border-line bg-surface text-ink focus:ring-1 focus:ring-primary focus:outline-none"
-                  placeholder="0105559999999"
+                  placeholder="0918517221"
                 />
               </div>
+            </div>
+
+            <div>
+              <label className="block text-xs font-semibold text-ink mb-1">เลขประจำตัวผู้เสียภาษี / นิติบุคคล</label>
+              <input
+                type="text"
+                value={settings.taxId}
+                onChange={(e) => handleChange('taxId', e.target.value)}
+                className="w-full sm:w-1/2 text-xs p-2.5 rounded-lg border border-line bg-surface text-ink focus:ring-1 focus:ring-primary focus:outline-none"
+                placeholder="0105559999999"
+              />
             </div>
 
             <div className="p-4 bg-primary/5 border border-primary/20 rounded-lg flex items-center justify-between mt-4">

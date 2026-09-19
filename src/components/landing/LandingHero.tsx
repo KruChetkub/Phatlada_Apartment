@@ -142,7 +142,9 @@ export const LandingHero: React.FC<LandingHeroProps> = ({ onOpenBooking }) => {
         <div className="mt-3 flex items-center space-x-2 text-[11px] text-ink-muted">
           <span>
             สอบถามด่วน โทร:{' '}
-            {(settings.phone || '087 188 9122, 0918517221')
+            {[settings.phone, settings.phone2]
+              .filter(Boolean)
+              .join(', ')
               .split(/[,/]/)
               .map((p) => p.trim())
               .filter(Boolean)
