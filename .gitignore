@@ -12,6 +12,7 @@ dist
 dist-ssr
 *.local
 *.tsbuildinfo
+CodeQL
 
 # Editor directories and files
 .vscode/*

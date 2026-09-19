@@ -1,6 +1,7 @@
 import { UserRole } from '../types/database';
 import { getLocalSettings } from './settingsService';
 import { supabase, isSupabaseConfigured } from '../lib/supabase';
+import { secureStorage } from '../lib/secureStorage';
 
 export interface AuthSession {
   userId: string;
@@ -77,9 +78,13 @@ export function getCurrentSession(): AuthSession {
 
   if (typeof window !== 'undefined') {
     try {
-      const savedUserStr = localStorage.getItem(AUTH_USER_DATA_KEY);
-      if (savedUserStr) {
-        const savedUser = JSON.parse(savedUserStr);
+      const savedUser = secureStorage.getItem<{
+        userId?: string;
+        displayName?: string;
+        email?: string;
+        avatarUrl?: string | null;
+      }>(AUTH_USER_DATA_KEY);
+      if (savedUser) {
         return {
           userId: savedUser.userId || 'usr-local',
           displayName: savedUser.displayName || settings.userDisplayName || DEMO_USERS[role].displayName,
@@ -194,7 +199,7 @@ function saveLocalSession(session: AuthSession): void {
   if (typeof window === 'undefined') return;
   localStorage.setItem(AUTH_LOGGED_IN_KEY, 'true');
   localStorage.setItem(AUTH_ROLE_STORAGE_KEY, session.role);
-  localStorage.setItem(AUTH_USER_DATA_KEY, JSON.stringify(session));
+  secureStorage.setItem(AUTH_USER_DATA_KEY, session);
 
   window.dispatchEvent(
     new CustomEvent('phatlada_auth_changed', {

@@ -1,15 +1,17 @@
 import { Tenant, Gender } from '../types/database';
 import { supabase, isSupabaseConfigured } from '../lib/supabase';
+import { secureStorage } from '../lib/secureStorage';
 
 const LOCAL_STORAGE_KEY = 'phatlada_real_tenants';
 
 function getLocalTenants(): Tenant[] {
-  const data = localStorage.getItem(LOCAL_STORAGE_KEY) || localStorage.getItem('dormplus_real_tenants');
-  return data ? JSON.parse(data) : [];
+  const data = secureStorage.getItem<Tenant[]>(LOCAL_STORAGE_KEY) || 
+               secureStorage.getItem<Tenant[]>('dormplus_real_tenants');
+  return Array.isArray(data) ? data : [];
 }
 
 function saveLocalTenants(tenants: Tenant[]): void {
-  localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(tenants));
+  secureStorage.setItem(LOCAL_STORAGE_KEY, tenants);
 }
 
 export async function fetchTenants(): Promise<Tenant[]> {
