@@ -1,16 +1,18 @@
 import { MessageItem } from '../types/database';
 import { supabase, isSupabaseConfigured } from '../lib/supabase';
+import { secureStorage } from '../lib/secureStorage';
 import { getOrEnsureDormitoryId } from './settingsService';
 
 const LOCAL_STORAGE_KEY = 'phatlada_real_messages';
 
 function getLocalMessages(): MessageItem[] {
-  const data = localStorage.getItem(LOCAL_STORAGE_KEY) || localStorage.getItem('dormplus_real_messages');
-  return data ? JSON.parse(data) : [];
+  const data = secureStorage.getItem<MessageItem[]>(LOCAL_STORAGE_KEY) || 
+               secureStorage.getItem<MessageItem[]>('dormplus_real_messages');
+  return Array.isArray(data) ? data : [];
 }
 
 function saveLocalMessages(items: MessageItem[]): void {
-  localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(items));
+  secureStorage.setItem(LOCAL_STORAGE_KEY, items);
 }
 
 export async function fetchMessages(): Promise<MessageItem[]> {

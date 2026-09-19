@@ -4,7 +4,8 @@ import { Modal } from '../common/Modal';
 import { ThaiDatePicker } from '../common/ThaiDatePicker';
 import { createMessage } from '../../services/messageService';
 import { getLocalSettings } from '../../services/settingsService';
-import { Send, CheckCircle2, ShieldCheck } from 'lucide-react';
+import { sanitizeInput } from '../../lib/utils';
+import { Send, CheckCircle2, ShieldCheck, Lock } from 'lucide-react';
 
 interface BookingInquiryModalProps {
   isOpen: boolean;
@@ -37,18 +38,40 @@ export const BookingInquiryModal: React.FC<BookingInquiryModalProps> = ({
     }
   }, [defaultRoomType, monthlyPriceFormatted, isOpen]);
 
+  const handleNameChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    // Sanitize and limit to 15 characters
+    const cleaned = sanitizeInput(e.target.value, 15);
+    setName(cleaned);
+  };
+
+  const handlePhoneChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    // Only allow numeric digits up to 10 characters
+    const digitsOnly = e.target.value.replace(/\D/g, '').slice(0, 10);
+    setPhone(digitsOnly);
+  };
+
+  const handleNotesChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
+    // Limit to 100 characters
+    const val = e.target.value.slice(0, 100);
+    setNotes(val);
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!name.trim() || !phone.trim()) return;
+    const cleanName = sanitizeInput(name.trim(), 15);
+    const cleanPhone = phone.replace(/\D/g, '').slice(0, 10);
+    const cleanNotes = sanitizeInput(notes.trim(), 100);
+
+    if (!cleanName || !cleanPhone) return;
 
     try {
       setSubmitting(true);
       // Create message for owner in the system
       await createMessage({
         recipientType: 'ALL',
-        senderName: `${name} (ผู้สนใจเข้าพัก)`,
+        senderName: `${cleanName} (ผู้สนใจเข้าพัก)`,
         title: `มีผู้สนใจนัดดูห้องพัก: ${roomType}`,
-        content: `ชื่อผู้ติดต่อ: ${name}\nเบอร์โทรศัพท์: ${phone}\nประเภทห้องที่สนใจ: ${roomType}\nวันที่สะดวกเข้าชม: ${visitDate}\nหมายเหตุเพิ่มเติม: ${notes || '-'}`,
+        content: `ชื่อผู้ติดต่อ: ${cleanName}\nเบอร์โทรศัพท์: ${cleanPhone}\nประเภทห้องที่สนใจ: ${roomType}\nวันที่สะดวกเข้าชม: ${visitDate}\nหมายเหตุเพิ่มเติม: ${cleanNotes || '-'}`,
         priority: 'NORMAL',
       });
 
@@ -72,7 +95,7 @@ export const BookingInquiryModal: React.FC<BookingInquiryModalProps> = ({
       {success ? (
         <div className="py-8 text-center space-y-3">
           <CheckCircle2 className="h-12 w-12 text-tone-green-solid mx-auto animate-bounce" />
-          <h3 className="text-base font-bold text-ink">ส่งข้อมูลนัดหมายเรียบร้อยแล้ว!</h3>
+          <h3 className="text-base font-bold text-ink font-prompt">ส่งข้อมูลนัดหมายเรียบร้อยแล้ว!</h3>
           <p className="text-xs text-ink-secondary max-w-sm mx-auto">
             เจ้าหน้าที่ผู้ดูแล ภัทร์ลดา อพาร์ทเมนท์ ได้รับข้อความของคุณแล้ว และจะติดต่อกลับทางเบอร์โทรศัพท์โดยเร็วที่สุด
           </p>
@@ -83,30 +106,51 @@ export const BookingInquiryModal: React.FC<BookingInquiryModalProps> = ({
             กรอกข้อมูลด้านล่างเพื่อทำการนัดหมายเข้าชมสถานที่จริง หรือสอบถามความพร้อมของห้องพักล่วงหน้า
           </p>
 
+          {/* Name Field: Max 15 chars & Sanitized */}
           <div>
-            <label className="block text-xs font-semibold text-ink mb-1">ชื่อ - นามสกุล *</label>
+            <div className="flex items-center justify-between mb-1">
+              <label className="text-xs font-semibold text-ink">
+                ชื่อ - นามสกุล *
+              </label>
+              <span className="text-[10px] text-ink-muted">
+                {name.length}/15 ตัวอักษร
+              </span>
+            </div>
             <input
               type="text"
               required
+              maxLength={15}
               value={name}
-              onChange={(e) => setName(e.target.value)}
-              placeholder="เช่น คุณสมชาย ใจดี"
+              onChange={handleNameChange}
+              placeholder="เช่น คุณสมชาย (ไม่เกิน 15 ตัว)"
               className="w-full text-xs p-2.5 rounded-lg border border-line bg-surface text-ink focus:outline-none focus:ring-1 focus:ring-primary"
             />
           </div>
 
+          {/* Phone Field: Digits only & Max 10 digits */}
           <div>
-            <label className="block text-xs font-semibold text-ink mb-1">เบอร์โทรศัพท์ติดต่อ *</label>
+            <div className="flex items-center justify-between mb-1">
+              <label className="text-xs font-semibold text-ink">
+                เบอร์โทรศัพท์ติดต่อ *
+              </label>
+              <span className="text-[10px] text-ink-muted">
+                เฉพาะตัวเลข 10 หลัก
+              </span>
+            </div>
             <input
               type="tel"
+              inputMode="numeric"
+              pattern="[0-9]*"
               required
+              maxLength={10}
               value={phone}
-              onChange={(e) => setPhone(e.target.value)}
-              placeholder="081-xxx-xxxx"
-              className="w-full text-xs p-2.5 rounded-lg border border-line bg-surface text-ink focus:outline-none focus:ring-1 focus:ring-primary font-mono"
+              onChange={handlePhoneChange}
+              placeholder="เช่น 0871889122"
+              className="w-full text-xs p-2.5 rounded-lg border border-line bg-surface text-ink focus:outline-none focus:ring-1 focus:ring-primary font-mono tracking-wider"
             />
           </div>
 
+          {/* Room Type Field */}
           <div>
             <label className="block text-xs font-semibold text-ink mb-1">ประเภทห้องพักที่สนใจ</label>
             <select
@@ -126,6 +170,7 @@ export const BookingInquiryModal: React.FC<BookingInquiryModalProps> = ({
             </select>
           </div>
 
+          {/* Visit Date */}
           <div>
             <ThaiDatePicker
               label="วันที่สะดวกเข้ามาดูห้องพัก (พ.ศ.)"
@@ -134,25 +179,41 @@ export const BookingInquiryModal: React.FC<BookingInquiryModalProps> = ({
             />
           </div>
 
+          {/* Notes: Max 100 chars & Anti-XSS Sanitized */}
           <div>
-            <label className="block text-xs font-semibold text-ink mb-1">ข้อความเพิ่มเติม / สอบถาม</label>
+            <div className="flex items-center justify-between mb-1">
+              <label className="text-xs font-semibold text-ink">
+                ข้อความเพิ่มเติม / สอบถาม
+              </label>
+              <span className={`text-[10px] ${notes.length >= 100 ? 'text-tone-red-solid font-bold' : 'text-ink-muted'}`}>
+                {notes.length}/100 ตัวอักษร
+              </span>
+            </div>
             <textarea
               rows={3}
+              maxLength={100}
               value={notes}
-              onChange={(e) => setNotes(e.target.value)}
-              placeholder="เช่น ต้องการเข้าพักช่วงต้นเดือนหน้า, มีที่จอดรถยนต์หรือไม่"
-              className="w-full text-xs p-2.5 rounded-lg border border-line bg-surface text-ink focus:outline-none focus:ring-1 focus:ring-primary"
+              onChange={handleNotesChange}
+              placeholder="เช่น ต้องการเข้าพักต้นเดือนหน้า, มีที่จอดรถยนต์หรือไม่ (ไม่เกิน 100 ตัวอักษร)"
+              className="w-full text-xs p-2.5 rounded-lg border border-line bg-surface text-ink focus:outline-none focus:ring-1 focus:ring-primary resize-none"
             />
           </div>
 
-          <div className="flex items-start gap-1.5 p-2.5 bg-slate-50 border border-slate-200 rounded-lg text-[11px] text-slate-600">
+          {/* Privacy & Security Note */}
+          <div className="flex items-start gap-2 p-2.5 bg-slate-50 border border-slate-200 rounded-lg text-[11px] text-slate-600">
             <ShieldCheck className="h-4 w-4 text-primary flex-shrink-0 mt-0.5" />
-            <span>
-              ข้อมูลของท่านจะถูกใช้เพื่อการติดต่อกลับและนัดหมายดูห้องพักตาม{' '}
-              <Link to="/privacy-policy" target="_blank" className="text-primary font-medium underline hover:text-primary-dark">
-                นโยบายคุ้มครองข้อมูลส่วนบุคคล (PDPA)
-              </Link>
-            </span>
+            <div className="space-y-0.5">
+              <span className="block">
+                ข้อมูลปลอดภัย: ระบบเข้ารหัสและส่งตรงถึงผู้ดูแลหอพัก ไม่บันทึกค้างบนเครื่องผู้ใช้ ตาม{' '}
+                <Link to="/privacy-policy" target="_blank" className="text-primary font-medium underline hover:text-primary-dark">
+                  นโยบาย PDPA
+                </Link>
+              </span>
+              <span className="text-[10px] text-slate-500 flex items-center gap-1">
+                <Lock className="h-3 w-3 text-emerald-600 inline" />
+                ระบบมีตัวกรองความปลอดภัย ป้องกันคำสั่งสคริปต์อันตราย (Anti-XSS Protection)
+              </span>
+            </div>
           </div>
 
           <div className="flex justify-end space-x-2 pt-2 border-t border-line">
