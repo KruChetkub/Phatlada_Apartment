@@ -3,17 +3,19 @@ import { fetchRooms } from './roomService';
 import { fetchTenants } from './tenantService';
 import { fetchPayments, fetchExpenses } from './financeService';
 import { fetchMaintenance } from './maintenanceService';
+import { fetchNotifications } from './notificationService';
 import { calculateOccupancyPct, calculateProfit, calculateChangePct } from '../lib/kpi';
 import { satangToBaht } from '../lib/format';
 
 export async function fetchDashboardSummary(): Promise<DashboardSummary> {
   try {
-    const [rooms, tenants, payments, expenses, maintenance] = await Promise.all([
+    const [rooms, tenants, payments, expenses, maintenance, notifications] = await Promise.all([
       fetchRooms(),
       fetchTenants(),
       fetchPayments(),
       fetchExpenses(),
       fetchMaintenance(),
+      fetchNotifications().catch(() => []),
     ]);
 
     // Calculate Room Stats
@@ -89,7 +91,7 @@ export async function fetchDashboardSummary(): Promise<DashboardSummary> {
         role: 'OWNER',
         avatarUrl: null,
       },
-      unreadNotifications: 0,
+      unreadNotifications: notifications.filter((n) => !n.readAt).length,
       rooms: {
         total: totalRooms,
         occupied: occupiedRooms,
@@ -131,7 +133,7 @@ export async function fetchDashboardSummary(): Promise<DashboardSummary> {
         status: p.status,
         paidAt: p.paidAt || p.createdAt,
       })),
-      notifications: [],
+      notifications: notifications.slice(0, 10),
     };
   } catch (error) {
     console.error('Error fetching dashboard summary:', error);

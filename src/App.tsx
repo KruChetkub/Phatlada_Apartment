@@ -27,6 +27,9 @@ import { ProtectedRoute } from './components/auth/ProtectedRoute';
 import { getCurrentSession, logout } from './services/authService';
 import { getLocalDormitories, getActiveDormitoryId } from './services/dormService';
 import { getLocalSettings, fetchSettings, DormSettings } from './services/settingsService';
+import { getUnreadNotificationsCount } from './services/notificationService';
+import { getUnreadMessagesCount } from './services/messageService';
+import { subscribeToTableChanges } from './services/realtimeService';
 import { useIdleTimer } from './hooks/useIdleTimer';
 import { DashboardSummary } from './types/dashboard';
 
@@ -49,6 +52,8 @@ export const App: React.FC = () => {
   const [isDormSwitchOpen, setIsDormSwitchOpen] = useState(false);
   const [isLogoutOpen, setIsLogoutOpen] = useState(false);
   const [systemSettings, setSystemSettings] = useState<DormSettings>(() => getLocalSettings());
+  const [unreadNotificationsCount, setUnreadNotificationsCount] = useState(0);
+  const [unreadMessagesCount, setUnreadMessagesCount] = useState(0);
 
   // Global Inactivity Auto-Logout Timer for Security & Anti-Session Hijacking
   useIdleTimer({
@@ -178,12 +183,44 @@ export const App: React.FC = () => {
       }
     };
 
+    const refreshCounters = async () => {
+      try {
+        const [n, m] = await Promise.all([
+          getUnreadNotificationsCount(),
+          getUnreadMessagesCount(),
+        ]);
+        setUnreadNotificationsCount(n);
+        setUnreadMessagesCount(m);
+        setDashboardData((prev) => ({ ...prev, unreadNotifications: n }));
+      } catch {
+        // ignore
+      }
+    };
+
+    refreshCounters();
+
+    const unsubMsg = subscribeToTableChanges('messages', () => {
+      refreshCounters();
+    });
+    const unsubNotif = subscribeToTableChanges('notifications', () => {
+      refreshCounters();
+    });
+
+    window.addEventListener('phatlada_notifications_updated', refreshCounters);
+    window.addEventListener('phatlada_messages_updated', refreshCounters);
+    const pollId = window.setInterval(refreshCounters, 15000);
+
     window.addEventListener('phatlada_settings_updated', handleSettingsUpdate);
     window.addEventListener('phatlada_dormitory_switched', handleDormSwitched);
     window.addEventListener('phatlada_auth_changed', handleAuthChanged);
     window.addEventListener('storage', handleStorage);
 
     return () => {
+      unsubMsg();
+      unsubNotif();
+      window.clearInterval(pollId);
+      window.removeEventListener('phatlada_notifications_updated', refreshCounters);
+      window.removeEventListener('phatlada_messages_updated', refreshCounters);
       window.removeEventListener('phatlada_settings_updated', handleSettingsUpdate);
       window.removeEventListener('phatlada_dormitory_switched', handleDormSwitched);
       window.removeEventListener('phatlada_auth_changed', handleAuthChanged);
@@ -211,7 +248,8 @@ export const App: React.FC = () => {
         {/* Topbar */}
         <Topbar
           user={dashboardData.user || initialUser}
-          unreadCount={dashboardData.unreadNotifications || 0}
+          unreadCount={unreadNotificationsCount}
+          unreadMessagesCount={unreadMessagesCount}
           onOpenMobileMenu={() => setMobileMenuOpen(true)}
           onOpenLogoutModal={() => setIsLogoutOpen(true)}
         />

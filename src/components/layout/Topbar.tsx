@@ -18,6 +18,7 @@ interface TopbarProps {
     avatarUrl?: string | null;
   };
   unreadCount?: number;
+  unreadMessagesCount?: number;
   onOpenMobileMenu?: () => void;
   onOpenLogoutModal?: () => void;
 }
@@ -31,6 +32,7 @@ const ROLE_LABELS: Record<UserRole, string> = {
 export const Topbar: React.FC<TopbarProps> = ({
   user,
   unreadCount = 0,
+  unreadMessagesCount = 0,
   onOpenMobileMenu,
   onOpenLogoutModal,
 }) => {
@@ -86,10 +88,19 @@ export const Topbar: React.FC<TopbarProps> = ({
         {/* Message Square Button */}
         <Link
           to="/messages"
-          className="flex h-10 w-10 items-center justify-center rounded-xl bg-surface text-ink-secondary shadow-card transition hover:text-ink focus:outline-none focus:ring-2 focus:ring-primary"
-          aria-label="กล่องข้อความ"
+          className="relative flex h-10 w-10 items-center justify-center rounded-xl bg-surface text-ink-secondary shadow-card transition hover:text-ink focus:outline-none focus:ring-2 focus:ring-primary"
+          aria-label={
+            unreadMessagesCount > 0
+              ? `กล่องข้อความ ${unreadMessagesCount} ข้อความใหม่`
+              : 'กล่องข้อความ'
+          }
         >
           <MessageSquare className="h-5 w-5" />
+          {unreadMessagesCount > 0 && (
+            <span className="absolute -top-1 -right-1 flex h-5 min-w-5 items-center justify-center rounded-full bg-tone-red-solid px-1 text-[11px] font-semibold text-white shadow-sm">
+              {unreadMessagesCount > 99 ? '99+' : unreadMessagesCount}
+            </span>
+          )}
         </Link>
 
         {/* User Profile Card with Dropdown */}

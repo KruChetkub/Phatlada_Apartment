@@ -10,20 +10,13 @@ import {
   Clock,
 } from 'lucide-react';
 import { NotificationItem, NotificationType } from '../types/database';
-import { supabase, isSupabaseConfigured } from '../lib/supabase';
+import {
+  fetchNotifications,
+  toggleNotificationRead,
+  markAllNotificationsAsRead,
+} from '../services/notificationService';
 import { formatThaiDateShort, formatThaiTime, formatRelativeTh } from '../lib/format';
 import { EmptyState } from '../components/common/EmptyState';
-
-const NOTIF_STORAGE_KEY = 'phatlada_real_notifications';
-
-function getLocalNotifications(): NotificationItem[] {
-  const raw = localStorage.getItem(NOTIF_STORAGE_KEY) || localStorage.getItem('dormplus_real_notifications');
-  return raw ? JSON.parse(raw) : [];
-}
-
-function saveLocalNotifications(items: NotificationItem[]): void {
-  localStorage.setItem(NOTIF_STORAGE_KEY, JSON.stringify(items));
-}
 
 type NotifFilter = 'ALL' | 'MAINTENANCE_NEW' | 'PAYMENT_RECEIVED' | 'LEASE_EXPIRING' | 'UNREAD';
 
@@ -36,28 +29,8 @@ export const NotificationsPage: React.FC = () => {
   const loadNotifications = useCallback(async () => {
     try {
       setLoading(true);
-      if (isSupabaseConfigured && supabase) {
-        const { data, error } = await supabase
-          .from('notifications')
-          .select('*')
-          .order('created_at', { ascending: false });
-        if (!error && data) {
-          const mapped = data.map((n) => ({
-            id: n.id,
-            dormitoryId: n.dormitory_id,
-            type: n.type as NotificationType,
-            title: n.title,
-            body: n.body,
-            href: n.href,
-            readAt: n.read_at,
-            createdAt: n.created_at,
-          }));
-          setNotifications(mapped);
-          saveLocalNotifications(mapped);
-          return;
-        }
-      }
-      setNotifications(getLocalNotifications());
+      const data = await fetchNotifications();
+      setNotifications(data);
     } catch (err) {
       console.error('Failed to load notifications:', err);
     } finally {
@@ -67,6 +40,15 @@ export const NotificationsPage: React.FC = () => {
 
   useEffect(() => {
     loadNotifications();
+
+    const handleUpdate = () => {
+      fetchNotifications().then(setNotifications).catch(() => {});
+    };
+
+    window.addEventListener('phatlada_notifications_updated', handleUpdate);
+    return () => {
+      window.removeEventListener('phatlada_notifications_updated', handleUpdate);
+    };
   }, [loadNotifications]);
 
   const stats = useMemo(() => {
@@ -92,24 +74,17 @@ export const NotificationsPage: React.FC = () => {
   }, [notifications, activeFilter, searchQuery]);
 
   const handleMarkAllAsRead = async () => {
+    await markAllNotificationsAsRead();
     const now = new Date().toISOString();
-    if (isSupabaseConfigured && supabase) {
-      await supabase.from('notifications').update({ read_at: now }).is('read_at', null);
-    }
     const updated = notifications.map((n) => ({ ...n, readAt: n.readAt || now }));
     setNotifications(updated);
-    saveLocalNotifications(updated);
   };
 
   const handleToggleRead = async (id: string) => {
+    await toggleNotificationRead(id);
     const target = notifications.find((n) => n.id === id);
     const nextVal = target?.readAt ? null : new Date().toISOString();
-    if (isSupabaseConfigured && supabase) {
-      await supabase.from('notifications').update({ read_at: nextVal }).eq('id', id);
-    }
-    const updated = notifications.map((n) => (n.id === id ? { ...n, readAt: nextVal } : n));
-    setNotifications(updated);
-    saveLocalNotifications(updated);
+    setNotifications((prev) => prev.map((n) => (n.id === id ? { ...n, readAt: nextVal } : n)));
   };
 
   const getIcon = (type: NotificationType) => {

@@ -94,16 +94,39 @@ export async function createMessage(input: {
 
   const list = getLocalMessages();
   saveLocalMessages([newMessage, ...list]);
+
+  if (typeof window !== 'undefined') {
+    window.dispatchEvent(new CustomEvent('phatlada_messages_updated'));
+  }
+
   return newMessage;
+}
+
+export async function getUnreadMessagesCount(): Promise<number> {
+  try {
+    const list = await fetchMessages();
+    return list.filter((m) => !m.isRead).length;
+  } catch {
+    const list = getLocalMessages();
+    return list.filter((m) => !m.isRead).length;
+  }
 }
 
 export async function markMessageAsRead(id: string): Promise<void> {
   if (isSupabaseConfigured && supabase) {
-    await supabase.from('messages').update({ is_read: true }).eq('id', id);
+    try {
+      await supabase.from('messages').update({ is_read: true }).eq('id', id);
+    } catch {
+      // ignore
+    }
   }
   const list = getLocalMessages();
   const updated = list.map((m) => (m.id === id ? { ...m, isRead: true } : m));
   saveLocalMessages(updated);
+
+  if (typeof window !== 'undefined') {
+    window.dispatchEvent(new CustomEvent('phatlada_messages_updated'));
+  }
 }
 
 export async function toggleMessageRead(id: string): Promise<void> {
@@ -112,18 +135,34 @@ export async function toggleMessageRead(id: string): Promise<void> {
   const nextVal = target ? !target.isRead : true;
 
   if (isSupabaseConfigured && supabase) {
-    await supabase.from('messages').update({ is_read: nextVal }).eq('id', id);
+    try {
+      await supabase.from('messages').update({ is_read: nextVal }).eq('id', id);
+    } catch {
+      // ignore
+    }
   }
   const updated = list.map((m) => (m.id === id ? { ...m, isRead: nextVal } : m));
   saveLocalMessages(updated);
+
+  if (typeof window !== 'undefined') {
+    window.dispatchEvent(new CustomEvent('phatlada_messages_updated'));
+  }
 }
 
 export async function deleteMessage(id: string): Promise<void> {
   if (isSupabaseConfigured && supabase) {
-    await supabase.from('messages').delete().eq('id', id);
+    try {
+      await supabase.from('messages').delete().eq('id', id);
+    } catch {
+      // ignore
+    }
   }
   const list = getLocalMessages();
   const updated = list.filter((m) => m.id !== id);
   saveLocalMessages(updated);
+
+  if (typeof window !== 'undefined') {
+    window.dispatchEvent(new CustomEvent('phatlada_messages_updated'));
+  }
 }
 

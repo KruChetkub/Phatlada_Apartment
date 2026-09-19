@@ -91,3 +91,4 @@ export function useIdleTimer({ enabled, timeoutMinutes, onTimeout }: UseIdleTime
     };
   }, [enabled, timeoutMinutes, onTimeout]);
 }
+

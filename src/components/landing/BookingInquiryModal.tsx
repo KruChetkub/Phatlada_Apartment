@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom';
 import { Modal } from '../common/Modal';
 import { ThaiDatePicker } from '../common/ThaiDatePicker';
 import { createMessage } from '../../services/messageService';
+import { createNotification } from '../../services/notificationService';
 import { getLocalSettings, fetchSettings, DormSettings } from '../../services/settingsService';
 import { sanitizeInput } from '../../lib/utils';
 import { Send, CheckCircle2, ShieldCheck, Lock, AlertCircle } from 'lucide-react';
@@ -148,6 +149,14 @@ export const BookingInquiryModal: React.FC<BookingInquiryModalProps> = ({
         title: `มีผู้สนใจนัดดูห้องพัก: ${roomType}`,
         content: `ชื่อผู้ติดต่อ: ${cleanName}\nเบอร์โทรศัพท์: ${cleanPhone}\nประเภทห้องที่สนใจ: ${roomType}\nวันที่สะดวกเข้าชม: ${visitDate}\nหมายเหตุเพิ่มเติม: ${cleanNotes || '-'}`,
         priority: 'NORMAL',
+      });
+
+      // Also create a system notification for the owner/manager
+      await createNotification({
+        type: 'ROOM_AVAILABLE',
+        title: `มีผู้สนใจนัดดูห้องพัก: ${cleanName}`,
+        body: `ห้อง: ${roomType} (เบอร์โทร: ${cleanPhone}) เข้าชม: ${visitDate}`,
+        href: '/messages',
       });
 
       // Record last submit timestamp to throttle repeated spam
