@@ -9,18 +9,11 @@ import {
   LogIn,
   AlertCircle,
   Loader2,
-  Crown,
-  Briefcase,
-  Wrench,
   ArrowLeft,
-  CheckCircle2,
 } from 'lucide-react';
-import { UserRole } from '../types/database';
 import {
   loginWithEmail,
-  loginAsDemo,
   isAuthenticated,
-  DEMO_USERS,
 } from '../services/authService';
 import { ForgotPasswordModal } from '../components/auth/ForgotPasswordModal';
 
@@ -72,11 +65,6 @@ export const LoginPage: React.FC = () => {
     } finally {
       setLoading(false);
     }
-  };
-
-  const handleQuickDemoLogin = (role: UserRole) => {
-    loginAsDemo(role);
-    navigate(fromLocation, { replace: true });
   };
 
   return (
@@ -216,66 +204,6 @@ export const LoginPage: React.FC = () => {
               )}
             </button>
           </form>
-
-          {/* Quick Demo Accounts Switcher Section */}
-          <div className="mt-8 pt-6 border-t border-line">
-            <div className="flex items-center space-x-1.5 mb-2">
-              <CheckCircle2 className="h-4 w-4 text-primary" />
-              <h4 className="text-xs font-bold text-ink uppercase tracking-wider">
-                เข้าสู่ระบบด่วนสำหรับการทดสอบ (Demo Accounts)
-              </h4>
-            </div>
-            <p className="text-xs text-ink-muted mb-3">
-              คลิกเพื่อสลับบทบาทและทดสอบระบบจัดการสิทธิ์ (RBAC) ได้ทันที:
-            </p>
-
-            <div className="grid grid-cols-1 sm:grid-cols-3 gap-2">
-              {/* OWNER */}
-              <button
-                type="button"
-                onClick={() => handleQuickDemoLogin('OWNER')}
-                className="flex flex-col items-center justify-center p-2.5 rounded-xl border border-primary/20 bg-primary/5 hover:bg-primary/15 text-primary transition text-center group"
-              >
-                <div className="flex items-center space-x-1 font-bold text-xs">
-                  <Crown className="h-3.5 w-3.5 text-primary" />
-                  <span>เจ้าของหอ</span>
-                </div>
-                <span className="text-[10px] text-ink-muted mt-0.5 group-hover:text-primary font-medium">
-                  (สิทธิ์เต็ม 100%)
-                </span>
-              </button>
-
-              {/* MANAGER */}
-              <button
-                type="button"
-                onClick={() => handleQuickDemoLogin('MANAGER')}
-                className="flex flex-col items-center justify-center p-2.5 rounded-xl border border-line bg-surface hover:bg-bg-subtle text-ink transition text-center group"
-              >
-                <div className="flex items-center space-x-1 font-bold text-xs">
-                  <Briefcase className="h-3.5 w-3.5 text-ink-secondary" />
-                  <span>ผู้จัดการ</span>
-                </div>
-                <span className="text-[10px] text-ink-muted mt-0.5 group-hover:text-ink font-medium">
-                  (ห้อง/สัญญา/บิล)
-                </span>
-              </button>
-
-              {/* STAFF */}
-              <button
-                type="button"
-                onClick={() => handleQuickDemoLogin('STAFF')}
-                className="flex flex-col items-center justify-center p-2.5 rounded-xl border border-line bg-surface hover:bg-bg-subtle text-ink transition text-center group"
-              >
-                <div className="flex items-center space-x-1 font-bold text-xs">
-                  <Wrench className="h-3.5 w-3.5 text-ink-secondary" />
-                  <span>ช่าง/พนักงาน</span>
-                </div>
-                <span className="text-[10px] text-ink-muted mt-0.5 group-hover:text-ink font-medium">
-                  (มิเตอร์/แจ้งซ่อม)
-                </span>
-              </button>
-            </div>
-          </div>
         </div>
 
         {/* Security Notice Footer */}
@@ -288,7 +216,7 @@ export const LoginPage: React.FC = () => {
       <ForgotPasswordModal
         isOpen={isForgotOpen}
         onClose={() => setIsForgotOpen(false)}
-        defaultEmail={email || DEMO_USERS.OWNER.email}
+        defaultEmail={email}
       />
     </div>
   );
