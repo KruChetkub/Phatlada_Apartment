@@ -87,6 +87,8 @@ export function getLocalSettings(): DormSettings {
   }
 }
 
+const UUID_REGEX = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+
 export async function fetchSettings(): Promise<DormSettings> {
   const local = getLocalSettings();
   if (isSupabaseConfigured && supabase) {
@@ -94,15 +96,18 @@ export async function fetchSettings(): Promise<DormSettings> {
       const { data, error } = await supabase
         .from('dormitories')
         .select('id, name, plan')
-        .limit(1)
-        .single();
-      if (!error && data) {
-        return {
+        .limit(1);
+
+      if (!error && data && data.length > 0) {
+        const dorm = data[0];
+        const updated: DormSettings = {
           ...local,
-          dormitoryId: data.id,
-          dormitoryName: data.name,
-          plan: data.plan,
+          dormitoryId: dorm.id,
+          dormitoryName: dorm.name,
+          plan: dorm.plan,
         };
+        localStorage.setItem(SETTINGS_STORAGE_KEY, JSON.stringify(updated));
+        return updated;
       }
     } catch {
       // ignore, fallback to local
@@ -119,12 +124,49 @@ export async function saveSettings(updates: Partial<DormSettings>): Promise<Dorm
 
   if (isSupabaseConfigured && supabase) {
     try {
-      await supabase
-        .from('dormitories')
-        .update({ name: merged.dormitoryName, plan: merged.plan })
-        .eq('id', merged.dormitoryId);
+      // 1. If we have a valid UUID for dormitoryId, update it
+      if (merged.dormitoryId && UUID_REGEX.test(merged.dormitoryId)) {
+        const { error: updateErr } = await supabase
+          .from('dormitories')
+          .update({ name: merged.dormitoryName, plan: merged.plan })
+          .eq('id', merged.dormitoryId);
+
+        if (updateErr) {
+          console.warn('Supabase update dormitory error:', updateErr);
+        }
+      } else {
+        // 2. Check if a dormitory already exists in Supabase
+        const { data: existing } = await supabase
+          .from('dormitories')
+          .select('id')
+          .limit(1);
+
+        if (existing && existing.length > 0) {
+          merged.dormitoryId = existing[0].id;
+          localStorage.setItem(SETTINGS_STORAGE_KEY, JSON.stringify(merged));
+          await supabase
+            .from('dormitories')
+            .update({ name: merged.dormitoryName, plan: merged.plan })
+            .eq('id', existing[0].id);
+        } else {
+          // 3. No dormitory exists yet -> insert the initial one
+          const { data: inserted, error: insertErr } = await supabase
+            .from('dormitories')
+            .insert({
+              name: merged.dormitoryName || 'ภัทร์ลดา อพาร์ทเมนท์',
+              plan: merged.plan || 'PREMIUM',
+            })
+            .select('id, name, plan')
+            .single();
+
+          if (!insertErr && inserted) {
+            merged.dormitoryId = inserted.id;
+            localStorage.setItem(SETTINGS_STORAGE_KEY, JSON.stringify(merged));
+          }
+        }
+      }
     } catch (err) {
-      console.warn('Supabase update dormitory error:', err);
+      console.warn('Supabase sync settings error:', err);
     }
   }
 
