@@ -283,6 +283,7 @@ export const FinancePage: React.FC = () => {
         isOpen={isAddPaymentOpen}
         onClose={() => setIsAddPaymentOpen(false)}
         title="บันทึกการชำระค่าเช่า"
+        maxWidth="max-w-lg"
       >
         <form onSubmit={handleSavePayment} className="space-y-4">
           <div>
@@ -303,6 +304,20 @@ export const FinancePage: React.FC = () => {
             </select>
           </div>
 
+          <ThaiPeriodPicker
+            label="งวดเดือน (พ.ศ.)"
+            value={paymentPeriod}
+            onChange={setPaymentPeriod}
+            required
+          />
+
+          <ThaiDatePicker
+            label="วันที่ชำระ (พ.ศ.)"
+            value={paymentDate}
+            onChange={setPaymentDate}
+            required
+          />
+
           <div className="grid grid-cols-2 gap-3">
             <div>
               <label className="block text-xs font-medium text-ink-secondary mb-1">
@@ -318,35 +333,20 @@ export const FinancePage: React.FC = () => {
                 className="w-full h-9 rounded-md border border-line bg-surface px-3 text-xs text-ink focus:border-primary focus:outline-none"
               />
             </div>
+
             <div>
-              <ThaiPeriodPicker
-                label="งวดเดือน (พ.ศ.)"
-                value={paymentPeriod}
-                onChange={setPaymentPeriod}
-                required
-              />
+              <label className="block text-xs font-medium text-ink-secondary mb-1">
+                สถานะการชำระเงิน
+              </label>
+              <select
+                value={paymentStatus}
+                onChange={(e) => setPaymentStatus(e.target.value as PaymentStatus)}
+                className="w-full h-9 rounded-md border border-line bg-surface px-2.5 text-xs text-ink focus:border-primary focus:outline-none"
+              >
+                <option value="PAID">ชำระแล้ว</option>
+                <option value="PENDING">รอชำระ</option>
+              </select>
             </div>
-          </div>
-
-          <ThaiDatePicker
-            label="วันที่ชำระ (พ.ศ.)"
-            value={paymentDate}
-            onChange={setPaymentDate}
-            required
-          />
-
-          <div>
-            <label className="block text-xs font-medium text-ink-secondary mb-1">
-              สถานะการชำระเงิน
-            </label>
-            <select
-              value={paymentStatus}
-              onChange={(e) => setPaymentStatus(e.target.value as PaymentStatus)}
-              className="w-full h-9 rounded-md border border-line bg-surface px-2.5 text-xs text-ink focus:border-primary focus:outline-none"
-            >
-              <option value="PAID">ชำระแล้ว</option>
-              <option value="PENDING">รอชำระ</option>
-            </select>
           </div>
 
           <div className="flex items-center justify-end space-x-2 pt-3 border-t border-line">
@@ -372,6 +372,7 @@ export const FinancePage: React.FC = () => {
         isOpen={isAddExpenseOpen}
         onClose={() => setIsAddExpenseOpen(false)}
         title="บันทึกรายจ่ายส่วนกลาง"
+        maxWidth="max-w-lg"
       >
         <form onSubmit={handleSaveExpense} className="space-y-4">
           <div>

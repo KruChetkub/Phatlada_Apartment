@@ -77,7 +77,7 @@ export const MeterRecordModal: React.FC<MeterRecordModalProps> = ({
   };
 
   return (
-    <Modal isOpen={isOpen} onClose={onClose} title="จดมิเตอร์น้ำ - ไฟฟ้าประจำเดือน">
+    <Modal isOpen={isOpen} onClose={onClose} title="จดมิเตอร์น้ำ - ไฟฟ้าประจำเดือน" maxWidth="max-w-lg">
       <form onSubmit={handleSubmit} className="space-y-4">
         <div>
           <label className="block text-xs font-semibold text-ink mb-1">เลือกห้องพัก *</label>

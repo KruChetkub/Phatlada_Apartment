@@ -136,7 +136,7 @@ export const InvoiceGenerateModal: React.FC<InvoiceGenerateModalProps> = ({
   };
 
   return (
-    <Modal isOpen={isOpen} onClose={onClose} title="ออกใบแจ้งหนี้ประจำเดือน (Invoice)">
+    <Modal isOpen={isOpen} onClose={onClose} title="ออกใบแจ้งหนี้ประจำเดือน (Invoice)" maxWidth="max-w-lg">
       <form onSubmit={handleSubmit} className="space-y-4">
         <div>
           <label className="block text-xs font-semibold text-ink mb-1">เลือกห้องพักที่มีสัญญาเช่า *</label>

@@ -87,7 +87,7 @@ export const ThaiPeriodPicker: React.FC<ThaiPeriodPickerProps> = ({
         <select
           value={parsed.month}
           onChange={(e) => handleChange(parsed.year, parseInt(e.target.value, 10))}
-          className="h-9 flex-1 rounded-md border border-line bg-surface px-2.5 text-xs text-ink focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary"
+          className="h-9 flex-1 min-w-0 rounded-md border border-line bg-surface px-2 text-xs text-ink focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary cursor-pointer"
         >
           {THAI_MONTHS.map((m, idx) => (
             <option key={idx + 1} value={idx + 1}>
@@ -100,7 +100,7 @@ export const ThaiPeriodPicker: React.FC<ThaiPeriodPickerProps> = ({
         <select
           value={parsed.year}
           onChange={(e) => handleChange(parseInt(e.target.value, 10), parsed.month)}
-          className="h-9 w-32 rounded-md border border-line bg-surface px-2.5 text-xs text-ink focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary"
+          className="h-9 w-28 flex-shrink-0 rounded-md border border-line bg-surface px-2 text-xs text-ink focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary cursor-pointer"
         >
           {yearOptions.map(({ ce, be }) => (
             <option key={ce} value={ce}>
@@ -112,3 +112,4 @@ export const ThaiPeriodPicker: React.FC<ThaiPeriodPickerProps> = ({
     </div>
   );
 };
+
