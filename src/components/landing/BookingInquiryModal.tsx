@@ -1,8 +1,9 @@
 import React, { useState } from 'react';
+import { Link } from 'react-router-dom';
 import { Modal } from '../common/Modal';
 import { ThaiDatePicker } from '../common/ThaiDatePicker';
 import { createMessage } from '../../services/messageService';
-import { Send, CheckCircle2 } from 'lucide-react';
+import { Send, CheckCircle2, ShieldCheck } from 'lucide-react';
 
 interface BookingInquiryModalProps {
   isOpen: boolean;
@@ -123,6 +124,16 @@ export const BookingInquiryModal: React.FC<BookingInquiryModalProps> = ({
               placeholder="เช่น ต้องการเข้าพักช่วงต้นเดือนหน้า, มีที่จอดรถยนต์หรือไม่"
               className="w-full text-xs p-2.5 rounded-lg border border-line bg-surface text-ink focus:outline-none focus:ring-1 focus:ring-primary"
             />
+          </div>
+
+          <div className="flex items-start gap-1.5 p-2.5 bg-slate-50 border border-slate-200 rounded-lg text-[11px] text-slate-600">
+            <ShieldCheck className="h-4 w-4 text-primary flex-shrink-0 mt-0.5" />
+            <span>
+              ข้อมูลของท่านจะถูกใช้เพื่อการติดต่อกลับและนัดหมายดูห้องพักตาม{' '}
+              <Link to="/privacy-policy" target="_blank" className="text-primary font-medium underline hover:text-primary-dark">
+                นโยบายคุ้มครองข้อมูลส่วนบุคคล (PDPA)
+              </Link>
+            </span>
           </div>
 
           <div className="flex justify-end space-x-2 pt-2 border-t border-line">

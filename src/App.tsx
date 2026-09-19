@@ -16,7 +16,11 @@ import { NotificationsPage } from './pages/NotificationsPage';
 import { HelpPage } from './pages/HelpPage';
 import { LandingPage } from './pages/LandingPage';
 import { LoginPage } from './pages/LoginPage';
+import { PrivacyPolicyPage } from './pages/PrivacyPolicyPage';
+import { CookiePolicyPage } from './pages/CookiePolicyPage';
+import { TermsPage } from './pages/TermsPage';
 import { PlaceholderPage } from './pages/PlaceholderPage';
+import { CookieConsentBanner } from './components/common/CookieConsentBanner';
 import { DormSwitchModal } from './components/dorm/DormSwitchModal';
 import { AuthRoleModal } from './components/auth/AuthRoleModal';
 import { LogoutConfirmModal } from './components/auth/LogoutConfirmModal';
@@ -190,6 +194,9 @@ export const App: React.FC = () => {
       <Routes>
         {/* Public Website (หน้าบ้าน - ภัทร์ลดา อพาร์ทเมนท์) */}
         <Route path="/" element={<LandingPage />} />
+        <Route path="/privacy-policy" element={<PrivacyPolicyPage />} />
+        <Route path="/cookie-policy" element={<CookiePolicyPage />} />
+        <Route path="/terms" element={<TermsPage />} />
 
         {/* Authentication Route */}
         <Route path="/login" element={<LoginPage />} />
@@ -367,6 +374,9 @@ export const App: React.FC = () => {
           window.location.href = '/login';
         }}
       />
+
+      {/* Global Cookie Consent Banner (PDPA Compliant) */}
+      <CookieConsentBanner />
     </BrowserRouter>
   );
 };
