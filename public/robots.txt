@@ -2,6 +2,9 @@
 User-agent: *
 Allow: /
 Allow: /help
+Allow: /privacy-policy
+Allow: /cookie-policy
+Allow: /terms
 Disallow: /rooms
 Disallow: /tenants
 Disallow: /leases
