@@ -135,12 +135,11 @@ export const LandingContact: React.FC<LandingContactProps> = ({ onOpenBooking })
                   src="https://www.google.com/maps/embed?origin=mfe&pb=!1m3!2m1!1s20.2503358,100.4079899!6i16!3m1!1sth!5m1!1sth"
                   width="100%"
                   height="100%"
-                  style={{ border: 0 }}
                   allowFullScreen
                   loading="lazy"
                   referrerPolicy="no-referrer-when-downgrade"
                   title="แผนที่ ภัทร์ลดา อพาร์ทเมนท์ เชียงของ เชียงราย"
-                  className="w-full h-full pointer-events-none select-none"
+                  className="w-full h-full pointer-events-none select-none border-0"
                 />
 
                 {/* Direct Navigation Click Overlay */}

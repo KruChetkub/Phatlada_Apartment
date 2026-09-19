@@ -146,10 +146,13 @@ export const LandingHero: React.FC<LandingHeroProps> = ({ onOpenBooking }) => {
     <section className="relative bg-bg select-none">
       {/* DESKTOP VIEW (lg and up): Fullscreen Hero with /1.jpg on left and card on right */}
       <div className="hidden lg:flex relative min-h-[calc(100vh-80px)] items-center justify-end overflow-hidden py-10 px-8">
-        <div
-          className="absolute inset-0 z-0 bg-cover bg-no-repeat bg-left scale-100"
-          style={{ backgroundImage: "url('/1.jpg')" }}
-        />
+        <div className="absolute inset-0 z-0 overflow-hidden">
+          <img
+            src="/1.jpg"
+            alt={settings.dormitoryName || 'ภัทร์ลดา อพาร์ทเมนท์'}
+            className="w-full h-full object-cover object-left scale-100"
+          />
+        </div>
         <div className="relative z-10 w-full max-w-xl animate-in fade-in slide-in-from-right-4 duration-300">
           {renderCardContent()}
         </div>

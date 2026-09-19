@@ -163,9 +163,9 @@ export const BookingInquiryModal: React.FC<BookingInquiryModalProps> = ({
         </div>
       ) : (
         <form onSubmit={handleSubmit} className="space-y-4">
-          {/* Honeypot Invisible Anti-Bot Trap */}
-          <div className="sr-only" aria-hidden="true" style={{ display: 'none', position: 'absolute', left: '-9999px' }}>
-            <label htmlFor="company_verify_hp">Company Verification</label>
+          {/* Anti-Bot Honeypot field (hidden from human users, bots fill it) */}
+          <div className="hidden absolute -left-[9999px] pointer-events-none opacity-0 select-none" aria-hidden="true">
+            <label htmlFor="website_hp">Do not fill this field</label>
             <input
               id="company_verify_hp"
               type="text"
