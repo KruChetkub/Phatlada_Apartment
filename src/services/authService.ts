@@ -44,7 +44,9 @@ export const DEMO_USERS: Record<UserRole, { email: string; displayName: string; 
  */
 export function isAuthenticated(): boolean {
   if (typeof window === 'undefined') return false;
-  return localStorage.getItem(AUTH_LOGGED_IN_KEY) === 'true' || localStorage.getItem('dormplus_auth_logged_in') === 'true';
+  return secureStorage.getItem<string>(AUTH_LOGGED_IN_KEY) === 'true' || 
+         localStorage.getItem(AUTH_LOGGED_IN_KEY) === 'true' || 
+         localStorage.getItem('dormplus_auth_logged_in') === 'true';
 }
 
 /**
@@ -52,7 +54,9 @@ export function isAuthenticated(): boolean {
  */
 export function getCurrentUserRole(): UserRole {
   if (typeof window === 'undefined') return 'OWNER';
-  const saved = localStorage.getItem(AUTH_ROLE_STORAGE_KEY) || localStorage.getItem('dormplus_current_user_role');
+  const saved = secureStorage.getItem<string>(AUTH_ROLE_STORAGE_KEY) || 
+                localStorage.getItem(AUTH_ROLE_STORAGE_KEY) || 
+                localStorage.getItem('dormplus_current_user_role');
   if (saved === 'OWNER' || saved === 'MANAGER' || saved === 'STAFF') {
     return saved as UserRole;
   }
@@ -65,7 +69,7 @@ export function getCurrentUserRole(): UserRole {
  */
 export function setCurrentUserRole(role: UserRole): void {
   if (typeof window === 'undefined') return;
-  localStorage.setItem(AUTH_ROLE_STORAGE_KEY, role);
+  secureStorage.setItem(AUTH_ROLE_STORAGE_KEY, role);
   window.dispatchEvent(new CustomEvent('phatlada_auth_changed', { detail: { role } }));
 }
 
@@ -197,8 +201,8 @@ export function loginAsDemo(role: UserRole): AuthSession {
  */
 function saveLocalSession(session: AuthSession): void {
   if (typeof window === 'undefined') return;
-  localStorage.setItem(AUTH_LOGGED_IN_KEY, 'true');
-  localStorage.setItem(AUTH_ROLE_STORAGE_KEY, session.role);
+  secureStorage.setItem(AUTH_LOGGED_IN_KEY, 'true');
+  secureStorage.setItem(AUTH_ROLE_STORAGE_KEY, session.role);
   secureStorage.setItem(AUTH_USER_DATA_KEY, session);
 
   window.dispatchEvent(
@@ -221,10 +225,15 @@ export async function logout(): Promise<void> {
   }
 
   if (typeof window !== 'undefined') {
+    secureStorage.removeItem(AUTH_LOGGED_IN_KEY);
+    secureStorage.removeItem(AUTH_ROLE_STORAGE_KEY);
+    secureStorage.removeItem(AUTH_USER_DATA_KEY);
     localStorage.removeItem(AUTH_LOGGED_IN_KEY);
+    localStorage.removeItem(AUTH_ROLE_STORAGE_KEY);
     localStorage.removeItem(AUTH_USER_DATA_KEY);
     localStorage.removeItem('dormplus_auth_logged_in');
     localStorage.removeItem('dormplus_auth_user_data');
+    localStorage.removeItem('dormplus_current_user_role');
     window.dispatchEvent(
       new CustomEvent('phatlada_auth_changed', {
         detail: { isAuthenticated: false, loggedOut: true },

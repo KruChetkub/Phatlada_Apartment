@@ -52,3 +52,4 @@ export const secureStorage = {
     localStorage.removeItem(key);
   },
 };
+

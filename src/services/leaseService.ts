@@ -1,5 +1,6 @@
 import { Lease, LeaseStatus } from '../types/database';
 import { supabase, isSupabaseConfigured } from '../lib/supabase';
+import { secureStorage } from '../lib/secureStorage';
 import { updateRoom } from './roomService';
 
 export interface LeaseWithDetails extends Lease {
@@ -10,12 +11,13 @@ export interface LeaseWithDetails extends Lease {
 const LOCAL_STORAGE_KEY = 'phatlada_real_leases';
 
 function getLocalLeases(): LeaseWithDetails[] {
-  const data = localStorage.getItem(LOCAL_STORAGE_KEY) || localStorage.getItem('dormplus_real_leases');
-  return data ? JSON.parse(data) : [];
+  const data = secureStorage.getItem<LeaseWithDetails[]>(LOCAL_STORAGE_KEY) || 
+               secureStorage.getItem<LeaseWithDetails[]>('dormplus_real_leases');
+  return Array.isArray(data) ? data : [];
 }
 
 function saveLocalLeases(leases: LeaseWithDetails[]): void {
-  localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(leases));
+  secureStorage.setItem(LOCAL_STORAGE_KEY, leases);
 }
 
 export async function fetchLeases(): Promise<LeaseWithDetails[]> {

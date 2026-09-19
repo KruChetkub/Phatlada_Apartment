@@ -37,3 +37,4 @@ describe('secureStorage', () => {
     expect(secureStorage.getItem('test_key')).toBeNull();
   });
 });
+
