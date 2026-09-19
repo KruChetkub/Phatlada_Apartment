@@ -1,5 +1,5 @@
-import React, { useEffect, useState } from 'react';
-import { CircleDollarSign, Plus, Trash2, ArrowUpRight, ArrowDownLeft } from 'lucide-react';
+import React, { useEffect, useState, useMemo } from 'react';
+import { CircleDollarSign, Plus, Trash2, ArrowUpRight, ArrowDownLeft, Receipt } from 'lucide-react';
 import {
   PaymentWithDetails,
   fetchPayments,
@@ -10,8 +10,10 @@ import {
   deleteExpense,
 } from '../services/financeService';
 import { fetchLeases, LeaseWithDetails } from '../services/leaseService';
+import { fetchInvoices, markInvoicePaid } from '../services/billingService';
 import { Expense, PaymentStatus } from '../types/database';
-import { formatBaht, formatThaiDateShort, formatThaiPeriod, satangToBaht } from '../lib/format';
+import { Invoice } from '../types/billing';
+import { formatBaht, formatSatang, formatThaiDateShort, formatThaiPeriod, satangToBaht } from '../lib/format';
 import { ThaiDatePicker } from '../components/common/ThaiDatePicker';
 import { ThaiPeriodPicker } from '../components/common/ThaiPeriodPicker';
 import { Modal } from '../components/common/Modal';
@@ -23,6 +25,7 @@ export const FinancePage: React.FC = () => {
   const [payments, setPayments] = useState<PaymentWithDetails[]>([]);
   const [expenses, setExpenses] = useState<Expense[]>([]);
   const [leases, setLeases] = useState<LeaseWithDetails[]>([]);
+  const [invoices, setInvoices] = useState<Invoice[]>([]);
   const [loading, setLoading] = useState(true);
 
   // Modals
@@ -50,18 +53,19 @@ export const FinancePage: React.FC = () => {
   const loadData = async () => {
     try {
       setLoading(true);
-      const [pData, eData, lData] = await Promise.all([
+      const [pData, eData, lData, invData] = await Promise.all([
         fetchPayments(),
         fetchExpenses(),
         fetchLeases(),
+        fetchInvoices(),
       ]);
       setPayments(pData);
       setExpenses(eData);
       setLeases(lData);
+      setInvoices(invData);
 
       if (lData.length > 0 && !selectedLeaseId) {
         setSelectedLeaseId(lData[0].id);
-        setPaymentAmountBaht(satangToBaht(lData[0].rent));
       }
     } finally {
       setLoading(false);
@@ -73,12 +77,29 @@ export const FinancePage: React.FC = () => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
+  // Find current lease and matching invoice for selected lease & period
+  const currentLease = useMemo(() => {
+    return leases.find((l) => l.id === selectedLeaseId);
+  }, [leases, selectedLeaseId]);
+
+  const matchingInvoice = useMemo(() => {
+    if (!currentLease) return null;
+    return invoices.find(
+      (inv) => inv.roomId === currentLease.roomId && inv.period === paymentPeriod
+    );
+  }, [invoices, currentLease, paymentPeriod]);
+
+  // Auto-set payment amount based on invoice or lease rent
+  useEffect(() => {
+    if (matchingInvoice) {
+      setPaymentAmountBaht(satangToBaht(matchingInvoice.totalAmount));
+    } else if (currentLease) {
+      setPaymentAmountBaht(satangToBaht(currentLease.rent));
+    }
+  }, [matchingInvoice, currentLease]);
+
   const handleLeaseSelect = (leaseId: string) => {
     setSelectedLeaseId(leaseId);
-    const found = leases.find((l) => l.id === leaseId);
-    if (found) {
-      setPaymentAmountBaht(satangToBaht(found.rent));
-    }
   };
 
   const handleSavePayment = async (e: React.FormEvent) => {
@@ -96,6 +117,15 @@ export const FinancePage: React.FC = () => {
       roomNumber: lease?.roomNumber,
       tenantName: lease?.tenantName,
     });
+
+    // If matching invoice exists and payment is marked PAID, update invoice status too
+    if (matchingInvoice && paymentStatus === 'PAID') {
+      try {
+        await markInvoicePaid(matchingInvoice.id);
+      } catch (err) {
+        console.warn('Failed to auto-mark invoice as paid:', err);
+      }
+    }
 
     setIsAddPaymentOpen(false);
     await loadData();
@@ -310,6 +340,78 @@ export const FinancePage: React.FC = () => {
             onChange={setPaymentPeriod}
             required
           />
+
+          {/* Breakdown Preview: ค่าห้อง, ค่าน้ำ, ค่าไฟ, ยอดรวม */}
+          {matchingInvoice ? (
+            <div className="p-3.5 bg-bg rounded-xl border border-line space-y-2">
+              <div className="flex items-center justify-between border-b border-line pb-1.5">
+                <span className="text-xs font-bold text-ink flex items-center gap-1.5">
+                  <Receipt className="h-4 w-4 text-primary" />
+                  <span>รายละเอียดตามใบแจ้งหนี้ (#{matchingInvoice.invoiceNumber})</span>
+                </span>
+                <span
+                  className={`text-[11px] font-semibold px-2 py-0.5 rounded ${
+                    matchingInvoice.status === 'PAID'
+                      ? 'bg-tone-green-soft text-tone-green-solid'
+                      : 'bg-tone-amber-soft text-tone-amber-solid'
+                  }`}
+                >
+                  {matchingInvoice.status === 'PAID' ? 'ชำระแล้ว' : 'รอชำระ'}
+                </span>
+              </div>
+
+              <div className="space-y-1.5 text-xs">
+                <div className="flex justify-between text-ink-secondary">
+                  <span>ค่าเช่าห้องพัก:</span>
+                  <span className="font-semibold text-ink">
+                    {formatSatang(matchingInvoice.rentAmount)}
+                  </span>
+                </div>
+                <div className="flex justify-between text-ink-secondary">
+                  <span>ค่าน้ำประปา ({matchingInvoice.waterUnits} หน่วย):</span>
+                  <span className="font-semibold text-ink">
+                    {formatSatang(matchingInvoice.waterAmount)}
+                  </span>
+                </div>
+                <div className="flex justify-between text-ink-secondary">
+                  <span>ค่าไฟฟ้า ({matchingInvoice.electricUnits} หน่วย):</span>
+                  <span className="font-semibold text-ink">
+                    {formatSatang(matchingInvoice.electricAmount)}
+                  </span>
+                </div>
+                {matchingInvoice.commonFee > 0 && (
+                  <div className="flex justify-between text-ink-secondary">
+                    <span>ค่าส่วนกลาง:</span>
+                    <span className="font-semibold text-ink">
+                      {formatSatang(matchingInvoice.commonFee)}
+                    </span>
+                  </div>
+                )}
+                {matchingInvoice.otherFee > 0 && (
+                  <div className="flex justify-between text-ink-secondary">
+                    <span>ค่าบริการอื่นๆ:</span>
+                    <span className="font-semibold text-ink">
+                      {formatSatang(matchingInvoice.otherFee)}
+                    </span>
+                  </div>
+                )}
+              </div>
+
+              <div className="pt-2 border-t border-line flex justify-between items-center text-xs font-bold text-ink">
+                <span>ยอดรวมสุทธิทั้งสิ้น:</span>
+                <span className="text-primary text-sm font-bold">
+                  {formatSatang(matchingInvoice.totalAmount)}
+                </span>
+              </div>
+            </div>
+          ) : (
+            <div className="p-3 bg-bg rounded-xl border border-dashed border-line text-xs text-ink-secondary flex items-center justify-between">
+              <span>ยังไม่ออกใบแจ้งหนี้งวดนี้ (ค่าเช่าตามสัญญา):</span>
+              <span className="font-bold text-ink">
+                {formatSatang(currentLease?.rent || 0)}
+              </span>
+            </div>
+          )}
 
           <ThaiDatePicker
             label="วันที่ชำระ (พ.ศ.)"
