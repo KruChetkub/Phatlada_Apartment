@@ -10,6 +10,7 @@ import {
   CheckCircle2,
 } from 'lucide-react';
 import { getLocalSettings, fetchSettings, DormSettings } from '../../services/settingsService';
+import { formatPhone } from '../../lib/format';
 
 interface LandingHeroProps {
   onOpenBooking: () => void;
@@ -143,20 +144,19 @@ export const LandingHero: React.FC<LandingHeroProps> = ({ onOpenBooking }) => {
           <span>
             สอบถามด่วน โทร:{' '}
             {[settings.phone, settings.phone2]
-              .filter(Boolean)
-              .join(', ')
-              .split(/[,/]/)
+              .flatMap((p) => (p ? p.split(/[,/]/) : []))
               .map((p) => p.trim())
               .filter(Boolean)
               .map((p, idx) => {
                 const tel = p.replace(/\D/g, '');
+                const formatted = formatPhone(p);
                 return (
-                  <React.Fragment key={idx}>
-                    {idx > 0 && <span className="text-ink-muted mx-1">,</span>}
+                  <span key={idx}>
+                    {idx > 0 && <span className="text-ink-muted mr-1.5">, </span>}
                     <a href={`tel:${tel}`} className="text-primary font-bold hover:underline">
-                      {p}
+                      {formatted}
                     </a>
-                  </React.Fragment>
+                  </span>
                 );
               })}{' '}
             (ยินดีต้อนรับทุกวัน)

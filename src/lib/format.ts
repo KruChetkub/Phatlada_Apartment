@@ -196,3 +196,20 @@ export function getAvatarInitial(fullName: string): string {
   return clean.charAt(0) || 'D';
 }
 
+/**
+ * Format Thai phone number cleanly:
+ * 10 digits -> "087-188-9122" or "091-851-7221"
+ * 9 digits -> "053-123-456"
+ */
+export function formatPhone(raw: string): string {
+  if (!raw) return '';
+  const digits = raw.replace(/\D/g, '');
+  if (digits.length === 10) {
+    return `${digits.slice(0, 3)}-${digits.slice(3, 6)}-${digits.slice(6)}`;
+  }
+  if (digits.length === 9) {
+    return `${digits.slice(0, 2)}-${digits.slice(2, 5)}-${digits.slice(5)}`;
+  }
+  return raw.trim();
+}
+

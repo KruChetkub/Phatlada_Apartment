@@ -7,6 +7,7 @@ import {
   Navigation,
 } from 'lucide-react';
 import { getLocalSettings, fetchSettings, DormSettings } from '../../services/settingsService';
+import { formatPhone } from '../../lib/format';
 
 interface LandingContactProps {
   onOpenBooking: () => void;
@@ -86,25 +87,24 @@ export const LandingContact: React.FC<LandingContactProps> = ({ onOpenBooking })
                   </div>
                   <div>
                     <span className="font-bold text-ink block mb-0.5">เบอร์โทรศัพท์ติดต่อ</span>
-                    <div className="flex flex-wrap items-center gap-x-2 gap-y-1">
+                    <div className="flex flex-wrap items-center">
                       {[settings.phone, settings.phone2]
-                        .filter(Boolean)
-                        .join(', ')
-                        .split(/[,/]/)
+                        .flatMap((p) => (p ? p.split(/[,/]/) : []))
                         .map((p) => p.trim())
                         .filter(Boolean)
                         .map((p, idx) => {
                           const tel = p.replace(/\D/g, '');
+                          const formatted = formatPhone(p);
                           return (
-                            <React.Fragment key={idx}>
-                              {idx > 0 && <span className="text-ink-muted">,</span>}
+                            <span key={idx} className="inline-flex items-center">
+                              {idx > 0 && <span className="text-ink-secondary mr-2">, </span>}
                               <a
                                 href={`tel:${tel}`}
                                 className="text-primary font-mono text-base font-bold hover:underline"
                               >
-                                {p}
+                                {formatted}
                               </a>
-                            </React.Fragment>
+                            </span>
                           );
                         })}
                     </div>
