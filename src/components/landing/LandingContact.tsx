@@ -132,11 +132,13 @@ export const LandingContact: React.FC<LandingContactProps> = ({ onOpenBooking })
               {/* Embedded Google Maps iFrame - Universal & Reliable Embed */}
               <div className="w-full h-80 sm:h-96 rounded-2xl overflow-hidden border border-line shadow-sm bg-surface relative">
                 <iframe
-                  src="https://maps.google.com/maps?q=20.2503358,100.4079899+(%E0%B8%A0%E0%B8%B1%E0%B8%97%E0%B8%A3%E0%B9%8C%E0%B8%A5%E0%B8%94%E0%B8%B2+%E0%B8%AD%E0%B8%9E%E0%B8%B2%E0%B8%A3%E0%B9%8C%E0%B8%97%E0%B9%80%E0%B8%A1%E0%B8%99%E0%B8%97%E0%B9%8C)&t=&z=16&ie=UTF8&iwloc=B&output=embed"
+                  src="https://maps.google.com/maps?q=20.2503358,100.4079899&hl=th&z=16&output=embed"
                   width="100%"
                   height="100%"
                   style={{ border: 0 }}
                   allowFullScreen
+                  loading="lazy"
+                  referrerPolicy="no-referrer-when-downgrade"
                   title="แผนที่ ภัทร์ลดา อพาร์ทเมนท์ เชียงของ เชียงราย"
                   className="w-full h-full"
                 />
