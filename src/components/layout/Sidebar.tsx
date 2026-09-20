@@ -105,6 +105,8 @@ export const Sidebar: React.FC<SidebarProps> = ({
               <NavLink
                 key={item.id}
                 to={item.path}
+                data-tour-id={item.id}
+                id={`tour-${item.id}`}
                 onClick={onClose}
                 className={({ isActive }) =>
                   `group flex h-11 items-center space-x-3 rounded-md px-3.5 text-[14px] font-medium transition-colors ${

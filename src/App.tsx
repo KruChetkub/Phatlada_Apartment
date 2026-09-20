@@ -32,6 +32,8 @@ import { getUnreadMessagesCount } from './services/messageService';
 import { subscribeToTableChanges } from './services/realtimeService';
 import { useIdleTimer } from './hooks/useIdleTimer';
 import { DashboardSummary } from './types/dashboard';
+import { SystemTourProvider } from './contexts/SystemTourContext';
+import { SystemTour } from './components/onboarding/SystemTour';
 
 const initialDormitory = {
   id: 'default-dorm',
@@ -262,7 +264,8 @@ export const App: React.FC = () => {
 
   return (
     <BrowserRouter>
-      <Routes>
+      <SystemTourProvider>
+        <Routes>
         {/* Public Website (หน้าบ้าน - ภัทร์ลดา อพาร์ทเมนท์) */}
         <Route path="/" element={<LandingPage />} />
         <Route path="/privacy-policy" element={<PrivacyPolicyPage />} />
@@ -433,6 +436,10 @@ export const App: React.FC = () => {
 
       {/* Global Cookie Consent Banner (PDPA Compliant) */}
       <CookieConsentBanner />
+
+      {/* First-time Onboarding Walkthrough Tour */}
+      <SystemTour />
+      </SystemTourProvider>
     </BrowserRouter>
   );
 };
