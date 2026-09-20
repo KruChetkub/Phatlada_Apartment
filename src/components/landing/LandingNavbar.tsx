@@ -9,19 +9,37 @@ interface LandingNavbarProps {
 export const LandingNavbar: React.FC<LandingNavbarProps> = ({ onOpenBooking }) => {
   const [mobileOpen, setMobileOpen] = useState(false);
 
+  const handleScrollToTop = () => {
+    setMobileOpen(false);
+    if (window.location.pathname === '/') {
+      if (window.location.hash) {
+        window.history.pushState(null, '', '/');
+      }
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    } else {
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+  };
+
   return (
     <header className="sticky top-0 z-50 bg-white/90 backdrop-blur-md border-b border-line shadow-xs">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-20 flex items-center justify-between">
         {/* Brand Logo */}
-        <Link to="/" className="flex items-center space-x-3 group">
-          <div className="h-11 w-11 rounded-xl bg-gradient-to-br from-primary to-tone-blue-solid flex items-center justify-center text-white shadow-sm group-hover:scale-105 transition-transform font-bold">
-            <Building2 className="h-6 w-6" />
+        <Link
+          to="/"
+          onClick={handleScrollToTop}
+          className="flex items-center space-x-2.5 sm:space-x-3 group"
+          aria-label="กลับสู่หน้าแรกและเลื่อนขึ้นบนสุด"
+        >
+          <div className="h-10 w-10 sm:h-11 sm:w-11 rounded-xl bg-gradient-to-br from-primary to-tone-blue-solid flex items-center justify-center text-white shadow-sm group-hover:scale-105 transition-transform font-bold shrink-0">
+            <Building2 className="h-5 w-5 sm:h-6 sm:w-6" />
           </div>
           <div>
-            <span className="text-lg sm:text-xl font-extrabold text-ink tracking-tight block font-prompt leading-tight">
-              ภัทร์ลดา อพาร์ทเมนท์
+            <span className="text-base sm:text-xl font-extrabold text-ink tracking-tight block font-prompt leading-tight">
+              <span className="block sm:inline">ภัทร์ลดา</span>{' '}
+              <span className="block sm:inline">อพาร์ทเมนท์</span>
             </span>
-            <span className="text-[11px] sm:text-xs text-primary font-semibold tracking-wider block uppercase font-sans">
+            <span className="text-[10px] sm:text-xs text-primary font-semibold tracking-wider block uppercase font-sans mt-0.5 sm:mt-0">
               Phatlada Apartment
             </span>
           </div>
