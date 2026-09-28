@@ -20,6 +20,7 @@ supabase/
 tests
 tests/
 graphify-out/
+Qpent/
 # Editor directories and files
 .vscode/*
 !.vscode/extensions.json

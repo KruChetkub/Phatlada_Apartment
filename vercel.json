@@ -2,7 +2,7 @@
   "framework": "vite",
   "rewrites": [
     {
-      "source": "/(.*)",
+      "source": "/((?!api|rest|ftp|actuator|cron|scheduler|upload|filemanager|phpmyadmin|pma|cpanel|webmail|adminer|jenkins|gitlab|grafana|kibana|portainer|traefik|wp-admin|administrator|crossdomain\\.xml|.*\\.(?:bak|php|sql|config|conf|ini|env|DS_Store|zip|tar|gz|tgz|rar|7z)).*)",
       "destination": "/index.html"
     }
   ],
