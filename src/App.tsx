@@ -34,6 +34,8 @@ import { useIdleTimer } from './hooks/useIdleTimer';
 import { DashboardSummary } from './types/dashboard';
 import { SystemTourProvider } from './contexts/SystemTourContext';
 import { SystemTour } from './components/onboarding/SystemTour';
+import { ThemeProvider } from './contexts/ThemeContext';
+import { LanguageProvider } from './contexts/LanguageContext';
 
 const initialDormitory = {
   id: 'default-dorm',
@@ -264,8 +266,10 @@ export const App: React.FC = () => {
 
   return (
     <BrowserRouter>
-      <SystemTourProvider>
-        <Routes>
+      <ThemeProvider>
+        <LanguageProvider>
+          <SystemTourProvider>
+            <Routes>
         {/* Public Website (หน้าบ้าน - ภัทร์ลดา อพาร์ทเมนท์) */}
         <Route path="/" element={<LandingPage />} />
         <Route path="/privacy-policy" element={<PrivacyPolicyPage />} />
@@ -439,7 +443,9 @@ export const App: React.FC = () => {
 
       {/* First-time Onboarding Walkthrough Tour */}
       <SystemTour />
-      </SystemTourProvider>
+          </SystemTourProvider>
+        </LanguageProvider>
+      </ThemeProvider>
     </BrowserRouter>
   );
 };

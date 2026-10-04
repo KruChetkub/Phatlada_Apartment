@@ -2,9 +2,11 @@ import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { Building2, LayoutDashboard } from 'lucide-react';
 import { getLocalSettings, fetchSettings, DormSettings } from '../../services/settingsService';
+import { useLanguage } from '../../contexts/LanguageContext';
 
 export const LandingFooter: React.FC = () => {
   const [settings, setSettings] = useState<DormSettings>(getLocalSettings);
+  const { t } = useLanguage();
 
   useEffect(() => {
     fetchSettings().then((s) => setSettings(s)).catch(() => {});
@@ -37,11 +39,11 @@ export const LandingFooter: React.FC = () => {
                 <Building2 className="h-5 w-5" />
               </div>
               <span className="text-base font-bold text-white tracking-tight font-prompt">
-                ภัทร์ลดา อพาร์ทเมนท์
+                {settings.dormitoryName || t.nav.brandName}
               </span>
             </div>
             <p className="text-xs text-white/60 leading-relaxed">
-              อพาร์ตเมนต์คุณภาพเพื่อการอยู่อาศัยที่สงบ ร่มรื่น และปลอดภัย พร้อมสิ่งอำนวยความสะดวกครบครัน
+              {t.footer.desc}
             </p>
             <p className="text-[11px] text-white/50">
               {settings.address || '79 หมู่ 7 ต.เวียง อ.เชียงของ จ.เชียงราย 57140'}
@@ -50,26 +52,26 @@ export const LandingFooter: React.FC = () => {
 
           {/* Col 2: Quick links */}
           <div className="space-y-2.5">
-            <h4 className="text-xs font-bold text-white uppercase tracking-wider">เมนูหน้าแรก</h4>
+            <h4 className="text-xs font-bold text-white uppercase tracking-wider">{t.footer.quickLinksTitle}</h4>
             <ul className="space-y-2 text-white/60">
               <li>
                 <a href="#rooms" className="hover:text-white transition">
-                  ประเภทห้องพัก
+                  {t.nav.rooms}
                 </a>
               </li>
               <li>
                 <a href="#facilities" className="hover:text-white transition">
-                  สิ่งอำนวยความสะดวก
+                  {t.nav.facilities}
                 </a>
               </li>
               <li>
                 <a href="#location" className="hover:text-white transition">
-                  ทำเลที่ตั้ง
+                  {t.nav.location}
                 </a>
               </li>
               <li>
                 <a href="#contact" className="hover:text-white transition">
-                  ติดต่อสอบถาม
+                  {t.nav.contact}
                 </a>
               </li>
             </ul>
@@ -77,7 +79,7 @@ export const LandingFooter: React.FC = () => {
 
           {/* Col 3: Management */}
           <div className="space-y-2.5">
-            <h4 className="text-xs font-bold text-white uppercase tracking-wider">ระบบจัดการ</h4>
+            <h4 className="text-xs font-bold text-white uppercase tracking-wider">{t.footer.managementTitle}</h4>
             <ul className="space-y-2 text-white/60">
               <li>
                 <Link
@@ -85,54 +87,53 @@ export const LandingFooter: React.FC = () => {
                   className="inline-flex items-center space-x-1.5 text-primary-soft hover:text-white transition font-semibold"
                 >
                   <LayoutDashboard className="h-3.5 w-3.5 text-primary" />
-                  <span>เข้าสู่ระบบ (Login)</span>
+                  <span>{t.footer.login}</span>
                 </Link>
               </li>
               <li>
                 <Link to="/invoices" className="hover:text-white transition">
-                  ตรวจสอบบิล & มิเตอร์
+                  {t.footer.checkBills}
                 </Link>
               </li>
               <li>
                 <Link to="/help" className="hover:text-white transition">
-                  วิธีใช้งานระบบ
+                  {t.footer.helpGuide}
                 </Link>
               </li>
             </ul>
           </div>
 
-          {/* Col 4: Privacy & Security (PDPA) */}
+          {/* Col 4: Legal & Policies */}
           <div className="space-y-2.5">
-            <h4 className="text-xs font-bold text-white uppercase tracking-wider">ความปลอดภัย & กฎหมาย</h4>
+            <h4 className="text-xs font-bold text-white uppercase tracking-wider">Legal & Compliance</h4>
             <ul className="space-y-2 text-white/60">
               <li>
-                <Link to="/privacy-policy" className="hover:text-white transition flex items-center gap-1.5">
-                  <span>นโยบายคุ้มครองข้อมูลส่วนบุคคล (PDPA)</span>
-                </Link>
-              </li>
-              <li>
-                <Link to="/cookie-policy" className="hover:text-white transition">
-                  นโยบายคุกกี้ (Cookie Policy)
+                <Link to="/privacy-policy" className="hover:text-white transition">
+                  {t.footer.privacy}
                 </Link>
               </li>
               <li>
                 <Link to="/terms" className="hover:text-white transition">
-                  ข้อกำหนดการใช้งาน (Terms of Service)
+                  {t.footer.terms}
+                </Link>
+              </li>
+              <li>
+                <Link to="/cookie-policy" className="hover:text-white transition">
+                  {t.footer.cookies}
                 </Link>
               </li>
             </ul>
           </div>
         </div>
 
-        <div className="flex flex-col sm:flex-row items-center justify-between gap-4 text-white/50 text-[11px]">
-          <p>© 2568 - 2569 ภัทร์ลดา อพาร์ทเมนท์ (Phatlada Apartment). All rights reserved.</p>
-          <div className="flex items-center space-x-4">
-            <Link to="/privacy-policy" className="hover:text-white transition">Privacy</Link>
-            <span>•</span>
-            <Link to="/cookie-policy" className="hover:text-white transition">Cookies</Link>
-            <span>•</span>
-            <Link to="/terms" className="hover:text-white transition">Terms</Link>
-          </div>
+        {/* Bottom row */}
+        <div className="flex flex-col sm:flex-row items-center justify-between text-white/50 text-[11px] gap-3">
+          <p>
+            &copy; {new Date().getFullYear()} {settings.dormitoryName || t.nav.brandName}. {t.footer.rightsReserved}
+          </p>
+          <p className="flex items-center space-x-1">
+            <span>Secured & Managed with Phatlada Core</span>
+          </p>
         </div>
       </div>
     </footer>

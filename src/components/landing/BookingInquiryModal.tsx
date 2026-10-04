@@ -6,6 +6,7 @@ import { createMessage } from '../../services/messageService';
 import { createNotification } from '../../services/notificationService';
 import { getLocalSettings, fetchSettings, DormSettings } from '../../services/settingsService';
 import { sanitizeInput } from '../../lib/utils';
+import { useLanguage } from '../../contexts/LanguageContext';
 import { Send, CheckCircle2, ShieldCheck, Lock, AlertCircle } from 'lucide-react';
 
 interface BookingInquiryModalProps {
@@ -23,12 +24,14 @@ export const BookingInquiryModal: React.FC<BookingInquiryModalProps> = ({
   defaultRoomType = '',
 }) => {
   const [settings, setSettings] = useState<DormSettings>(getLocalSettings);
+  const { t } = useLanguage();
+
   const monthlyPriceFormatted = Number(settings.landingStartingPrice || 3800).toLocaleString();
   const dailyPriceFormatted = Number(settings.landingDailyPrice || 500).toLocaleString();
 
   const [name, setName] = useState('');
   const [phone, setPhone] = useState('');
-  const [roomType, setRoomType] = useState(defaultRoomType || `ห้องแอร์มาตรฐาน (พักรายเดือน) - ${monthlyPriceFormatted} บ./เดือน`);
+  const [roomType, setRoomType] = useState(defaultRoomType || `${t.bookingModal.monthlyOption} - ${monthlyPriceFormatted} ฿`);
   const [visitDate, setVisitDate] = useState(new Date().toISOString().split('T')[0]);
   const [notes, setNotes] = useState('');
   const [botTrap, setBotTrap] = useState(''); // Anti-Bot Honeypot Field
@@ -67,10 +70,10 @@ export const BookingInquiryModal: React.FC<BookingInquiryModalProps> = ({
       if (defaultRoomType) {
         setRoomType(defaultRoomType);
       } else {
-        setRoomType(`ห้องแอร์มาตรฐาน (พักรายเดือน) - ${monthlyPriceFormatted} บ./เดือน`);
+        setRoomType(`${t.bookingModal.monthlyOption} - ${monthlyPriceFormatted} ฿`);
       }
     }
-  }, [defaultRoomType, monthlyPriceFormatted, isOpen]);
+  }, [defaultRoomType, monthlyPriceFormatted, isOpen, t.bookingModal.monthlyOption]);
 
   const handleNameChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     // Sanitize and limit to 15 characters
@@ -125,7 +128,7 @@ export const BookingInquiryModal: React.FC<BookingInquiryModalProps> = ({
         const elapsedSeconds = Math.floor((Date.now() - lastSubmitTime) / 1000);
         if (elapsedSeconds < COOLDOWN_SECONDS) {
           const remaining = COOLDOWN_SECONDS - elapsedSeconds;
-          setCooldownMessage(`ระบบได้รับข้อมูลแล้ว กรุณารออีก ${remaining} วินาที ก่อนส่งรายการใหม่`);
+          setCooldownMessage(t.bookingModal.cooldownNotice.replace('{sec}', remaining.toString()));
           return;
         }
       }
@@ -136,7 +139,7 @@ export const BookingInquiryModal: React.FC<BookingInquiryModalProps> = ({
     const cleanNotes = sanitizeInput(notes.trim(), 100);
 
     if (!cleanName || !cleanPhone || cleanPhone.length < 9) {
-      setCooldownMessage('กรุณากรอกเบอร์โทรศัพท์ติดต่อให้ถูกต้องครบถ้วน (9-10 หลัก)');
+      setCooldownMessage('Please enter a valid phone number (9-10 digits) / กรุณากรอกเบอร์โทรศัพท์ (9-10 หลัก)');
       return;
     }
 
@@ -181,20 +184,20 @@ export const BookingInquiryModal: React.FC<BookingInquiryModalProps> = ({
   };
 
   return (
-    <Modal isOpen={isOpen} onClose={onClose} title="นัดหมายชมห้องพักจริง / สอบถามข้อมูล">
+    <Modal isOpen={isOpen} onClose={onClose} title={t.bookingModal.title}>
       {success ? (
         <div className="py-8 text-center space-y-3">
           <CheckCircle2 className="h-12 w-12 text-tone-green-solid mx-auto animate-bounce" />
-          <h3 className="text-base font-bold text-ink font-prompt">ส่งข้อมูลนัดหมายเรียบร้อยแล้ว!</h3>
+          <h3 className="text-base font-bold text-ink font-prompt">{t.bookingModal.successTitle}</h3>
           <p className="text-xs text-ink-secondary max-w-sm mx-auto">
-            เจ้าหน้าที่ผู้ดูแล ภัทร์ลดา อพาร์ทเมนท์ ได้รับข้อความของคุณแล้ว และจะติดต่อกลับทางเบอร์โทรศัพท์โดยเร็วที่สุด
+            {t.bookingModal.successMessage}
           </p>
         </div>
       ) : (
         <form onSubmit={handleSubmit} className="space-y-4">
           {/* Anti-Bot Honeypot field (hidden from human users, bots fill it) */}
           <div className="hidden absolute -left-[9999px] pointer-events-none opacity-0 select-none" aria-hidden="true">
-            <label htmlFor="website_hp">Do not fill this field</label>
+            <label htmlFor="company_verify_hp">Do not fill this field</label>
             <input
               id="company_verify_hp"
               type="text"
@@ -215,17 +218,17 @@ export const BookingInquiryModal: React.FC<BookingInquiryModalProps> = ({
           )}
 
           <p className="text-xs text-ink-secondary">
-            กรอกข้อมูลด้านล่างเพื่อทำการนัดหมายเข้าชมสถานที่จริง หรือสอบถามความพร้อมของห้องพักล่วงหน้า
+            {t.bookingModal.subtitle}
           </p>
 
           {/* Name Field: Max 15 chars & Sanitized */}
           <div>
             <div className="flex items-center justify-between mb-1">
               <label className="text-xs font-semibold text-ink">
-                ชื่อ - นามสกุล *
+                {t.bookingModal.nameLabel} *
               </label>
               <span className="text-[10px] text-ink-muted">
-                {name.length}/15 ตัวอักษร
+                {name.length}/15
               </span>
             </div>
             <input
@@ -234,7 +237,7 @@ export const BookingInquiryModal: React.FC<BookingInquiryModalProps> = ({
               maxLength={15}
               value={name}
               onChange={handleNameChange}
-              placeholder="เช่น คุณสมชาย (ไม่เกิน 15 ตัว)"
+              placeholder={t.bookingModal.namePlaceholder}
               className="w-full text-xs p-2.5 rounded-lg border border-line bg-surface text-ink focus:outline-none focus:ring-1 focus:ring-primary"
             />
           </div>
@@ -243,10 +246,10 @@ export const BookingInquiryModal: React.FC<BookingInquiryModalProps> = ({
           <div>
             <div className="flex items-center justify-between mb-1">
               <label className="text-xs font-semibold text-ink">
-                เบอร์โทรศัพท์ติดต่อ *
+                {t.bookingModal.phoneLabel} *
               </label>
               <span className="text-[10px] text-ink-muted">
-                เฉพาะตัวเลข 10 หลัก
+                Max 10 digits
               </span>
             </div>
             <input
@@ -257,27 +260,24 @@ export const BookingInquiryModal: React.FC<BookingInquiryModalProps> = ({
               maxLength={10}
               value={phone}
               onChange={handlePhoneChange}
-              placeholder="เช่น 0871889122"
+              placeholder={t.bookingModal.phonePlaceholder}
               className="w-full text-xs p-2.5 rounded-lg border border-line bg-surface text-ink focus:outline-none focus:ring-1 focus:ring-primary font-mono tracking-wider"
             />
           </div>
 
           {/* Room Type Field */}
           <div>
-            <label className="block text-xs font-semibold text-ink mb-1">ประเภทห้องพักที่สนใจ</label>
+            <label className="block text-xs font-semibold text-ink mb-1">{t.bookingModal.roomTypeLabel}</label>
             <select
               value={roomType}
               onChange={(e) => setRoomType(e.target.value)}
               className="w-full text-xs p-2.5 rounded-lg border border-line bg-surface text-ink focus:outline-none focus:ring-1 focus:ring-primary"
             >
-              <option value={`ห้องแอร์มาตรฐาน (พักรายเดือน) - ${monthlyPriceFormatted} บ./เดือน`}>
-                ห้องแอร์มาตรฐาน (พักรายเดือน) - {monthlyPriceFormatted} บ./เดือน
+              <option value={`${t.bookingModal.monthlyOption} - ฿${monthlyPriceFormatted}`}>
+                {t.bookingModal.monthlyOption} - ฿{monthlyPriceFormatted}
               </option>
-              <option value={`ห้องแอร์มาตรฐาน (พักรายวัน) - ${dailyPriceFormatted} บ./วัน`}>
-                ห้องแอร์มาตรฐาน (พักรายวัน) - {dailyPriceFormatted} บ./วัน
-              </option>
-              <option value="สอบถามห้องว่าง / ปรึกษาข้อมูลทั่วไป">
-                สอบถามห้องว่าง / ปรึกษาข้อมูลทั่วไป
+              <option value={`${t.bookingModal.dailyOption} - ฿${dailyPriceFormatted}`}>
+                {t.bookingModal.dailyOption} - ฿{dailyPriceFormatted}
               </option>
             </select>
           </div>
@@ -285,7 +285,7 @@ export const BookingInquiryModal: React.FC<BookingInquiryModalProps> = ({
           {/* Visit Date */}
           <div>
             <ThaiDatePicker
-              label="วันที่สะดวกเข้ามาดูห้องพัก (พ.ศ.)"
+              label={t.bookingModal.visitDateLabel}
               value={visitDate}
               onChange={setVisitDate}
             />
@@ -295,10 +295,10 @@ export const BookingInquiryModal: React.FC<BookingInquiryModalProps> = ({
           <div>
             <div className="flex items-center justify-between mb-1">
               <label className="text-xs font-semibold text-ink">
-                ข้อความเพิ่มเติม / สอบถาม
+                {t.bookingModal.notesLabel}
               </label>
               <span className={`text-[10px] ${notes.length >= 100 ? 'text-tone-red-solid font-bold' : 'text-ink-muted'}`}>
-                {notes.length}/100 ตัวอักษร
+                {notes.length}/100
               </span>
             </div>
             <textarea
@@ -306,7 +306,7 @@ export const BookingInquiryModal: React.FC<BookingInquiryModalProps> = ({
               maxLength={100}
               value={notes}
               onChange={handleNotesChange}
-              placeholder="เช่น ต้องการเข้าพักต้นเดือนหน้า, มีที่จอดรถยนต์หรือไม่ (ไม่เกิน 100 ตัวอักษร)"
+              placeholder={t.bookingModal.notesPlaceholder}
               className="w-full text-xs p-2.5 rounded-lg border border-line bg-surface text-ink focus:outline-none focus:ring-1 focus:ring-primary resize-none"
             />
           </div>
@@ -316,14 +316,14 @@ export const BookingInquiryModal: React.FC<BookingInquiryModalProps> = ({
             <ShieldCheck className="h-4 w-4 text-primary flex-shrink-0 mt-0.5" />
             <div className="space-y-0.5">
               <span className="block">
-                ข้อมูลปลอดภัย: ระบบเข้ารหัสและส่งตรงถึงผู้ดูแลหอพัก ไม่บันทึกค้างบนเครื่องผู้ใช้ ตาม{' '}
+                {t.bookingModal.privacyNotice}{' '}
                 <Link to="/privacy-policy" target="_blank" rel="noopener noreferrer" className="text-primary font-medium underline hover:text-primary-dark">
-                  นโยบาย PDPA
+                  {t.bookingModal.pdpaLink}
                 </Link>
               </span>
               <span className="text-[10px] text-slate-500 flex items-center gap-1">
                 <Lock className="h-3 w-3 text-emerald-600 inline" />
-                ระบบมีตัวกรองความปลอดภัย ป้องกันคำสั่งสคริปต์อันตราย (Anti-XSS Protection)
+                Anti-XSS & Honeypot Secured
               </span>
             </div>
           </div>
@@ -334,15 +334,15 @@ export const BookingInquiryModal: React.FC<BookingInquiryModalProps> = ({
               onClick={onClose}
               className="px-4 py-2 text-xs font-medium text-ink-secondary hover:text-ink transition"
             >
-              ยกเลิก
+              {t.bookingModal.closeBtn}
             </button>
             <button
               type="submit"
               disabled={submitting}
-              className="inline-flex items-center space-x-1.5 px-5 py-2 text-xs font-semibold text-white bg-primary hover:bg-primary/90 rounded-lg shadow-sm transition disabled:opacity-50"
+              className="inline-flex items-center space-x-1.5 px-5 py-2 text-xs font-semibold text-white bg-primary hover:bg-primary/90 rounded-lg shadow-sm transition disabled:opacity-50 cursor-pointer"
             >
               <Send className="h-3.5 w-3.5" />
-              <span>{submitting ? 'กำลังส่งข้อมูล...' : 'ยืนยันการนัดหมาย'}</span>
+              <span>{submitting ? t.bookingModal.submitting : t.bookingModal.submitBtn}</span>
             </button>
           </div>
         </form>

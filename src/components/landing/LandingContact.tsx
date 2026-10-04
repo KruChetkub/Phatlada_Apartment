@@ -8,6 +8,7 @@ import {
 } from 'lucide-react';
 import { getLocalSettings, fetchSettings, DormSettings } from '../../services/settingsService';
 import { formatPhone } from '../../lib/format';
+import { useLanguage } from '../../contexts/LanguageContext';
 
 interface LandingContactProps {
   onOpenBooking: () => void;
@@ -15,6 +16,7 @@ interface LandingContactProps {
 
 export const LandingContact: React.FC<LandingContactProps> = ({ onOpenBooking }) => {
   const [settings, setSettings] = useState<DormSettings>(() => getLocalSettings());
+  const { t } = useLanguage();
 
   useEffect(() => {
     fetchSettings().then((s) => setSettings(s)).catch(() => {});
@@ -44,13 +46,13 @@ export const LandingContact: React.FC<LandingContactProps> = ({ onOpenBooking })
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="text-center max-w-2xl mx-auto mb-12 space-y-3">
           <span className="text-xs font-bold text-primary tracking-wider uppercase">
-            ติดต่อเรา & แผนที่การเดินทาง
+            {t.contact.badge}
           </span>
           <h2 className="text-2xl sm:text-4xl font-bold text-ink font-prompt">
-            ยินดีต้อนรับสู่ ภัทร์ลดา อพาร์ทเมนท์
+            {t.contact.title}
           </h2>
           <p className="text-xs sm:text-sm text-ink-secondary">
-            สอบถามข้อมูลห้องพัก นัดหมายชมสถานที่จริง หรือปรึกษาเรื่องการเข้าพักได้ทุกวัน
+            {t.contact.subtitle}
           </p>
         </div>
 
@@ -59,8 +61,10 @@ export const LandingContact: React.FC<LandingContactProps> = ({ onOpenBooking })
           <div className="p-6 sm:p-8 rounded-2xl bg-surface border border-line shadow-xs flex flex-col justify-between space-y-6">
             <div className="space-y-6">
               <div>
-                <h3 className="text-lg font-bold text-ink mb-1 font-prompt">ภัทร์ลดา อพาร์ทเมนท์ (Phatlada Apartment)</h3>
-                <p className="text-xs text-ink-secondary">อพาร์ตเมนต์คุณภาพ บรรยากาศอบอุ่น สะอาด ปลอดภัย</p>
+                <h3 className="text-lg font-bold text-ink mb-1 font-prompt">
+                  {settings.dormitoryName || 'ภัทร์ลดา อพาร์ทเมนท์'}
+                </h3>
+                <p className="text-xs text-ink-secondary">{t.contact.subHeading}</p>
               </div>
 
               <div className="space-y-4 text-xs">
@@ -70,7 +74,7 @@ export const LandingContact: React.FC<LandingContactProps> = ({ onOpenBooking })
                     <MapPin className="h-5 w-5" />
                   </div>
                   <div>
-                    <span className="font-bold text-ink block mb-0.5">ที่อยู่</span>
+                    <span className="font-bold text-ink block mb-0.5">{t.contact.addressLabel}</span>
                     <p className="text-ink-secondary leading-relaxed font-medium">
                       {fullAddress}
                     </p>
@@ -86,7 +90,7 @@ export const LandingContact: React.FC<LandingContactProps> = ({ onOpenBooking })
                     <Phone className="h-5 w-5" />
                   </div>
                   <div>
-                    <span className="font-bold text-ink block mb-0.5">เบอร์โทรศัพท์ติดต่อ</span>
+                    <span className="font-bold text-ink block mb-0.5">{t.contact.phoneLabel}</span>
                     <div className="flex flex-wrap items-center">
                       {[settings.phone, settings.phone2]
                         .flatMap((p) => (p ? p.split(/[,/]/) : []))
@@ -109,7 +113,7 @@ export const LandingContact: React.FC<LandingContactProps> = ({ onOpenBooking })
                         })}
                     </div>
                     <span className="text-[11px] text-ink-secondary block mt-0.5">
-                      โทรติดต่อสอบถามห้องว่าง หรือนัดหมายเข้าชมห้องได้ทุกวัน
+                      {t.contact.phoneHint}
                     </span>
                   </div>
                 </div>
@@ -120,8 +124,8 @@ export const LandingContact: React.FC<LandingContactProps> = ({ onOpenBooking })
                     <Clock className="h-5 w-5" />
                   </div>
                   <div>
-                    <span className="font-bold text-ink block mb-0.5">เวลาทำการสำนักงาน</span>
-                    <p className="text-ink-secondary">เปิดทำการทุกวัน: 08:00 น. - 19:00 น.</p>
+                    <span className="font-bold text-ink block mb-0.5">{t.contact.hoursLabel}</span>
+                    <p className="text-ink-secondary">{t.contact.hoursValue}</p>
                   </div>
                 </div>
               </div>
@@ -129,9 +133,9 @@ export const LandingContact: React.FC<LandingContactProps> = ({ onOpenBooking })
 
             <button
               onClick={onOpenBooking}
-              className="w-full py-3.5 px-4 rounded-xl bg-primary hover:bg-primary/90 text-white font-bold text-xs shadow-md hover:shadow-lg transition flex items-center justify-center space-x-2"
+              className="w-full py-3.5 px-4 rounded-xl bg-primary hover:bg-primary/90 text-white font-bold text-xs shadow-md hover:shadow-lg transition flex items-center justify-center space-x-2 cursor-pointer"
             >
-              <span>ส่งข้อความนัดหมายชมห้องพักล่วงหน้า</span>
+              <span>{t.contact.bookViewingBtn}</span>
               <ArrowUpRight className="h-4 w-4" />
             </button>
           </div>
@@ -142,7 +146,7 @@ export const LandingContact: React.FC<LandingContactProps> = ({ onOpenBooking })
               <div className="flex items-center justify-between mb-3">
                 <h3 className="text-sm font-bold text-ink flex items-center space-x-2 font-prompt">
                   <Navigation className="h-4 w-4 text-primary" />
-                  <span>แผนที่ตั้ง ภัทร์ลดา อพาร์ทเมนท์</span>
+                  <span>{t.contact.mapTitle}</span>
                 </h3>
                 <a
                   href={googleMapsShareUrl}
@@ -150,7 +154,7 @@ export const LandingContact: React.FC<LandingContactProps> = ({ onOpenBooking })
                   rel="noopener noreferrer"
                   className="inline-flex items-center space-x-1 text-xs text-primary font-semibold hover:underline"
                 >
-                  <span>เปิด Google Maps</span>
+                  <span>{t.contact.openMaps}</span>
                   <ArrowUpRight className="h-3.5 w-3.5" />
                 </a>
               </div>
@@ -164,7 +168,7 @@ export const LandingContact: React.FC<LandingContactProps> = ({ onOpenBooking })
                   allowFullScreen
                   loading="lazy"
                   referrerPolicy="no-referrer-when-downgrade"
-                  title="แผนที่ ภัทร์ลดา อพาร์ทเมนท์ เชียงของ เชียงราย"
+                  title={t.contact.mapIframeTitle}
                   className="w-full h-full pointer-events-none select-none border-0"
                 />
 
@@ -174,11 +178,11 @@ export const LandingContact: React.FC<LandingContactProps> = ({ onOpenBooking })
                   target="_blank"
                   rel="noopener noreferrer"
                   className="absolute inset-0 z-10 flex items-end justify-center p-3.5 bg-black/0 hover:bg-black/10 transition cursor-pointer"
-                  title="คลิกเพื่อเปิดดูใน Google Maps และนำทางด้วย GPS"
+                  title={t.contact.clickToNavigate}
                 >
                   <div className="bg-white/95 backdrop-blur-md text-ink px-4 py-2 rounded-xl shadow-md border border-line flex items-center space-x-2 text-xs font-bold group-hover:scale-105 transition-transform">
                     <Navigation className="h-4 w-4 text-primary" />
-                    <span>คลิกเพื่อเปิดแผนที่ & นำทาง (Google Maps)</span>
+                    <span>{t.contact.clickToNavigate}</span>
                     <ArrowUpRight className="h-3.5 w-3.5 text-primary" />
                   </div>
                 </a>
@@ -188,7 +192,7 @@ export const LandingContact: React.FC<LandingContactProps> = ({ onOpenBooking })
             <div className="flex flex-col sm:flex-row items-center justify-between gap-3 text-xs text-ink-secondary bg-surface p-3.5 rounded-xl border border-line">
               <div className="flex items-center space-x-2">
                 <MapPin className="h-4 w-4 text-primary shrink-0" />
-                <span>พิกัด: 79 หมู่ 7 เวียง อ.เชียงของ จ.เชียงราย</span>
+                <span>{t.contact.gpsCoordinates}</span>
               </div>
               <a
                 href={googleMapsShareUrl}
@@ -196,7 +200,7 @@ export const LandingContact: React.FC<LandingContactProps> = ({ onOpenBooking })
                 rel="noopener noreferrer"
                 className="text-xs text-primary font-bold hover:underline shrink-0"
               >
-                นำทางด้วย GPS &rarr;
+                {t.contact.gpsNavigateBtn}
               </a>
             </div>
           </div>
