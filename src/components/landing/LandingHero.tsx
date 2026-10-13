@@ -424,26 +424,7 @@ export const LandingHero: React.FC<LandingHeroProps> = ({ onOpenBooking, onOpenG
         </div>
 
         {/* 2. THUMBNAIL PREVIEWS DIRECTLY UNDERNEATH (ภาพตัวอย่างใต้ภาพ คล้ายตัวอย่าง Baiyoke Sky Hotel) */}
-        <div className="bg-surface border-y border-line py-2.5 px-3 sm:px-4">
-          <div className="flex items-center justify-between mb-1.5 px-1">
-            <span className="text-[11px] font-bold text-ink-secondary flex items-center gap-1.5">
-              <span>🖼️ ภาพตัวอย่างห้องพัก</span>
-              <span className="text-primary font-medium text-[10px]">(เลื่อนอัตโนมัติ / แตะเลือกดู)</span>
-            </span>
-            <div className="flex items-center gap-1">
-              {HERO_SLIDES.map((_, idx) => (
-                <button
-                  key={idx}
-                  onClick={() => setActiveSlide(idx)}
-                  className={`h-1.5 rounded-full transition-all cursor-pointer ${
-                    idx === activeSlide ? 'w-4 bg-primary' : 'w-1.5 bg-line hover:bg-ink-muted'
-                  }`}
-                  aria-label={`ไปยังภาพที่ ${idx + 1}`}
-                />
-              ))}
-            </div>
-          </div>
-
+        <div className="bg-surface border-y border-line py-2 px-3 sm:px-4">
           {/* Horizontal scrollable thumbnails strip */}
           <div
             ref={mobileThumbnailsRef}

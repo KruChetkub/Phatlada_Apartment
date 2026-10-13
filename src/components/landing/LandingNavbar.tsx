@@ -54,40 +54,40 @@ export const LandingNavbar: React.FC<LandingNavbarProps> = ({ onOpenBooking }) =
         <Link
           to="/"
           onClick={handleScrollToTop}
-          className="flex items-center space-x-2.5 sm:space-x-3 group"
+          className="flex items-center space-x-2 sm:space-x-3 group min-w-0"
           aria-label={t.nav.brandName}
         >
-          <div className="h-10 w-10 sm:h-11 sm:w-11 rounded-xl bg-gradient-to-br from-primary to-tone-blue-solid flex items-center justify-center text-white shadow-sm group-hover:scale-105 transition-transform font-bold shrink-0">
-            <Building2 className="h-5 w-5 sm:h-6 sm:w-6" />
+          <div className="h-9 w-9 sm:h-11 sm:w-11 rounded-xl bg-gradient-to-br from-primary to-tone-blue-solid flex items-center justify-center text-white shadow-sm group-hover:scale-105 transition-transform font-bold shrink-0">
+            <Building2 className="h-4.5 w-4.5 sm:h-6 sm:w-6" />
           </div>
-          <div>
-            <span className="text-base sm:text-xl font-extrabold text-ink tracking-tight block font-prompt leading-tight">
+          <div className="min-w-0">
+            <span className="text-sm sm:text-lg md:text-xl font-extrabold text-ink tracking-tight block font-prompt leading-tight whitespace-nowrap">
               {t.nav.brandName}
             </span>
-            <span className="text-[10px] sm:text-xs text-primary font-semibold tracking-wider block uppercase font-sans mt-0.5 sm:mt-0">
+            <span className="text-[9px] sm:text-xs text-primary font-semibold tracking-wider block uppercase font-sans mt-0.5 sm:mt-0 whitespace-nowrap">
               {t.nav.brandSubtitle}
             </span>
           </div>
         </Link>
 
         {/* Desktop Navigation Links */}
-        <nav className="hidden md:flex items-center space-x-8 text-xs sm:text-sm font-medium text-ink-secondary">
-          <a href="#rooms" className="hover:text-primary transition">
+        <nav className="hidden lg:flex items-center space-x-6 xl:space-x-8 text-xs sm:text-sm font-medium text-ink-secondary whitespace-nowrap">
+          <a href="#rooms" className="hover:text-primary transition whitespace-nowrap">
             {t.nav.rooms}
           </a>
-          <a href="#facilities" className="hover:text-primary transition">
+          <a href="#facilities" className="hover:text-primary transition whitespace-nowrap">
             {t.nav.facilities}
           </a>
-          <a href="#location" className="hover:text-primary transition">
+          <a href="#location" className="hover:text-primary transition whitespace-nowrap">
             {t.nav.location}
           </a>
-          <a href="#contact" className="hover:text-primary transition">
+          <a href="#contact" className="hover:text-primary transition whitespace-nowrap">
             {t.nav.contact}
           </a>
         </nav>
 
         {/* Desktop Action Buttons: Language + Theme Toggle + Booking CTA */}
-        <div className="hidden md:flex items-center space-x-2.5">
+        <div className="hidden lg:flex items-center space-x-2.5">
           {/* Language Selector Dropdown */}
           <div className="relative" ref={langDropdownRef}>
             <button
@@ -141,7 +141,7 @@ export const LandingNavbar: React.FC<LandingNavbarProps> = ({ onOpenBooking }) =
         </div>
 
         {/* Mobile Actions: Theme Toggle + Booking CTA + Hamburger */}
-        <div className="flex md:hidden items-center space-x-1.5">
+        <div className="flex lg:hidden items-center space-x-1 sm:space-x-1.5 shrink-0">
           {/* Theme Toggle Button for Mobile Header */}
           <button
             onClick={toggleTheme}
@@ -173,7 +173,7 @@ export const LandingNavbar: React.FC<LandingNavbarProps> = ({ onOpenBooking }) =
 
       {/* Mobile Drawer */}
       {mobileOpen && (
-        <div className="md:hidden bg-surface border-b border-line px-4 pt-3 pb-5 space-y-3 shadow-lg animate-in slide-in-from-top-2">
+        <div className="lg:hidden bg-surface border-b border-line px-4 pt-3 pb-5 space-y-3 shadow-lg animate-in slide-in-from-top-2">
           <a
             href="#rooms"
             onClick={() => setMobileOpen(false)}
