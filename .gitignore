@@ -21,6 +21,8 @@ tests
 tests/
 graphify-out/
 Qpent/
+docs/
+.github/
 # Editor directories and files
 .vscode/*
 !.vscode/extensions.json
