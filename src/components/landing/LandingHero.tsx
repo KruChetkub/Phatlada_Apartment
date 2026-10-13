@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import {
   ShieldCheck,
   Wifi,
@@ -8,18 +8,87 @@ import {
   Waves,
   Car,
   CheckCircle2,
+  ChevronLeft,
+  ChevronRight,
 } from 'lucide-react';
 import { getLocalSettings, fetchSettings, DormSettings } from '../../services/settingsService';
 import { formatPhone } from '../../lib/format';
 import { useLanguage } from '../../contexts/LanguageContext';
 
-interface LandingHeroProps {
-  onOpenBooking: () => void;
+export interface HeroSlide {
+  id: number;
+  src: string;
+  title: string;
+  subtitle: string;
+  tag: string;
+  galleryIndex: number;
 }
 
-export const LandingHero: React.FC<LandingHeroProps> = ({ onOpenBooking }) => {
+export const HERO_SLIDES: HeroSlide[] = [
+  {
+    id: 0,
+    src: '/1.jpg',
+    title: 'ภัทร์ลดา อพาร์ทเมนท์',
+    subtitle: 'อาคาร 2 ชั้น บรรยากาศเงียบสงบ สะอาด ปลอดภัย',
+    tag: 'อาคารภายนอก',
+    galleryIndex: 0,
+  },
+  {
+    id: 1,
+    src: '/rooms/room-1.jpg',
+    title: 'ห้องพักสไตล์ฟ้าคราม โปร่งสบาย',
+    subtitle: 'เตียง 5 ฟุต โต๊ะทำงานริมระเบียงส่วนตัว แสงธรรมชาติ',
+    tag: 'ห้องนอนฟ้าคราม',
+    galleryIndex: 0,
+  },
+  {
+    id: 2,
+    src: '/rooms/room-2.jpg',
+    title: 'ห้องพักสไตล์วอร์มมอคค่า อบอุ่น',
+    subtitle: 'แอร์เย็นฉ่ำ ผ้าม่านทึบแสง 100% โต๊ะเครื่องแป้ง',
+    tag: 'ห้องนอนมอคค่า',
+    galleryIndex: 1,
+  },
+  {
+    id: 3,
+    src: '/rooms/room-3.jpg',
+    title: 'ห้องพักสไตล์เซจกรีน ธรรมชาติ',
+    subtitle: 'โทนธรรมชาติผ่อนคลาย สะอาด ร่มรื่น พร้อมเข้าอยู่',
+    tag: 'ห้องนอนเซจกรีน',
+    galleryIndex: 2,
+  },
+];
+
+interface LandingHeroProps {
+  onOpenBooking: () => void;
+  onOpenGallery?: (index?: number) => void;
+}
+
+export const LandingHero: React.FC<LandingHeroProps> = ({ onOpenBooking, onOpenGallery }) => {
   const [settings, setSettings] = useState<DormSettings>(getLocalSettings);
   const { t } = useLanguage();
+  const [activeSlide, setActiveSlide] = useState(0);
+  const [isPaused, setIsPaused] = useState(false);
+  const mobileThumbnailsRef = useRef<HTMLDivElement>(null);
+
+  // Auto-slide every 4.5 seconds
+  useEffect(() => {
+    if (isPaused) return;
+    const timer = setInterval(() => {
+      setActiveSlide((prev) => (prev + 1) % HERO_SLIDES.length);
+    }, 4500);
+    return () => clearInterval(timer);
+  }, [isPaused]);
+
+  // Keep active thumbnail centered in mobile scroll
+  useEffect(() => {
+    if (mobileThumbnailsRef.current) {
+      const activeEl = mobileThumbnailsRef.current.children[activeSlide] as HTMLElement;
+      if (activeEl) {
+        activeEl.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'center' });
+      }
+    }
+  }, [activeSlide]);
 
   useEffect(() => {
     fetchSettings().then((s) => setSettings(s)).catch(() => {});
@@ -170,32 +239,247 @@ export const LandingHero: React.FC<LandingHeroProps> = ({ onOpenBooking }) => {
 
   return (
     <section className="relative bg-bg select-none">
-      {/* DESKTOP VIEW (lg and up): Fullscreen Hero with /1.jpg on left and card on right */}
-      <div className="hidden lg:flex relative min-h-[calc(100vh-80px)] items-center justify-end overflow-hidden py-10 px-8">
-        <div className="absolute inset-0 z-0 overflow-hidden">
-          <img
-            src="/1.jpg"
-            alt={settings.dormitoryName || 'ภัทร์ลดา อพาร์ทเมนท์'}
-            className="w-full h-full object-cover object-left scale-100"
-          />
+      {/* DESKTOP VIEW (lg and up): Fullscreen Hero with auto-slide background and thumbnail strip at bottom-left */}
+      <div
+        className="hidden lg:flex relative min-h-[calc(100vh-80px)] items-center justify-end overflow-hidden py-10 px-8 xl:px-12"
+        onMouseEnter={() => setIsPaused(true)}
+        onMouseLeave={() => setIsPaused(false)}
+      >
+        {/* Background Slide Images with smooth crossfade */}
+        <div className="absolute inset-0 z-0 overflow-hidden bg-black">
+          {HERO_SLIDES.map((slide, idx) => (
+            <img
+              key={slide.id}
+              src={slide.src}
+              alt={slide.title}
+              width={1448}
+              height={1086}
+              className={`absolute inset-0 w-full h-full object-cover object-[left_30%] transition-all duration-1000 ease-out ${
+                idx === activeSlide
+                  ? 'opacity-100 scale-100 z-10'
+                  : 'opacity-0 scale-105 z-0 pointer-events-none'
+              }`}
+            />
+          ))}
+          {/* Subtle gradient overlay to enhance card and thumbnail contrast */}
+          <div className="absolute inset-0 bg-gradient-to-r from-black/40 via-transparent to-black/30 z-10 pointer-events-none" />
         </div>
-        <div className="relative z-10 w-full max-w-xl animate-in fade-in slide-in-from-right-4 duration-300">
+
+        {/* Desktop Left-Bottom: Thumbnail Strip (ตรงตามตัวอย่างภาพแนบ มีภาพตัวอย่างเรียงด้านล่าง เลื่อนอัตโนมัติ/คลิกเลือกได้) */}
+        <div className="absolute left-8 xl:left-12 bottom-8 z-20 max-w-xl bg-black/65 backdrop-blur-md border border-white/20 rounded-2xl p-3 shadow-2xl animate-in fade-in slide-in-from-bottom-3 duration-500">
+          <div className="flex items-center justify-between mb-2 px-1 text-white text-xs">
+            <div className="flex items-center space-x-2">
+              <span className="font-bold flex items-center gap-1.5 font-prompt">
+                <span className="h-2 w-2 rounded-full bg-primary animate-ping" />
+                <span>{HERO_SLIDES[activeSlide].title}</span>
+              </span>
+              <span className="text-white/60 text-[11px]">({activeSlide + 1}/{HERO_SLIDES.length})</span>
+            </div>
+
+            {/* Prev / Next buttons */}
+            <div className="flex items-center space-x-1.5">
+              {onOpenGallery && (
+                <button
+                  onClick={() => onOpenGallery(HERO_SLIDES[activeSlide].galleryIndex)}
+                  className="px-2 py-0.5 rounded-lg bg-white/10 hover:bg-white/20 text-white text-[11px] font-medium transition cursor-pointer flex items-center gap-1 mr-1"
+                  title="ดูภาพขยายเต็มจอ"
+                >
+                  <span>🔍 ขยาย</span>
+                </button>
+              )}
+              <button
+                onClick={() => setActiveSlide((prev) => (prev === 0 ? HERO_SLIDES.length - 1 : prev - 1))}
+                className="p-1 rounded-lg bg-white/10 hover:bg-white/20 text-white transition cursor-pointer"
+                aria-label="ภาพก่อนหน้า"
+              >
+                <ChevronLeft className="h-4 w-4" />
+              </button>
+              <button
+                onClick={() => setActiveSlide((prev) => (prev + 1) % HERO_SLIDES.length)}
+                className="p-1 rounded-lg bg-white/10 hover:bg-white/20 text-white transition cursor-pointer"
+                aria-label="ภาพถัดไป"
+              >
+                <ChevronRight className="h-4 w-4" />
+              </button>
+            </div>
+          </div>
+
+          {/* Row of 4 Thumbnails */}
+          <div className="flex items-center gap-2.5">
+            {HERO_SLIDES.map((slide, idx) => {
+              const isActive = idx === activeSlide;
+              return (
+                <button
+                  key={slide.id}
+                  onClick={() => setActiveSlide(idx)}
+                  className={`group relative rounded-xl overflow-hidden w-24 aspect-[4/3] border-2 transition-all cursor-pointer ${
+                    isActive
+                      ? 'border-primary ring-2 ring-primary/50 scale-105 shadow-lg opacity-100'
+                      : 'border-white/20 hover:border-white/50 opacity-60 hover:opacity-90'
+                  }`}
+                >
+                  <img
+                    src={slide.src}
+                    alt={slide.tag}
+                    width={1448}
+                    height={1086}
+                    className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-300"
+                  />
+                  <div className="absolute inset-x-0 bottom-0 px-1 py-0.5 bg-black/80">
+                    <span className="text-[9px] font-bold text-white block truncate text-center font-prompt">
+                      {slide.tag}
+                    </span>
+                  </div>
+                </button>
+              );
+            })}
+          </div>
+        </div>
+
+        {/* Right Info Card */}
+        <div className="relative z-20 w-full lg:max-w-[490px] xl:max-w-xl animate-in fade-in slide-in-from-right-4 duration-300">
           {renderCardContent()}
         </div>
       </div>
 
-      {/* MOBILE & TABLET VIEW (< lg): Stack Layout - Photo on top 100% unobstructed, Card stacked cleanly below */}
+      {/* MOBILE & TABLET VIEW (< lg): Stack Layout with Carousel on Top + Thumbnails Directly Underneath (ตรงตามตัวอย่างภาพแนบ) */}
       <div className="lg:hidden flex flex-col bg-bg">
-        {/* Top: 100% unobstructed photo of the apartment */}
-        <div className="relative w-full aspect-[4/3] sm:aspect-[16/9] sm:max-h-[420px] overflow-hidden bg-surface">
-          <img
-            src="/1.jpg"
-            alt={settings.dormitoryName || 'ภัทร์ลดา อพาร์ทเมนท์'}
-            className="w-full h-full object-cover object-center"
-          />
+        {/* 1. Main Featured Photo Viewport (1448x1086 = 4:3) with Slide Transitions */}
+        <div
+          className="relative w-full aspect-[4/3] max-h-[560px] overflow-hidden bg-black select-none group"
+          onMouseEnter={() => setIsPaused(true)}
+          onMouseLeave={() => setIsPaused(false)}
+          onTouchStart={() => setIsPaused(true)}
+          onTouchEnd={() => setIsPaused(false)}
+        >
+          {/* Main Image with smooth crossfade */}
+          {HERO_SLIDES.map((slide, idx) => (
+            <img
+              key={slide.id}
+              src={slide.src}
+              alt={slide.title}
+              width={1448}
+              height={1086}
+              className={`absolute inset-0 w-full h-full object-cover object-center transition-all duration-700 ease-out ${
+                idx === activeSlide
+                  ? 'opacity-100 scale-100 z-10'
+                  : 'opacity-0 scale-105 z-0 pointer-events-none'
+              }`}
+            />
+          ))}
+
+          {/* Left Arrow Button */}
+          <button
+            onClick={(e) => {
+              e.stopPropagation();
+              setActiveSlide((prev) => (prev === 0 ? HERO_SLIDES.length - 1 : prev - 1));
+            }}
+            className="absolute left-2.5 top-1/2 -translate-y-1/2 z-20 p-2 rounded-full bg-black/60 hover:bg-black/85 text-white backdrop-blur-md border border-white/20 transition active:scale-95 cursor-pointer shadow-md"
+            aria-label="ภาพก่อนหน้า"
+          >
+            <ChevronLeft className="h-5 w-5" />
+          </button>
+
+          {/* Right Arrow Button */}
+          <button
+            onClick={(e) => {
+              e.stopPropagation();
+              setActiveSlide((prev) => (prev + 1) % HERO_SLIDES.length);
+            }}
+            className="absolute right-2.5 top-1/2 -translate-y-1/2 z-20 p-2 rounded-full bg-black/60 hover:bg-black/85 text-white backdrop-blur-md border border-white/20 transition active:scale-95 cursor-pointer shadow-md"
+            aria-label="ภาพถัดไป"
+          >
+            <ChevronRight className="h-5 w-5" />
+          </button>
+
+          {/* Top-Left Expand Badge */}
+          {onOpenGallery && (
+            <button
+              onClick={() => onOpenGallery(HERO_SLIDES[activeSlide].galleryIndex)}
+              className="absolute top-3 left-3 z-20 flex items-center gap-1 px-2.5 py-1 rounded-full bg-black/70 backdrop-blur-md border border-white/20 text-white text-[11px] font-semibold transition active:scale-95 cursor-pointer"
+              title="ดูภาพขยายเต็มจอ"
+            >
+              <span>🔍 ดูภาพขยาย</span>
+            </button>
+          )}
+
+          {/* Top-Right Badge: Active Slide Counter & Tag */}
+          <div className="absolute top-3 right-3 z-20 flex items-center gap-1.5 px-3 py-1 rounded-full bg-black/70 backdrop-blur-md border border-white/20 text-white text-[11px] font-semibold">
+            <span className="text-primary font-bold">{activeSlide + 1}</span>
+            <span>/</span>
+            <span>{HERO_SLIDES.length}</span>
+            <span className="mx-0.5">•</span>
+            <span className="truncate max-w-[120px] font-prompt">{HERO_SLIDES[activeSlide].tag}</span>
+          </div>
+
+          {/* Bottom Caption Overlay */}
+          <div className="absolute inset-x-0 bottom-0 z-20 p-3.5 bg-gradient-to-t from-black/85 via-black/40 to-transparent text-white">
+            <p className="text-xs font-bold drop-shadow-sm font-prompt line-clamp-1">
+              {HERO_SLIDES[activeSlide].title}
+            </p>
+            <p className="text-[11px] text-white/80 line-clamp-1">
+              {HERO_SLIDES[activeSlide].subtitle}
+            </p>
+          </div>
         </div>
 
-        {/* Bottom: Card placed cleanly below photo with no overlap */}
+        {/* 2. THUMBNAIL PREVIEWS DIRECTLY UNDERNEATH (ภาพตัวอย่างใต้ภาพ คล้ายตัวอย่าง Baiyoke Sky Hotel) */}
+        <div className="bg-surface border-y border-line py-2.5 px-3 sm:px-4">
+          <div className="flex items-center justify-between mb-1.5 px-1">
+            <span className="text-[11px] font-bold text-ink-secondary flex items-center gap-1.5">
+              <span>🖼️ ภาพตัวอย่างห้องพัก</span>
+              <span className="text-primary font-medium text-[10px]">(เลื่อนอัตโนมัติ / แตะเลือกดู)</span>
+            </span>
+            <div className="flex items-center gap-1">
+              {HERO_SLIDES.map((_, idx) => (
+                <button
+                  key={idx}
+                  onClick={() => setActiveSlide(idx)}
+                  className={`h-1.5 rounded-full transition-all cursor-pointer ${
+                    idx === activeSlide ? 'w-4 bg-primary' : 'w-1.5 bg-line hover:bg-ink-muted'
+                  }`}
+                  aria-label={`ไปยังภาพที่ ${idx + 1}`}
+                />
+              ))}
+            </div>
+          </div>
+
+          {/* Horizontal scrollable thumbnails strip */}
+          <div
+            ref={mobileThumbnailsRef}
+            className="flex items-center gap-2 overflow-x-auto scrollbar-none py-1 scroll-smooth"
+          >
+            {HERO_SLIDES.map((slide, idx) => {
+              const isActive = idx === activeSlide;
+              return (
+                <button
+                  key={slide.id}
+                  onClick={() => setActiveSlide(idx)}
+                  className={`relative flex-shrink-0 w-24 sm:w-28 rounded-xl overflow-hidden aspect-[4/3] border-2 transition-all cursor-pointer ${
+                    isActive
+                      ? 'border-primary ring-2 ring-primary/40 shadow-md scale-[1.03] opacity-100'
+                      : 'border-line/70 hover:border-primary/50 opacity-60 hover:opacity-90'
+                  }`}
+                >
+                  <img
+                    src={slide.src}
+                    alt={slide.tag}
+                    width={1448}
+                    height={1086}
+                    className="w-full h-full object-cover"
+                  />
+                  <div className="absolute inset-x-0 bottom-0 px-1 py-0.5 bg-black/75 backdrop-blur-[2px]">
+                    <span className="text-[9px] font-bold text-white block truncate text-center font-prompt">
+                      {slide.tag}
+                    </span>
+                  </div>
+                </button>
+              );
+            })}
+          </div>
+        </div>
+
+        {/* 3. Card placed cleanly below photo & thumbnails with no overlap */}
         <div className="px-4 sm:px-6 py-6 sm:py-8 max-w-xl mx-auto w-full">
           {renderCardContent()}
         </div>

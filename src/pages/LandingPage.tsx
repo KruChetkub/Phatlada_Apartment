@@ -6,14 +6,22 @@ import { LandingFacilities } from '../components/landing/LandingFacilities';
 import { LandingContact } from '../components/landing/LandingContact';
 import { LandingFooter } from '../components/landing/LandingFooter';
 import { BookingInquiryModal } from '../components/landing/BookingInquiryModal';
+import { RoomGalleryModal } from '../components/landing/RoomGalleryModal';
 
 export const LandingPage: React.FC = () => {
   const [isBookingOpen, setIsBookingOpen] = useState(false);
   const [selectedRoomType, setSelectedRoomType] = useState('');
+  const [isGalleryOpen, setIsGalleryOpen] = useState(false);
+  const [galleryInitialIndex, setGalleryInitialIndex] = useState(0);
 
   const handleOpenBooking = (roomType = '') => {
     setSelectedRoomType(roomType);
     setIsBookingOpen(true);
+  };
+
+  const handleOpenGallery = (index = 0) => {
+    setGalleryInitialIndex(index);
+    setIsGalleryOpen(true);
   };
 
   return (
@@ -23,8 +31,14 @@ export const LandingPage: React.FC = () => {
 
       {/* Main Sections */}
       <main className="flex-1">
-        <LandingHero onOpenBooking={() => handleOpenBooking()} />
-        <LandingRooms onSelectRoom={(type) => handleOpenBooking(type)} />
+        <LandingHero
+          onOpenBooking={() => handleOpenBooking()}
+          onOpenGallery={handleOpenGallery}
+        />
+        <LandingRooms
+          onSelectRoom={(type) => handleOpenBooking(type)}
+          onOpenGallery={handleOpenGallery}
+        />
         <LandingFacilities />
         <LandingContact onOpenBooking={() => handleOpenBooking()} />
       </main>
@@ -37,6 +51,14 @@ export const LandingPage: React.FC = () => {
         isOpen={isBookingOpen}
         onClose={() => setIsBookingOpen(false)}
         defaultRoomType={selectedRoomType}
+      />
+
+      {/* Room Photo Gallery Lightbox Modal */}
+      <RoomGalleryModal
+        isOpen={isGalleryOpen}
+        onClose={() => setIsGalleryOpen(false)}
+        initialIndex={galleryInitialIndex}
+        onOpenBooking={(style) => handleOpenBooking(style || selectedRoomType)}
       />
     </div>
   );

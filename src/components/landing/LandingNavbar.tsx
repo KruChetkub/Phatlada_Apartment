@@ -140,23 +140,8 @@ export const LandingNavbar: React.FC<LandingNavbarProps> = ({ onOpenBooking }) =
           </button>
         </div>
 
-        {/* Mobile Actions: Language + Theme Toggle + Booking CTA + Hamburger */}
+        {/* Mobile Actions: Theme Toggle + Booking CTA + Hamburger */}
         <div className="flex md:hidden items-center space-x-1.5">
-          {/* Mobile Language Button (Quick Cycle) */}
-          <button
-            onClick={() => {
-              const currentIndex = availableLanguages.findIndex((l) => l.code === language);
-              const nextIndex = (currentIndex + 1) % availableLanguages.length;
-              setLanguage(availableLanguages[nextIndex].code);
-            }}
-            className="px-2 py-1.5 text-xs font-bold text-ink bg-bg border border-line rounded-lg flex items-center space-x-1 transition active:scale-95"
-            aria-label={t.nav.language}
-            title={currentLangOption.nativeName}
-          >
-            <span className="text-sm">{currentLangOption.flag}</span>
-            <span className="text-[11px] uppercase">{currentLangOption.code}</span>
-          </button>
-
           {/* Theme Toggle Button for Mobile Header */}
           <button
             onClick={toggleTheme}
